@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AssemblyName>DrifterApps.Seeds.FluentResult</AssemblyName>
+        <RootNamespace>DrifterApps.Seeds.FluentResult</RootNamespace>
+        <Product>DrifterApps.Seeds.FluentResult</Product>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Update="Result.Static.cs">
+        <DependentUpon>Result.cs</DependentUpon>
+      </Compile>
+      <Compile Update="ResultExtensions.Async.cs">
+        <DependentUpon>ResultExtensions.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+</Project>

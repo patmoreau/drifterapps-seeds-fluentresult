@@ -1,0 +1,58 @@
+name: linter
+
+on:
+  push:
+    branches: [main]
+
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: linter-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  check_changes:
+    uses: patmoreau/workflow-config/.github/workflows/check-changes-action.yml@main
+    with:
+      file_patterns: ${{ vars.LINTER_CODE_FILE_PATTERNS }}
+
+  csharp:
+    runs-on: ubuntu-latest
+    needs: check_changes
+    if: ${{ needs.check_changes.outputs.code_was_changed == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: ./global.json
+
+      - name: Lint C# files with dotnet format
+        id: lint
+        run: dotnet format --severity error --verbosity diagnostic --report ./linter-report || true
+
+      - name: Save report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-format-report
+          path: ./linter-report/*
+
+      - name: Check for errors
+        if: ${{ steps.lint.outcome != 'success' }}
+        run: echo "::error::dotnet format found issues in the code. Please fix them."
+
+  create_check:
+    needs: [check_changes, csharp]
+    uses: patmoreau/workflow-config/.github/workflows/create-check.yml@main
+    if: always() && needs.check_changes.result == 'success'
+    with:
+      code_was_changed: ${{ needs.check_changes.outputs.code_was_changed }}
+      check_name: 'linter-completed'
+      check_result: ${{ needs.csharp.result }}

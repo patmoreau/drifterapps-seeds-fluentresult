@@ -1,0 +1,70 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+        <AnalysisMode>All</AnalysisMode>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+        <EnablePackageManagement>true</EnablePackageManagement>
+    </PropertyGroup>
+
+    <!-- Add the icon file and READNME.md to the NuGet package -->
+    <ItemGroup>
+        <None Include="../../README.md" Pack="true" PackagePath="\"/>
+        <None Include="../../icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+
+    <!-- Enable a readme for all projects and configurations -->
+    <PropertyGroup>
+        <!-- Set the readme file for the project -->
+        <ReadmeFile>$(MSBuildSolutionDirectory)/README.md</ReadmeFile>
+    </PropertyGroup>
+
+    <!-- Enable XML documentation for all projects and configurations -->
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+    </PropertyGroup>
+
+    <!-- Set the NuGet repository URL for all projects -->
+    <PropertyGroup>
+        <Product>DrifterApps.Seeds</Product>
+        <Authors>Patrick Moreau</Authors>
+        <Copyright>Drifter Apps Inc.</Copyright>
+        <PackageProjectUrl>https://github.com/patmoreau/drifterapps-seeds-result</PackageProjectUrl>
+        <PackageLicense>https://github.com/patmoreau/drifterapps-seeds-result/blob/main/LICENSE</PackageLicense>
+        <PackageIcon>icon.png</PackageIcon>
+        <RepositoryUrl>https://github.com/patmoreau/drifterapps-seeds-result</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <!-- Allow dotnet pack to create NuGet packages -->
+    <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <IncludeSymbols>true</IncludeSymbols>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="SonarAnalyzer.CSharp">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.CLSCompliantAttribute">
+            <_Parameter1>false</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="$(AssemblyName).Tests"/>
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2"/>
+    </ItemGroup>
+</Project>
