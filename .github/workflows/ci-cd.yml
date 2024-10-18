@@ -54,7 +54,7 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.0.0
         with:
-          versionSpec: "5.x"
+          versionSpec: '5.x'
 
       - name: Determine Version
         id: gitversion
@@ -110,7 +110,7 @@ jobs:
         if: always()
         with:
           name: .Net Tests
-          path: ./tests-results/**/*.trx
+          path: ./tests-results/*.trx
           reporter: dotnet-trx
 
       - name: Set badge color
@@ -129,7 +129,7 @@ jobs:
         uses: emibcn/badge-action@v2.0.3
         with:
           label: Tests
-          status: "${{ steps.test-results.outputs.passed }} passed, ${{ steps.test-results.outputs.failed }} failed, ${{ steps.test-results.outputs.skipped }} skipped: ${{ steps.test-results.outputs.conclusion }}"
+          status: '${{ steps.test-results.outputs.passed }} passed, ${{ steps.test-results.outputs.failed }} failed, ${{ steps.test-results.outputs.skipped }} skipped: ${{ steps.test-results.outputs.conclusion }}'
           color: ${{ env.BADGE_COLOR }}
           path: seeds-tests-badge.svg
 
@@ -198,5 +198,5 @@ jobs:
     if: always() && needs.check_changes.result == 'success'
     with:
       code_was_changed: ${{ needs.check_changes.outputs.code_was_changed }}
-      check_name: "build-completed"
+      check_name: 'build-completed'
       check_result: ${{ needs.build.result }}
