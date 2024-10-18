@@ -4,6 +4,10 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AssemblyName>DrifterApps.Seeds.FluentResult.FluentAssertions</AssemblyName>
+        <RootNamespace>DrifterApps.Seeds.FluentResult.FluentAssertions</RootNamespace>
+        <PackageId>DrifterApps.Seeds.FluentResult.FluentAssertions</PackageId>
+        <Product>DrifterApps.Seeds.FluentResult.FluentAssertions</Product>
     </PropertyGroup>
 
     <ItemGroup>
