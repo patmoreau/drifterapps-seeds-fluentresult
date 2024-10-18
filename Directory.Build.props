@@ -37,10 +37,10 @@
         <Product>DrifterApps.Seeds</Product>
         <Authors>Patrick Moreau</Authors>
         <Copyright>Drifter Apps Inc.</Copyright>
-        <PackageProjectUrl>https://github.com/patmoreau/drifterapps-seeds-result</PackageProjectUrl>
-        <PackageLicense>https://github.com/patmoreau/drifterapps-seeds-result/blob/main/LICENSE</PackageLicense>
+        <PackageProjectUrl>https://github.com/patmoreau/drifterapps-seeds-fluentresult</PackageProjectUrl>
+        <PackageLicense>https://github.com/patmoreau/drifterapps-seeds-fluentresult/blob/main/LICENSE</PackageLicense>
         <PackageIcon>icon.png</PackageIcon>
-        <RepositoryUrl>https://github.com/patmoreau/drifterapps-seeds-result</RepositoryUrl>
+        <RepositoryUrl>https://github.com/patmoreau/drifterapps-seeds-fluentresult</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
