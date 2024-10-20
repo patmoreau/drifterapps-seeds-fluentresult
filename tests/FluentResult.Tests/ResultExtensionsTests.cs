@@ -1,4 +1,5 @@
 using System.Globalization;
+// ReSharper disable RedundantArgumentDefaultValue
 
 namespace FluentResult.Tests;
 
@@ -166,6 +167,20 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
+    public void GivenEnsure_WhenResultIgnoreOnFailure_ThenReturn()
+    {
+        // Arrange
+        var aggregate = ResultAggregate.Create();
+        aggregate.AddResult(Result<Nothing>.Failure(_testFirstError));
+
+        // Act
+        var result = aggregate.Ensure(SuccessfulValidation(), EnsureOnFailure.IgnoreOnFailure);
+
+        //Assert
+        result.Results.Should().ContainSingle();
+    }
+
+    [Fact]
     public void GivenEnsure_WhenValidateOnFailure_ThenPerformValidation()
     {
         // Arrange
@@ -174,6 +189,21 @@ public partial class ResultExtensionsTests
 
         // Act
         var result = aggregate.Ensure(() => true, _testSecondError, EnsureOnFailure.ValidateOnFailure);
+
+        //Assert
+        result.Results.Where(x => x.IsFailure).Should().ContainSingle();
+        result.Results.Where(x => x.IsSuccess).Should().ContainSingle();
+    }
+
+    [Fact]
+    public void GivenEnsure_WhenResultValidateOnFailure_ThenPerformValidation()
+    {
+        // Arrange
+        var aggregate = ResultAggregate.Create();
+        aggregate.AddResult(Result<Nothing>.Failure(_testFirstError));
+
+        // Act
+        var result = aggregate.Ensure(SuccessfulValidation(), EnsureOnFailure.ValidateOnFailure);
 
         //Assert
         result.Results.Where(x => x.IsFailure).Should().ContainSingle();
@@ -195,4 +225,25 @@ public partial class ResultExtensionsTests
         result.Results.Where(x => x.IsFailure).Should().ContainSingle();
         result.Results.Where(x => x.IsSuccess).Should().ContainSingle();
     }
+
+    [Fact]
+    public void GivenEnsure_WhenSResultuccessAndFailure_ThenPerformBothValidations()
+    {
+        // Arrange
+        var aggregate = ResultAggregate.Create();
+
+        // Act
+        var result = aggregate
+            .Ensure(SuccessfulValidation())
+            .Ensure(FailedValidation(_testSecondError));
+
+        //Assert
+        result.Results.Where(x => x.IsFailure).Should().ContainSingle();
+        result.Results.Where(x => x.IsSuccess).Should().ContainSingle();
+    }
+
+    private static Func<Result<Nothing>> SuccessfulValidation() => Result<Nothing>.Success;
+
+    private static Func<Result<Nothing>> FailedValidation(ResultError resultError) =>
+        () => Result<Nothing>.Failure(resultError);
 }

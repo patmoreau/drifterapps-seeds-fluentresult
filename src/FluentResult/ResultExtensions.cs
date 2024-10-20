@@ -85,26 +85,35 @@ public static partial class ResultExtensions
     /// it adds a failure result to the source.
     /// </summary>
     /// <param name="source">The initial result aggregate.</param>
-    /// <param name="validation">The validation function to execute.</param>
+    /// <param name="validation">The validation function to execute returning a <see cref="System.Boolean"/></param>
     /// <param name="error">The error to add if the validation fails.</param>
     /// <param name="options">Indicates whether to run validation on failure.</param>
     /// <returns>The updated result aggregate.</returns>
     public static ResultAggregate Ensure(this ResultAggregate source, Func<bool> validation,
         ResultError error, EnsureOnFailure options = EnsureOnFailure.ValidateOnFailure)
     {
+        return source.Ensure(Func, options);
+
+        Result<Nothing> Func() => !validation() ? Result<Nothing>.Failure(error) : Result<Nothing>.Success();
+    }
+
+    /// <summary>
+    /// Ensures that the specified validation function returns true. If the validation fails,
+    /// it adds a failure result to the source.
+    /// </summary>
+    /// <param name="source">The initial result aggregate.</param>
+    /// <param name="validation">The validation function to execute returning a <see cref="Result{Nothing}"/>.</param>
+    /// <param name="options">Indicates whether to run validation on failure.</param>
+    /// <returns>The updated result aggregate.</returns>
+    public static ResultAggregate Ensure(this ResultAggregate source, Func<Result<Nothing>> validation,
+        EnsureOnFailure options = EnsureOnFailure.ValidateOnFailure)
+    {
         if (source.IsFailure && options == EnsureOnFailure.IgnoreOnFailure)
         {
             return source;
         }
 
-        if (!validation())
-        {
-            source.AddResult(Result<Nothing>.Failure(error));
-        }
-        else
-        {
-            source.AddResult(Result<Nothing>.Success());
-        }
+        source.AddResult(validation());
 
         return source;
     }
