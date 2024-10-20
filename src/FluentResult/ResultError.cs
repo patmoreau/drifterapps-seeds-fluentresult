@@ -21,7 +21,7 @@ public record ResultError
     /// <param name="code">The error code.</param>
     /// <param name="description">The error description.</param>
     /// <example>
-    ///     How to implement your domain errors:
+    ///     How to implement your errors in a domain:
     ///     <code>
     ///     public static class DomainErrors
     ///     {
@@ -56,9 +56,14 @@ public record ResultError
     /// <summary>The error description.</summary>
     public string Description { get; }
 
-    public void Deconstruct(out string Code, out string Description)
+    /// <summary>
+    /// Deconstructs the <see cref="ResultError"/> into its code and description.
+    /// </summary>
+    /// <param name="code">The error code.</param>
+    /// <param name="description">The error description.</param>
+    public void Deconstruct(out string code, out string description)
     {
-        Code = this.Code;
-        Description = this.Description;
+        code = Code;
+        description = Description;
     }
 }
