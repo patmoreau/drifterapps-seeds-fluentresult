@@ -162,24 +162,20 @@ public class ResultAggregateTests
     }
 
     [Fact]
-    public void ToFailure_WithNoFailureResults_ReturnsEmptyValidationError()
+    public void GivenSwitch_WhenNoFailureResults_ThenReturnsSuccess()
     {
         // Arrange
         var resultAggregate = ResultAggregate.Create();
 
         // Act
-        var result = resultAggregate.ToFailure<Nothing>();
+        var result = resultAggregate.Switch(Result<Nothing>.Success, Result<Nothing>.Failure);
 
         // Assert
-        result.Should()
-            .BeFailure()
-            .And.Subject
-            .Error.Should().BeOfType<ResultErrorAggregate>()
-            .Which.Errors.Should().BeEmpty();
+        result.Should().BeSuccessful();
     }
 
     [Fact]
-    public void ToFailure_WithSingleFailureResult_ReturnsValidationError()
+    public void GivenSwitch_WhenSingleFailureResult_ThenReturnsValidationError()
     {
         // Arrange
         var error = Faker.Random.Word();
@@ -188,7 +184,7 @@ public class ResultAggregateTests
         resultAggregate.AddResult(Result<Nothing>.Failure(new ResultError(error, description)));
 
         // Act
-        var result = resultAggregate.ToFailure<Nothing>();
+        var result = resultAggregate.Switch(Result<Nothing>.Success, Result<Nothing>.Failure);
 
         // Assert
         result.Should()
@@ -201,7 +197,7 @@ public class ResultAggregateTests
     }
 
     [Fact]
-    public void ToFailure_WithMultipleFailureResults_ReturnsValidationError()
+    public void GivenSwitch_WhenMultipleFailureResults_ThenReturnsValidationError()
     {
         // Arrange
         var error1 = Faker.Random.Word();
@@ -213,7 +209,7 @@ public class ResultAggregateTests
         resultAggregate.AddResult(Result<Nothing>.Failure(new ResultError(error2, description2)));
 
         // Act
-        var result = resultAggregate.ToFailure<Nothing>();
+        var result = resultAggregate.Switch(Result<Nothing>.Success, Result<Nothing>.Failure);
 
         // Assert
         result.Should()
@@ -233,7 +229,7 @@ public class ResultAggregateTests
     }
 
     [Fact]
-    public void ToFailure_WithDuplicateFailureResults_ReturnsValidationErrorWithAggregatedDescriptions()
+    public void GivenSwitch_WhenDuplicateFailureResults_ThenReturnsValidationErrorWithAggregatedDescriptions()
     {
         // Arrange
         var error = Faker.Random.Word();
@@ -244,7 +240,7 @@ public class ResultAggregateTests
         resultAggregate.AddResult(Result<Nothing>.Failure(new ResultError(error, description2)));
 
         // Act
-        var result = resultAggregate.ToFailure<Nothing>();
+        var result = resultAggregate.Switch(Result<Nothing>.Success, Result<Nothing>.Failure);
 
         // Assert
         result.Should()

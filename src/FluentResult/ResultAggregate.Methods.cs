@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace DrifterApps.Seeds.FluentResult;
 
+[SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
 public partial record ResultAggregate
 {
     /// <summary>
@@ -41,21 +44,26 @@ public partial record ResultAggregate
     }
 
     /// <summary>
-    /// Converts the <see cref="ResultAggregate"/> to a <see cref="Result{TSource}"/>.
+    ///     Matches the result to the appropriate function based on success or failure and returns a result of type
+    ///     <typeparamref name="TOut" />.
     /// </summary>
-    /// <typeparam name="TSource">The type of the result source.</typeparam>
-    /// <returns>A <see cref="ResultErrorAggregate"/> containing aggregated errors.</returns>
-    public Result<TSource> ToFailure<TSource>() =>
-        Result<TSource>.Failure(
-            new ResultErrorAggregate(
-                $"{typeof(TSource).Name}.ValidationErrors",
-                "Validation errors occurred",
-                Results
-                    .Where(r => r.IsFailure)
-                    .Select(r => r.Error)
-                    .GroupBy(error => error.Code)
-                    .ToDictionary(
-                        entry => entry.Key,
-                        entry => entry.Select(x => x.Description).ToArray()
-                    )));
+    /// <typeparam name="TOut">The type of the result.</typeparam>
+    /// <param name="onSuccess">The function to execute if the result is successful.</param>
+    /// <param name="onFailure">The function to execute if the result is a failure.</param>
+    /// <returns>The result of the appropriate function.</returns>
+    public Result<TOut> Switch<TOut>(Func<Result<TOut>> onSuccess,
+        Func<ResultErrorAggregate, Result<TOut>> onFailure) =>
+        IsSuccess ? onSuccess() : onFailure(ToErrorAggregate<TOut>());
+
+    private ResultErrorAggregate ToErrorAggregate<TOut>() =>
+        new($"{typeof(TOut).Name}.Errors",
+            "Errors occurred",
+            Results
+                .Where(r => r.IsFailure)
+                .Select(r => r.Error)
+                .GroupBy(error => error.Code)
+                .ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Select(x => x.Description).ToArray()
+                ));
 }
