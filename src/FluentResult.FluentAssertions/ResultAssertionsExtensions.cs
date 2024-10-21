@@ -80,14 +80,14 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
     ///     <see cref="ResultAssertions{TValue}" />
     /// </returns>
     [CustomAssertion]
-    public ResultAssertions<TValue> BeSuccessful(string because = "",
+    public AndConstraint<ResultAssertions<TValue>> BeSuccessful(string because = "",
         params object[] becauseArgs)
     {
         var assertion = Execute.Assertion.BecauseOf(because, becauseArgs).UsingLineBreaks;
 
         assertion.IsSuccessfulAssertion(Subject);
 
-        return this;
+        return new AndConstraint<ResultAssertions<TValue>>(this);
     }
 
     /// <summary>
@@ -99,13 +99,13 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
     ///     <see cref="ResultAssertions{TValue}" />
     /// </returns>
     [CustomAssertion]
-    public ResultAssertions<TValue> BeFailure(string because = "", params object[] becauseArgs)
+    public AndConstraint<ResultAssertions<TValue>> BeFailure(string because = "", params object[] becauseArgs)
     {
         var assertion = Execute.Assertion.BecauseOf(because, becauseArgs).UsingLineBreaks;
 
         assertion.IsFailureAssertion(Subject);
 
-        return this;
+        return new AndConstraint<ResultAssertions<TValue>>(this);
     }
 
     /// <summary>
@@ -118,7 +118,7 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
     ///     <see cref="ResultAssertions{TValue}" />
     /// </returns>
     [CustomAssertion]
-    public ResultAssertions<TValue> WithValue(TValue expectedValue,
+    public AndConstraint<ResultAssertions<TValue>> WithValue(TValue expectedValue,
         string because = "", params object[] becauseArgs)
     {
         var assertion = Execute.Assertion.BecauseOf(because, becauseArgs).UsingLineBreaks;
@@ -130,7 +130,7 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
             .FailWith("Expected {context:result} to have value {0}{reason}, but found {1}.", expectedValue,
                 Subject.Value);
 
-        return this;
+        return new AndConstraint<ResultAssertions<TValue>>(this);
     }
 
     /// <summary>
@@ -143,13 +143,13 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
     ///     <see cref="ResultAssertions{TValue}" />
     /// </returns>
     [CustomAssertion]
-    public ResultAssertions<TValue> WithError(ResultError resultError, string because = "",
+    public AndConstraint<ResultAssertions<TValue>> WithError(ResultError resultError, string because = "",
         params object[] becauseArgs)
     {
         var assertion = Execute.Assertion.BecauseOf(because, becauseArgs).UsingLineBreaks;
 
         assertion.WithErrorAssertion(Subject, resultError);
 
-        return this;
+        return new AndConstraint<ResultAssertions<TValue>>(this);
     }
 }
