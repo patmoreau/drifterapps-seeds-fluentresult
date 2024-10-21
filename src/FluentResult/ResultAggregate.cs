@@ -1,11 +1,9 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace DrifterApps.Seeds.FluentResult;
 
 /// <summary>
 /// Represents an aggregate of <see cref="Result{Nothing}"/> results.
 /// </summary>
-public record ResultAggregate
+public partial record ResultAggregate
 {
     private readonly List<Result<Nothing>> _results;
 

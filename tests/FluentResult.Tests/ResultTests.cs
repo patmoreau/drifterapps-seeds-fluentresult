@@ -6,6 +6,8 @@ namespace FluentResult.Tests;
 public class ResultTests
 {
     private readonly Faker _faker = new();
+    private readonly ResultError _testFirstError = new("TestFirstError", "Test Error");
+    private readonly ResultError _testSecondError = new("TestSecondError", "Test Error");
 
     [Fact]
     public void GivenSuccess_WhenCreated_ThenIsSuccessIsTrue()
@@ -157,6 +159,100 @@ public class ResultTests
 
         // Assert
         result.Should().BeFailure().And.WithError(error);
+    }
+
+    [Fact]
+    public void GivenOnSuccessOfTInTOut_WhenResultIsSuccess_ThenExecuteNext()
+    {
+        // Arrange
+        var expectedValue = _faker.Random.Int();
+        var resultIn = Result<string>.Success(_faker.Random.Word());
+
+        // Act
+        var result = resultIn.OnSuccess(_ => Result<int>.Success(expectedValue));
+
+        // Assert
+        result.Should().BeOfType<Result<int>>();
+        result.Should().BeSuccessful().And.WithValue(expectedValue);
+    }
+
+    [Fact]
+    public void GivenOnSuccessOfTInTOut_WhenResultIsFailure_ThenReturnFailure()
+    {
+        // Arrange
+        var expectedValue = _faker.Random.Int();
+        var resultIn = Result<string>.Failure(_testFirstError);
+
+        // Act
+        var result = resultIn.OnSuccess(_ => Result<int>.Success(expectedValue));
+
+        // Assert
+        result.Should().BeOfType<Result<int>>();
+        result.Should().BeFailure().And.WithError(_testFirstError);
+    }
+
+    [Fact]
+    public void GivenOnFailureOfTIn_WhenResultIsSuccess_ThenReturnSuccess()
+    {
+        // Arrange
+        var expectedValue = _faker.Random.Word();
+        var resultIn = Result<string>.Success(expectedValue);
+
+        // Act
+        var result = resultIn.OnFailure(_ => Result<string>.Failure(_testSecondError));
+
+        // Assert
+        result.Should().BeOfType<Result<string>>();
+        result.Should().BeSuccessful();
+    }
+
+    [Fact]
+    public void GivenOnFailureOfTIn_WhenResultIsFailure_ThenExecuteNext()
+    {
+        // Arrange
+        var resultIn = Result<string>.Failure(_testFirstError);
+        var expectedError = ResultError.None;
+
+        // Act
+        var result = resultIn.OnFailure(error =>
+        {
+            expectedError = error;
+            return Result<string>.Failure(_testSecondError);
+        });
+
+        // Assert
+        result.Should().BeOfType<Result<string>>();
+        result.Should().BeFailure().And.WithError(_testSecondError);
+        expectedError.Should().Be(_testFirstError);
+    }
+
+    [Fact]
+    public void GivenSwitchOfTInTOut_WhenResultIsSuccess_ThenExecuteSuccessNext()
+    {
+        // Arrange
+        var expectedValue = _faker.Random.Word();
+        var resultIn = Result<string>.Success(expectedValue);
+
+        // Act
+        var result = resultIn.Switch(_ => Result<int>.Success(_faker.Random.Int()), Result<int>.Failure);
+
+        // Assert
+        result.Should().BeOfType<Result<int>>();
+        result.Should().BeSuccessful();
+    }
+
+    [Fact]
+    public void GivenSwitchOfTInTOut_WhenResultIsFailure_ThenExecuteFailureNext()
+    {
+        // Arrange
+        var resultIn = Result<string>.Failure(_testFirstError);
+
+        // Act
+        var result = resultIn.Switch(_ => Result<int>.Success(_faker.Random.Int()), Result<int>.Failure);
+
+        // Assert
+        result.Should().BeOfType<Result<int>>();
+        result.Should().BeFailure().And.WithError(_testFirstError);
     }
 
     private ResultError CreateError() => new(_faker.Random.Hash(), _faker.Lorem.Sentence());

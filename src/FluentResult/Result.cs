@@ -6,6 +6,7 @@ namespace DrifterApps.Seeds.FluentResult;
 ///     Represents the result of an operation with a value.
 /// </summary>
 /// <typeparam name="T">The type of the value.</typeparam>
+[SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
 public sealed partial record Result<T>
 {
     private readonly T? _value;

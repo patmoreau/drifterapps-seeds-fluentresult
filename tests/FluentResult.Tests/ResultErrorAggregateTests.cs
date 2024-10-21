@@ -12,7 +12,7 @@ namespace FluentResult.Tests;
 [SuppressMessage("Usage", "xUnit1045:Avoid using TheoryData type arguments that might not be serializable")]
 [SuppressMessage("Design", "CA1034:Nested types should not be visible")]
 #pragma warning disable CS1718 // Comparison made to same variable
-public class ResultValidationErrorTests
+public class ResultErrorAggregateTests
 {
     private static readonly Faker Faker = new();
 
@@ -25,7 +25,7 @@ public class ResultValidationErrorTests
         var property = Faker.Random.Hash();
         var message = Faker.Lorem.Sentence();
         var error1 =
-            new ResultValidationError(code, description, new Dictionary<string, string[]> {{property, [message]}});
+            new ResultErrorAggregate(code, description, new Dictionary<string, string[]> {{property, [message]}});
 
         // Act
         var result = error1.Equals(error1);
@@ -43,7 +43,7 @@ public class ResultValidationErrorTests
         var property = Faker.Random.Hash();
         var message = Faker.Lorem.Sentence();
         var error1 =
-            new ResultValidationError(code, description, new Dictionary<string, string[]> {{property, [message]}});
+            new ResultErrorAggregate(code, description, new Dictionary<string, string[]> {{property, [message]}});
 
         // Act
         var result = error1 == null;
@@ -61,9 +61,9 @@ public class ResultValidationErrorTests
     {
         // Arrange
         var errorSelf =
-            new ResultValidationError(codeSelf, descriptionSelf, validationErrorsSelf);
+            new ResultErrorAggregate(codeSelf, descriptionSelf, validationErrorsSelf);
         var errorOther =
-            new ResultValidationError(codeOther, descriptionOther, validationErrorsOther);
+            new ResultErrorAggregate(codeOther, descriptionOther, validationErrorsOther);
 
         // Act
         var resultEquals = errorSelf.Equals(errorOther);
