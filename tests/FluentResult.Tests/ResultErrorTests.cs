@@ -75,4 +75,20 @@ public class ResultErrorTests
         codeValue.Should().Be(code);
         descriptionValue.Should().Be(description);
     }
+
+    [Fact]
+    public void GivenResultAssertions_WhenSame_ThenDontAssert()
+    {
+        // Arrange
+        var code = _faker.Random.String();
+        var description = _faker.Random.String();
+        var error1 = new ResultError(code, description);
+        var error2 = new ResultError(code, description);
+
+        // Act
+        var result = Result<Nothing>.Failure(error1);
+
+        // Assert
+        result.Should().BeFailure().And.WithError(error2);
+    }
 }

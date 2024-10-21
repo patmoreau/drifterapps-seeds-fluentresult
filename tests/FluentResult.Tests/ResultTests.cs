@@ -116,7 +116,7 @@ public class ResultTests
         Result<string> result = value;
 
         // Assert
-        result.Should().BeSuccessful().WithValue(value);
+        result.Should().BeSuccessful().And.WithValue(value);
     }
 
     [Fact]
@@ -129,7 +129,7 @@ public class ResultTests
         Result<Nothing> result = error;
 
         // Assert
-        result.Should().BeFailure().WithError(error);
+        result.Should().BeFailure().And.WithError(error);
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public class ResultTests
         var result = expected.ToResult();
 
         // Assert
-        result.Should().BeSuccessful().WithValue(Nothing.Value);
+        result.Should().BeSuccessful().And.WithValue(Nothing.Value);
     }
 
     [Fact]
@@ -156,7 +156,7 @@ public class ResultTests
         var result = expected.ToResult();
 
         // Assert
-        result.Should().BeFailure().WithError(error);
+        result.Should().BeFailure().And.WithError(error);
     }
 
     private ResultError CreateError() => new(_faker.Random.Hash(), _faker.Lorem.Sentence());

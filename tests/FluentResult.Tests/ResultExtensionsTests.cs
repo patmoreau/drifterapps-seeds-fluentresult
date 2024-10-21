@@ -22,7 +22,7 @@ public partial class ResultExtensionsTests
 
         // Assert
         result.Should().BeOfType<Result<int>>();
-        result.Should().BeSuccessful().WithValue(expectedValue);
+        result.Should().BeSuccessful().And.WithValue(expectedValue);
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public partial class ResultExtensionsTests
 
         // Assert
         result.Should().BeOfType<Result<int>>();
-        result.Should().BeFailure().WithError(_testFirstError);
+        result.Should().BeFailure().And.WithError(_testFirstError);
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public partial class ResultExtensionsTests
 
         // Assert
         result.Should().BeOfType<Result<string>>();
-        result.Should().BeFailure().WithError(_testSecondError);
+        result.Should().BeFailure().And.WithError(_testSecondError);
         expectedError.Should().Be(_testFirstError);
     }
 
@@ -101,7 +101,7 @@ public partial class ResultExtensionsTests
 
         // Assert
         result.Should().BeOfType<Result<int>>();
-        result.Should().BeFailure().WithError(_testFirstError);
+        result.Should().BeFailure().And.WithError(_testFirstError);
     }
 
     [Fact]
@@ -122,11 +122,11 @@ public partial class ResultExtensionsTests
 
         // Assert
         methodResult.Should().BeOfType<Result<string>>()
-            .And.BeSuccessful().WithValue(expectedString);
+            .And.BeSuccessful().And.WithValue(expectedString);
         methodManyResult.Should().BeOfType<Result<string>>()
-            .And.BeSuccessful().WithValue(expectedString);
+            .And.BeSuccessful().And.WithValue(expectedString);
         queryResult.Should().BeOfType<Result<string>>()
-            .And.BeSuccessful().WithValue(expectedString);
+            .And.BeSuccessful().And.WithValue(expectedString);
     }
 
     [Fact]
@@ -145,11 +145,11 @@ public partial class ResultExtensionsTests
 
         // Assert
         methodResult.Should().BeOfType<Result<string>>()
-            .And.BeFailure().WithError(_testFirstError);
+            .And.BeFailure().And.WithError(_testFirstError);
         methodManyResult.Should().BeOfType<Result<string>>()
-            .And.BeFailure().WithError(_testFirstError);
+            .And.BeFailure().And.WithError(_testFirstError);
         queryResult.Should().BeOfType<Result<string>>()
-            .And.BeFailure().WithError(_testFirstError);
+            .And.BeFailure().And.WithError(_testFirstError);
     }
 
     [Fact]
