@@ -13,6 +13,17 @@
       "excludePackagePatterns": ["^Microsoft.", "^System."],
       "groupName": "3rd parties .NET packages updates",
       "groupSlug": "other-dotnet-updates"
+    },
+    {
+      "matchManagers": ["nuget"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true,
+      "groupName": "Nuget major updates",
+      "groupSlug": "nuger-major-updates"
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
     }
   ]
 }
