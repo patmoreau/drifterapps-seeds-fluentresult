@@ -11,6 +11,14 @@ namespace DrifterApps.Seeds.FluentResult;
 public static partial class ResultExtensions
 {
     /// <summary>
+    /// Converts the source object to a <see cref="Result{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the source object.</typeparam>
+    /// <param name="source">The source object to convert.</param>
+    /// <returns>A successful result containing the source object.</returns>
+    public static Result<T> ToResult<T>(this T source) => Result<T>.Success(source);
+
+    /// <summary>
     /// Projects each element of a sequence into a new form.
     /// </summary>
     /// <typeparam name="TFrom">The type of the input value.</typeparam>

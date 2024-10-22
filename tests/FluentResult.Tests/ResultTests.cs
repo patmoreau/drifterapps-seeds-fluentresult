@@ -1,5 +1,3 @@
-using ArgumentException = System.ArgumentException;
-
 namespace FluentResult.Tests;
 
 [UnitTest]
@@ -162,7 +160,7 @@ public class ResultTests
     }
 
     [Fact]
-    public void GivenOnSuccessOfTInTOut_WhenResultIsSuccess_ThenExecuteNext()
+    public void GivenOnSuccessOfTOut_WhenResultIsSuccess_ThenExecuteNext()
     {
         // Arrange
         var expectedValue = _faker.Random.Int();
@@ -177,7 +175,7 @@ public class ResultTests
     }
 
     [Fact]
-    public void GivenOnSuccessOfTInTOut_WhenResultIsFailure_ThenReturnFailure()
+    public void GivenOnSuccessOfTOut_WhenResultIsFailure_ThenReturnFailure()
     {
         // Arrange
         var expectedValue = _faker.Random.Int();
@@ -192,7 +190,37 @@ public class ResultTests
     }
 
     [Fact]
-    public void GivenOnFailureOfTIn_WhenResultIsSuccess_ThenReturnSuccess()
+    public async Task GivenOnSuccessOfTOutAsync_WhenResultIsSuccess_ThenExecuteNext()
+    {
+        // Arrange
+        var expectedValue = _faker.Random.Int();
+        var resultIn = Result<string>.Success(_faker.Random.Word());
+
+        // Act
+        var result = await resultIn.OnSuccess(_ => Task.FromResult(Result<int>.Success(expectedValue)));
+
+        // Assert
+        result.Should().BeOfType<Result<int>>();
+        result.Should().BeSuccessful().And.WithValue(expectedValue);
+    }
+
+    [Fact]
+    public async Task GivenOnSuccessOfTOutAsync_WhenResultIsFailure_ThenReturnFailure()
+    {
+        // Arrange
+        var expectedValue = _faker.Random.Int();
+        var resultIn = Result<string>.Failure(_testFirstError);
+
+        // Act
+        var result = await resultIn.OnSuccess(_ => Task.FromResult(Result<int>.Success(expectedValue)));
+
+        // Assert
+        result.Should().BeOfType<Result<int>>();
+        result.Should().BeFailure().And.WithError(_testFirstError);
+    }
+
+    [Fact]
+    public void GivenOnFailure_WhenResultIsSuccess_ThenReturnSuccess()
     {
         // Arrange
         var expectedValue = _faker.Random.Word();
@@ -207,7 +235,7 @@ public class ResultTests
     }
 
     [Fact]
-    public void GivenOnFailureOfTIn_WhenResultIsFailure_ThenExecuteNext()
+    public void GivenOnFailure_WhenResultIsFailure_ThenExecuteNext()
     {
         // Arrange
         var resultIn = Result<string>.Failure(_testFirstError);
@@ -227,7 +255,42 @@ public class ResultTests
     }
 
     [Fact]
-    public void GivenSwitchOfTInTOut_WhenResultIsSuccess_ThenExecuteSuccessNext()
+    public async Task GivenOnFailureAsync_WhenResultIsSuccess_ThenReturnSuccess()
+    {
+        // Arrange
+        var expectedValue = _faker.Random.Word();
+        var resultIn = Result<string>.Success(expectedValue);
+
+        // Act
+        var result = await resultIn.OnFailure(_ => Task.FromResult(Result<string>.Failure(_testSecondError)));
+
+        // Assert
+        result.Should().BeOfType<Result<string>>();
+        result.Should().BeSuccessful();
+    }
+
+    [Fact]
+    public async Task GivenOnFailureAsync_WhenResultIsFailure_ThenExecuteNext()
+    {
+        // Arrange
+        var resultIn = Result<string>.Failure(_testFirstError);
+        var expectedError = ResultError.None;
+
+        // Act
+        var result = await resultIn.OnFailure(error =>
+        {
+            expectedError = error;
+            return Task.FromResult(Result<string>.Failure(_testSecondError));
+        });
+
+        // Assert
+        result.Should().BeOfType<Result<string>>();
+        result.Should().BeFailure().And.WithError(_testSecondError);
+        expectedError.Should().Be(_testFirstError);
+    }
+
+    [Fact]
+    public void GivenSwitchOfTOut_WhenResultIsSuccess_ThenExecuteSuccessNext()
     {
         // Arrange
         var expectedValue = _faker.Random.Word();
@@ -242,13 +305,46 @@ public class ResultTests
     }
 
     [Fact]
-    public void GivenSwitchOfTInTOut_WhenResultIsFailure_ThenExecuteFailureNext()
+    public void GivenSwitchOfTOut_WhenResultIsFailure_ThenExecuteFailureNext()
     {
         // Arrange
         var resultIn = Result<string>.Failure(_testFirstError);
 
         // Act
         var result = resultIn.Switch(_ => Result<int>.Success(_faker.Random.Int()), Result<int>.Failure);
+
+        // Assert
+        result.Should().BeOfType<Result<int>>();
+        result.Should().BeFailure().And.WithError(_testFirstError);
+    }
+
+    [Fact]
+    public async Task GivenSwitchOfTOutAsync_WhenResultIsSuccess_ThenExecuteSuccessNext()
+    {
+        // Arrange
+        var expectedValue = _faker.Random.Word();
+        var resultIn = Result<string>.Success(expectedValue);
+
+        // Act
+        var result = await resultIn.Switch(
+            _ => Task.FromResult(Result<int>.Success(_faker.Random.Int())),
+            e => Task.FromResult(Result<int>.Failure(e)));
+
+        // Assert
+        result.Should().BeOfType<Result<int>>();
+        result.Should().BeSuccessful();
+    }
+
+    [Fact]
+    public async Task GivenSwitchOfTOutAsync_WhenResultIsFailure_ThenExecuteFailureNext()
+    {
+        // Arrange
+        var resultIn = Result<string>.Failure(_testFirstError);
+
+        // Act
+        var result = await resultIn.Switch(
+            _ => Task.FromResult(Result<int>.Success(_faker.Random.Int())),
+            e => Task.FromResult(Result<int>.Failure(e)));
 
         // Assert
         result.Should().BeOfType<Result<int>>();
