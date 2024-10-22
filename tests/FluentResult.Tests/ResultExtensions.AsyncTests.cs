@@ -1,7 +1,24 @@
+using System.Globalization;
+
 namespace FluentResult.Tests;
 
 public partial class ResultExtensionsTests
 {
+
+    [Fact]
+    public async Task GivenToResultAsync_WhenInvoked_ThenReturnSuccess()
+    {
+        // Arrange
+        var number = _faker.Random.Int();
+        var numberTask = Task.FromResult(number);
+
+        // Act
+        var result = await numberTask.ToResult();
+
+        // Assert
+        result.Should().BeSuccessful().And.WithValue(number);
+    }
+
     [Fact]
     public async Task GivenAsyncOnSuccessOfTInTOut_WhenResultIsSuccess_ThenExecuteNext()
     {
@@ -96,5 +113,53 @@ public partial class ResultExtensionsTests
         // Assert
         result.Should().BeOfType<Result<int>>();
         result.Should().BeFailure().And.WithError(_testFirstError);
+    }
+
+    [Fact]
+    public async Task GivenAsyncSelect_WhenResultIsSuccess_ThenExecuteSuccessNext()
+    {
+        // Arrange
+        var number = _faker.Random.Int();
+        var expectedString = number.ToString(CultureInfo.InvariantCulture);
+
+        // Act
+        var methodResult = await Task.FromResult(Result<int>.Success(number))
+            .Select(n => Task.FromResult(n.ToString(CultureInfo.InvariantCulture)));
+        var methodManyResult = await Task.FromResult(Result<int>.Success(number))
+            .SelectMany(i => Task.FromResult(Result<decimal>.Success(i)), (_, d) => d.ToString(CultureInfo.InvariantCulture));
+        var queryResult = await (from intResult in Task.FromResult(Result<int>.Success(number))
+            from stringResult in Task.FromResult(Result<string>.Success(intResult.ToString(CultureInfo.InvariantCulture)))
+            select stringResult);
+
+        // Assert
+        methodResult.Should().BeOfType<Result<string>>()
+            .And.BeSuccessful().And.WithValue(expectedString);
+        methodManyResult.Should().BeOfType<Result<string>>()
+            .And.BeSuccessful().And.WithValue(expectedString);
+        queryResult.Should().BeOfType<Result<string>>()
+            .And.BeSuccessful().And.WithValue(expectedString);
+    }
+
+    [Fact]
+    public async Task GivenAsyncSelect_WhenResultIsFailure_ThenExecuteFailureNext()
+    {
+        // Arrange
+
+        // Act
+        var methodResult = await Task.FromResult(Result<int>.Failure(_testFirstError))
+            .Select(n => Task.FromResult(n.ToString(CultureInfo.InvariantCulture)));
+        var methodManyResult = await Task.FromResult(Result<int>.Failure(_testFirstError))
+            .SelectMany(i => Task.FromResult(Result<decimal>.Success(i)), (_, d) => d.ToString(CultureInfo.InvariantCulture));
+        var queryResult = await (from intResult in Task.FromResult(Result<int>.Failure(_testFirstError))
+            from stringResult in Task.FromResult(Result<string>.Success(intResult.ToString(CultureInfo.InvariantCulture)))
+            select stringResult);
+
+        // Assert
+        methodResult.Should().BeOfType<Result<string>>()
+            .And.BeFailure().And.WithError(_testFirstError);
+        methodManyResult.Should().BeOfType<Result<string>>()
+            .And.BeFailure().And.WithError(_testFirstError);
+        queryResult.Should().BeOfType<Result<string>>()
+            .And.BeFailure().And.WithError(_testFirstError);
     }
 }

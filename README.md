@@ -2,6 +2,8 @@
 
 FluentResult is a C# library that provides a fluent API for handling results of operations, including success and failure cases. It includes various utilities and extensions to simplify error handling and result aggregation.
 
+Some of my inspirations comes from [Andrew Lock's Series: Working with the result pattern](https://andrewlock.net/series/working-with-the-result-pattern/)
+
 ## Table of Contents
 
 - [Installation](#installation)

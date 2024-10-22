@@ -10,6 +10,19 @@ public partial class ResultExtensionsTests
     private readonly ResultError _testSecondError = new("TestSecondError", "Test Error");
 
     [Fact]
+    public void GivenToResult_WhenInvoked_ThenReturnSuccess()
+    {
+        // Arrange
+        var number = _faker.Random.Int();
+
+        // Act
+        var result = number.ToResult();
+
+        // Assert
+        result.Should().BeSuccessful().And.WithValue(number);
+    }
+
+    [Fact]
     public void GivenSelect_WhenResultIsSuccess_ThenExecuteSuccessNext()
     {
         // Arrange
