@@ -25,15 +25,10 @@ public partial record Result<T>
     /// </summary>
     /// <param name="error">The error associated with the failed operation.</param>
     /// <returns>A new instance of <see cref="Result{T}" /> representing a failed operation.</returns>
-    public static Result<T> Failure(ResultError error)
-    {
-        if(error == ResultError.None)
-        {
-            throw new ArgumentException("Invalid error", nameof(error));
-        }
-
-        return new Result<T>(false, error, default);
-    }
+    public static Result<T> Failure(ResultError error) =>
+     error == ResultError.None
+            ? throw new ArgumentException("Invalid error", nameof(error))
+            : new Result<T>(false, error, default);
 
     public static implicit operator Result<T>(T value) => Success(value);
 

@@ -77,7 +77,7 @@ public class ResultErrorAggregateTests
         resultHashCode.Should().Be(expected, because);
     }
 
-    public class EqualsData : TheoryData<
+    internal class EqualsData : TheoryData<
         string,
         string, string, Dictionary<string, string[]>,
         string, string, Dictionary<string, string[]>,

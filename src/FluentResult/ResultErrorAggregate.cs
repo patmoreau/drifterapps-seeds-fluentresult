@@ -27,20 +27,9 @@ public record ResultErrorAggregate : ResultError
     /// <returns>
     /// <c>true</c> if the specified <see cref="ResultErrorAggregate"/> is equal to the current instance; otherwise, <c>false</c>.
     /// </returns>
-    public virtual bool Equals(ResultErrorAggregate? other)
-    {
-        if (other is null)
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return base.Equals(other) && AreErrorAggregateEqual(other.Errors);
-    }
+    public virtual bool Equals(ResultErrorAggregate? other) =>
+        other is not null &&
+        (ReferenceEquals(this, other) || (base.Equals(other) && AreErrorAggregateEqual(other.Errors)));
 
     /// <summary>
     /// Computes the hash code for the current instance.
