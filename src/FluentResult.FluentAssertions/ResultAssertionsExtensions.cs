@@ -4,7 +4,9 @@ using FluentAssertions.Primitives;
 
 // ReSharper disable once CheckNamespace
 
+#pragma warning disable IDE0130
 namespace FluentAssertions;
+#pragma warning restore IDE0130
 
 /// <summary>
 ///     Provides extension methods for asserting <see cref="Result{T}" /> instances.
@@ -85,7 +87,7 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
     {
         var assertion = Execute.Assertion.BecauseOf(because, becauseArgs).UsingLineBreaks;
 
-        assertion.IsSuccessfulAssertion(Subject);
+        _ = assertion.IsSuccessfulAssertion(Subject);
 
         return new AndConstraint<ResultAssertions<TValue>>(this);
     }
@@ -103,7 +105,7 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
     {
         var assertion = Execute.Assertion.BecauseOf(because, becauseArgs).UsingLineBreaks;
 
-        assertion.IsFailureAssertion(Subject);
+        _ = assertion.IsFailureAssertion(Subject);
 
         return new AndConstraint<ResultAssertions<TValue>>(this);
     }
@@ -123,7 +125,7 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
     {
         var assertion = Execute.Assertion.BecauseOf(because, becauseArgs).UsingLineBreaks;
 
-        assertion.IsSuccessfulAssertion(Subject)
+        _ = assertion.IsSuccessfulAssertion(Subject)
             .Then
             .ForCondition(Subject.IsSuccess && Subject.Value!.Equals(expectedValue))
             .BecauseOf(because, becauseArgs)
@@ -148,7 +150,7 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
     {
         var assertion = Execute.Assertion.BecauseOf(because, becauseArgs).UsingLineBreaks;
 
-        assertion.WithErrorAssertion(Subject, resultError);
+        _ = assertion.WithErrorAssertion(Subject, resultError);
 
         return new AndConstraint<ResultAssertions<TValue>>(this);
     }

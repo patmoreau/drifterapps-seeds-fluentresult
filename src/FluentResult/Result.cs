@@ -42,18 +42,8 @@ public sealed partial record Result<T>
     ///     Gets the value associated with the operation.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown the result is failure.</exception>
-    public T Value
-    {
-        get
-        {
-            if (IsFailure)
-            {
-                throw new InvalidOperationException("Cannot access the value of a failed result.");
-            }
-
-            return _value;
-        }
-    }
+    public T Value =>
+        IsFailure ? throw new InvalidOperationException("Cannot access the value of a failed result.") : _value;
 
     /// <summary>
     ///     Gets the error associated with the operation.

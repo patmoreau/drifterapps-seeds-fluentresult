@@ -5,9 +5,9 @@ namespace DrifterApps.Seeds.FluentResult;
 /// <summary>
 ///     Represents a void type, since <see cref="System.Void" /> is not a valid return type in C#.
 /// </summary>
-[SuppressMessage("Design", "CA1036:Override methods on comparable types")]
 [SuppressMessage("Naming", "CA1716:Identifiers should not match keywords")]
 [SuppressMessage("Performance", "CA1805:Do not initialize unnecessarily")]
+[SuppressMessage("Style", "IDE0060:Remove unused parameter")]
 public readonly struct Nothing : IEquatable<Nothing>, IComparable<Nothing>, IComparable
 {
     private static readonly Nothing PrivateValue = new();

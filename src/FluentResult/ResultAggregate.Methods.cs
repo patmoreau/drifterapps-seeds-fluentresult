@@ -18,7 +18,10 @@ public partial record ResultAggregate
     {
         return Ensure(Func, options);
 
-        Result<Nothing> Func() => !validation() ? Result<Nothing>.Failure(error) : Result<Nothing>.Success();
+        Result<Nothing> Func()
+        {
+            return !validation() ? Result<Nothing>.Failure(error) : Result<Nothing>.Success();
+        }
     }
 
     /// <summary>
