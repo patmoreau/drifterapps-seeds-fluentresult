@@ -351,5 +351,127 @@ public class ResultTests
         result.Should().BeFailure().And.WithError(_testFirstError);
     }
 
+    [Fact]
+    public void GivenEquals_WhenSameResult_ThenReturnTrue()
+    {
+        // Arrange
+        var result = Result<string>.Success(_faker.Random.Hash());
+
+        // Act
+        var isEqual = result.Equals(result);
+
+        // Assert
+        isEqual.Should().BeTrue();
+    }
+
+    [Fact]
+    public void GivenEquals_WhenSameValues_ThenReturnTrue()
+    {
+        // Arrange
+        var hash = _faker.Random.Hash();
+        var result = Result<string>.Success(hash);
+
+        // Act
+        var isEqual = result.Equals(Result<string>.Success(hash));
+
+        // Assert
+        isEqual.Should().BeTrue();
+    }
+
+    [Fact]
+    public void GivenEquals_WhenSameObject_ThenReturnTrue()
+    {
+        // Arrange
+        var hash = _faker.Random.Hash();
+        var result = Result<string>.Success(hash);
+
+        // Act
+        var isEqual = result.Equals((object)Result<string>.Success(hash));
+
+        // Assert
+        isEqual.Should().BeTrue();
+    }
+
+    [Fact]
+    public void GivenEquals_WhenDifferentObject_ThenReturnFalse()
+    {
+        // Arrange
+        var result = Result<string>.Success(_faker.Random.Hash());
+
+        // Act
+        var isEqual = result.Equals((object)Result<string>.Success(_faker.Random.Hash()));
+
+        // Assert
+        isEqual.Should().BeFalse();
+    }
+
+    [Fact]
+    public void GivenEqualOperator_WhenSameValues_ThenReturnTrue()
+    {
+        // Arrange
+        var hash = _faker.Random.Hash();
+        var result = Result<string>.Success(hash);
+
+        // Act
+        var isEqual = result == Result<string>.Success(hash);
+
+        // Assert
+        isEqual.Should().BeTrue();
+    }
+
+    [Fact]
+    public void GivenEqualOperator_WhenDifferentObject_ThenReturnFalse()
+    {
+        // Arrange
+        var result = Result<string>.Success(_faker.Random.Hash());
+
+        // Act
+        var isEqual = result == Result<string>.Success(_faker.Random.Hash());
+
+        // Assert
+        isEqual.Should().BeFalse();
+    }
+
+    [Fact]
+    public void GivenNotEqualOperator_WhenDifferentValues_ThenReturnTrue()
+    {
+        // Arrange
+        var result = Result<string>.Success(_faker.Random.Hash());
+
+        // Act
+        var isEqual = result != Result<string>.Success(_faker.Random.Hash());
+
+        // Assert
+        isEqual.Should().BeTrue();
+    }
+
+    [Fact]
+    public void GivenNotEqualOperator_WhenSameValues_ThenReturnFalse()
+    {
+        // Arrange
+        var hash = _faker.Random.Hash();
+        var result = Result<string>.Success(hash);
+
+        // Act
+        var isEqual = result != Result<string>.Success(hash);
+
+        // Assert
+        isEqual.Should().BeFalse();
+    }
+
+    [Fact]
+    public void GivenGetHashCode_WhenSameValues_ThenSameHash()
+    {
+        // Arrange
+        var hash = _faker.Random.Hash();
+        var result = Result<string>.Success(hash);
+
+        // Act
+        var isEqual = result.GetHashCode() == Result<string>.Success(hash).GetHashCode();
+
+        // Assert
+        isEqual.Should().BeTrue();
+    }
+
     private ResultError CreateError() => new(_faker.Random.Hash(), _faker.Lorem.Sentence());
 }

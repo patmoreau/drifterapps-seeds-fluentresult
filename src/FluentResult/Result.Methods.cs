@@ -1,6 +1,6 @@
 namespace DrifterApps.Seeds.FluentResult;
 
-public sealed partial record Result<T>
+public partial struct Result<T>
 {
     /// <summary>
     ///     Executes the next function if the result is successful and returns a result of type <typeparamref name="TOut" />.

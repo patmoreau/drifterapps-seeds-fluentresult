@@ -1,6 +1,6 @@
 namespace DrifterApps.Seeds.FluentResult;
 
-public partial record Result<T>
+public partial struct Result<T>
 {
     /// <summary>
     ///     Creates a new instance of <see cref="Result{T}" /> representing a successful operation.
