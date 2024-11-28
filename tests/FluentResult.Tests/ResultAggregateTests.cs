@@ -32,7 +32,7 @@ public class ResultAggregateTests
         resultAggregate.AddResult(successResult);
 
         // Assert
-        resultAggregate.Results.Should().ContainSingle().Which.Should().BeSameAs(successResult);
+        resultAggregate.Results.Should().ContainSingle().And.OnlyContain(x => x.Equals(successResult));
         resultAggregate.IsSuccess.Should().BeTrue();
         resultAggregate.IsFailure.Should().BeFalse();
     }
@@ -48,7 +48,7 @@ public class ResultAggregateTests
         resultAggregate.AddResult(failureResult);
 
         // Assert
-        resultAggregate.Results.Should().ContainSingle().Which.Should().BeSameAs(failureResult);
+        resultAggregate.Results.Should().ContainSingle().And.OnlyContain(x => x.Equals(failureResult));
         resultAggregate.IsSuccess.Should().BeFalse();
         resultAggregate.IsFailure.Should().BeTrue();
     }
