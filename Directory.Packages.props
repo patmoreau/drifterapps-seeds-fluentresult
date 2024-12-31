@@ -1,7 +1,7 @@
 <Project>
   <ItemGroup>
     <PackageVersion Include="Bogus" Version="35.6.1" />
-    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.3" />
     <PackageVersion Include="coverlet.msbuild" Version="6.0.2" />
     <PackageVersion Include="FluentAssertions" Version="7.0.0" />
     <PackageVersion Include="FluentAssertions.Analyzers" Version="0.34.1" />
