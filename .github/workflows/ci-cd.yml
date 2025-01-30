@@ -189,11 +189,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Ensure .NET 7 Installed
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '7.x'
-
       - name: Ensure .NET 8 Installed
         uses: actions/setup-dotnet@v4
         with:
