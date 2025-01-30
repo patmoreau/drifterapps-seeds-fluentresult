@@ -106,7 +106,7 @@ jobs:
       - run: echo '${{ steps.stepid.outputs.dotnet-version }}'
 
       - name: Restore packages
-        run: dotnet restore  --framework ${{ matrix.framework }}
+        run: dotnet restore
 
       - name: Build
         run: dotnet build --no-restore --configuration Release --framework ${{ matrix.framework }} /property:Version=${{ env.ASSEMBLY_VERSION }}
