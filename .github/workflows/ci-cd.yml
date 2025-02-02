@@ -3,9 +3,13 @@ name: ci-cd
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '.devcontainer/**'
 
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '.devcontainer/**'
 
   release:
     types:

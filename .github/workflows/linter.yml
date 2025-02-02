@@ -3,9 +3,13 @@ name: linter
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '.devcontainer/**'
 
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '.devcontainer/**'
 
 concurrency:
   group: linter-${{ github.ref }}
