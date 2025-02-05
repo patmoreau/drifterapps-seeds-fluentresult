@@ -2,14 +2,12 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
 {
   "name": "fluentresult-devcontainer",
-  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
-  "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+  "dockerComposeFile": [
+    "docker-compose.yml"
   ],
-  // Features to add to the dev container. More info: https://containers.dev/features.
+  "service": "devcontainer",
+  "workspaceFolder": "/workspaces/drifterapps-seeds-fluentresult",
+  "shutdownAction": "none",
   "features": {
     "ghcr.io/devcontainers/features/dotnet:2": {
       "version": "latest",
@@ -32,16 +30,7 @@
       "upgradePackages": true
     }
   },
-  // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  // "forwardPorts": [5000, 5001],
-  // "portsAttributes": {
-  //		"5001": {
-  //			"protocol": "https"
-  //		}
-  // }
-  // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "dotnet restore",
-  "postStartCommand": "/bin/sh -c 'if [ ! -S /tmp/ssh-agent.sock ]; then eval $(ssh-agent -a /tmp/ssh-agent.sock); fi && ssh-add /home/vscode/.ssh/id_ed25519'",
+  "postCreateCommand": "dotnet dev-certs https --trust && sudo dotnet workload update && dotnet restore",
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
@@ -53,10 +42,5 @@
         "davidanson.vscode-markdownlint"
       ]
     }
-  },
-  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-  "remoteUser": "vscode",
-  "remoteEnv": {
-    "SSH_AUTH_SOCK": "/tmp/ssh-agent.sock"
   }
 }

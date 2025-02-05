@@ -1,0 +1,15 @@
+services:
+  devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fluentresult-devcontainer
+    volumes:
+      - ..:/workspaces/drifterapps-seeds-fluentresult:cached
+      - ~/.ssh:/home/vscode/.ssh:ro
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    ports:
+      - '2222:22'

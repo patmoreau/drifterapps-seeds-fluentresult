@@ -1,15 +1,24 @@
+# Use the official .NET SDK image as the base image
 FROM mcr.microsoft.com/devcontainers/dotnet:1-9.0-bookworm
 
-# Install JetBrains Rider (latest version)
-USER root
-RUN curl -s "https://download-cdn.jetbrains.com/rider/JetBrains.Rider-2024.3.4.tar.gz" | tar -xzf - -C /opt && \
-    ln -s /opt/rider-*/bin/rider.sh /usr/local/bin/rider
+# Install OpenSSH Server and supervisor
+RUN apt-get update && apt-get install -y openssh-server supervisor
 
-# [Optional] Install the .NET MAUI workload if needed
-# RUN dotnet workload install maui
+# Create the SSH directory and set permissions
+RUN mkdir -p /var/run/sshd
+RUN chmod 0755 /var/run/sshd
 
-# Clean up
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Create a config directory in your project and copy the supervisord.conf file
+# Make sure you create a 'config' directory at the root of your project,
+# and inside it, create a 'supervisord.conf' file
+COPY config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Switch back to a non-root user (good practice)
-USER 1000
+# Disable password authentication
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+RUN sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+# Expose the SSH port
+EXPOSE 22
+
+# Start supervisord, which in turn will start the SSH service
+CMD ["/usr/bin/supervisord"]
