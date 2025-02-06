@@ -1,5 +1,3 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
 {
   "name": "fluentresult-devcontainer",
   "dockerComposeFile": [
@@ -30,8 +28,11 @@
       "upgradePackages": true
     }
   },
-  "postCreateCommand": "dotnet dev-certs https --trust && sudo dotnet workload update && dotnet restore",
-  // Configure tool-specific properties.
+  "postCreateCommand": [
+    "sudo dotnet workload update",
+    "dotnet dev-certs https --trust",
+    "dotnet restore"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
