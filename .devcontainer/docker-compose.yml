@@ -7,6 +7,7 @@ services:
     volumes:
       - ..:/workspaces/drifterapps-seeds-fluentresult:cached
       - ~/.ssh:/home/vscode/.ssh:ro
+      - ~/.gitconfig:/home/vscode/.gitconfig:ro
     cap_add:
       - SYS_PTRACE
     security_opt:
