@@ -1,10 +1,8 @@
-# FluentResult
+# <img alt='paper plane icons' src='./icon.png' height='10%' width='10%'> FluentResult
 
 FluentResult is a C# library that provides a fluent API for handling results of operations, including success and failure cases. It includes various utilities and extensions to simplify error handling and result aggregation.
 
 Some of my inspirations comes from [Andrew Lock's Series: Working with the result pattern](https://andrewlock.net/series/working-with-the-result-pattern/)
-
-<img alt='paper plane icons' src='./icon.png' height='10%' width='10%'>
 
 [![Build and Publish NuGet Package](https://github.com/patmoreau/drifterapps-seeds-fluentresult/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/patmoreau/drifterapps-seeds-fluentresult/actions/workflows/ci-cd.yml)
 [![CodeQL](https://github.com/patmoreau/drifterapps-seeds-fluentresult/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/patmoreau/drifterapps-seeds-fluentresult/actions/workflows/codeql-analysis.yml)
