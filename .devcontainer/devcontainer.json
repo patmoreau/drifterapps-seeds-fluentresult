@@ -26,7 +26,8 @@
       "gid": "1000",
       "installOhMyZsh": true,
       "upgradePackages": true
-    }
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
   "postCreateCommand": "/workspaces/drifterapps-seeds-fluentresult/.devcontainer/setup.sh",
   "customizations": {
@@ -36,7 +37,8 @@
         "ms-azuretools.vscode-docker",
         "eamodio.gitlens",
         "esbenp.prettier-vscode",
-        "davidanson.vscode-markdownlint"
+        "davidanson.vscode-markdownlint",
+        "ms-vscode-remote.remote-containers"
       ]
     }
   }
