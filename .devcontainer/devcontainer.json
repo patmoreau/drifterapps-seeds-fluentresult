@@ -28,11 +28,7 @@
       "upgradePackages": true
     }
   },
-  "postCreateCommand": [
-    "sudo dotnet workload update",
-    "dotnet dev-certs https --trust",
-    "dotnet restore"
-  ],
+  "postCreateCommand": "/workspaces/drifterapps-seeds-fluentresult/.devcontainer/setup.sh",
   "customizations": {
     "vscode": {
       "extensions": [
