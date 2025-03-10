@@ -23,6 +23,48 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
+    public void GivenToResult_WhenInvokedFromNull_ThenThrowArgumentNullException()
+    {
+        // Arrange
+        object number = null!;
+
+        // Act
+        var action = () => number.ToResult();
+
+        // Assert
+        action.Should()
+            .Throw<ArgumentNullException>()
+            .WithParameterName("source");
+    }
+
+    [Fact]
+    public void GivenToResult_WhenInvokedWithResultError_ThenReturnFailure()
+    {
+        // Arrange
+
+        // Act
+        var result = _testFirstError.ToResult<string>();
+
+        // Assert
+        result.Should().BeFailure().And.WithError(_testFirstError);
+    }
+
+    [Fact]
+    public void GivenToResult_WhenInvokedWithResultErrorNone_ThenThrowArgumentException()
+    {
+        // Arrange
+
+        // Act
+        var action = () => ResultError.None.ToResult<string>();
+
+        // Assert
+        action.Should()
+            .Throw<ArgumentException>()
+            .WithParameterName("error")
+            .WithMessage("Invalid error (Parameter 'error')");
+    }
+
+    [Fact]
     public void GivenSelect_WhenResultIsSuccess_ThenExecuteSuccessNext()
     {
         // Arrange
@@ -30,12 +72,12 @@ public partial class ResultExtensionsTests
         var expectedString = number.ToString(CultureInfo.InvariantCulture);
 
         // Act
-        var methodResult = Result<int>.Success(number)
+        var methodResult = number.ToResult()
             .Select(n => n.ToString(CultureInfo.InvariantCulture));
-        var methodManyResult = Result<int>.Success(number)
-            .SelectMany(i => Result<decimal>.Success(i), (_, d) => d.ToString(CultureInfo.InvariantCulture));
-        var queryResult = from intResult in Result<int>.Success(number)
-            from stringResult in Result<string>.Success(intResult.ToString(CultureInfo.InvariantCulture))
+        var methodManyResult = number.ToResult()
+            .SelectMany(i => ((decimal)i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
+        var queryResult = from intResult in number.ToResult()
+            from stringResult in intResult.ToString(CultureInfo.InvariantCulture).ToResult()
             select stringResult;
 
         // Assert
@@ -53,12 +95,12 @@ public partial class ResultExtensionsTests
         // Arrange
 
         // Act
-        var methodResult = Result<int>.Failure(_testFirstError)
+        var methodResult = _testFirstError.ToResult<int>()
             .Select(n => n.ToString(CultureInfo.InvariantCulture));
-        var methodManyResult = Result<int>.Failure(_testFirstError)
-            .SelectMany(i => Result<decimal>.Success(i), (_, d) => d.ToString(CultureInfo.InvariantCulture));
-        var queryResult = from intResult in Result<int>.Failure(_testFirstError)
-            from stringResult in Result<string>.Success(intResult.ToString(CultureInfo.InvariantCulture))
+        var methodManyResult = _testFirstError.ToResult<int>()
+            .SelectMany(i => ((decimal)i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
+        var queryResult = from intResult in _testFirstError.ToResult<int>()
+            from stringResult in intResult.ToString(CultureInfo.InvariantCulture).ToResult()
             select stringResult;
 
         // Assert

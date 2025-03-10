@@ -8,85 +8,12 @@ public class ResultTests
     private readonly ResultError _testSecondError = new("TestSecondError", "Test Error");
 
     [Fact]
-    public void GivenSuccess_WhenCreated_ThenIsSuccessIsTrue()
-    {
-        // Arrange
-
-        // Act
-        var result = Result<Nothing>.Success();
-
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-        result.IsFailure.Should().BeFalse();
-        result.Error.Should().Be(ResultError.None);
-    }
-
-    [Fact]
-    public void GivenSuccess_WhenCreatedWithValue_ThenIsSuccessIsTrue()
-    {
-        // Arrange
-        var value = _faker.Random.Hash();
-
-        // Act
-        var result = Result<string>.Success(value);
-
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-        result.IsFailure.Should().BeFalse();
-        result.Error.Should().Be(ResultError.None);
-    }
-
-    [Fact]
-    public void GivenSuccess_WhenCreatedWithNullValue_ThenThrowException()
-    {
-        // Arrange
-
-        // Act
-        var act = () => Result<string>.Success(null!);
-
-        // Assert
-        act.Should()
-            .Throw<ArgumentException>()
-            .WithParameterName("value")
-            .WithMessage("Value cannot be null. (Parameter 'value')");
-    }
-
-    [Fact]
-    public void GivenFailure_WhenErrorIsNotNone_ThenIsFailureIsTrue()
-    {
-        // Arrange
-        var error = CreateError();
-
-        // Act
-        var result = Result<Nothing>.Failure(error);
-
-        // Assert
-        result.IsSuccess.Should().BeFalse();
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be(error);
-    }
-
-    [Fact]
-    public void GivenFailure_WhenErrorIsNone_ThenThrowException()
-    {
-        // Arrange
-
-        // Act
-        var action = () => Result<Nothing>.Failure(ResultError.None);
-
-        // Assert
-        action.Should()
-            .Throw<ArgumentException>()
-            .WithMessage("Invalid error (Parameter 'error')");
-    }
-
-    [Fact]
     public void GivenValue_WhenSuccess_ThenGetGoodValue()
     {
         // Arrange
 
         // Act
-        var result = Result<Nothing>.Success();
+        var result = Nothing.Value.ToResult();
 
         // Assert
         result.Value.Should().Be(Nothing.Value);
@@ -97,7 +24,7 @@ public class ResultTests
     {
         // Arrange
         var error = CreateError();
-        var result = Result<string>.Failure(error);
+        var result = error.ToResult<string>();
 
         // Act
         Action act = () => _ = result.Value;
@@ -136,7 +63,7 @@ public class ResultTests
     public void GivenToResult_WhenSuccess_ThenReturnSuccess()
     {
         // Arrange
-        var expected = Result<Nothing>.Success();
+        var expected = Nothing.Value;
 
         // Act
         var result = expected.ToResult();
@@ -150,7 +77,7 @@ public class ResultTests
     {
         // Arrange
         var error = new ResultError(_faker.Random.Hash(), _faker.Lorem.Sentence());
-        var expected = Result<Nothing>.Failure(error);
+        var expected = error.ToResult<Nothing>();
 
         // Act
         var result = expected.ToResult();
@@ -164,10 +91,10 @@ public class ResultTests
     {
         // Arrange
         var expectedValue = _faker.Random.Int();
-        var resultIn = Result<string>.Success(_faker.Random.Word());
+        Result<string> resultIn = _faker.Random.Word();
 
         // Act
-        var result = resultIn.OnSuccess(_ => Result<int>.Success(expectedValue));
+        var result = resultIn.OnSuccess(_ => (Result<int>)expectedValue);
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -179,10 +106,10 @@ public class ResultTests
     {
         // Arrange
         var expectedValue = _faker.Random.Int();
-        var resultIn = Result<string>.Failure(_testFirstError);
+        var resultIn = _testFirstError.ToResult<string>();
 
         // Act
-        var result = resultIn.OnSuccess(_ => Result<int>.Success(expectedValue));
+        var result = resultIn.OnSuccess(_ => expectedValue.ToResult());
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -194,10 +121,10 @@ public class ResultTests
     {
         // Arrange
         var expectedValue = _faker.Random.Int();
-        var resultIn = Result<string>.Success(_faker.Random.Word());
+        var resultIn = _faker.Random.Word().ToResult();
 
         // Act
-        var result = await resultIn.OnSuccess(_ => Task.FromResult(Result<int>.Success(expectedValue)));
+        var result = await resultIn.OnSuccess(_ => Task.FromResult(expectedValue.ToResult()));
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -209,10 +136,10 @@ public class ResultTests
     {
         // Arrange
         var expectedValue = _faker.Random.Int();
-        var resultIn = Result<string>.Failure(_testFirstError);
+        var resultIn = _testFirstError.ToResult<string>();
 
         // Act
-        var result = await resultIn.OnSuccess(_ => Task.FromResult(Result<int>.Success(expectedValue)));
+        var result = await resultIn.OnSuccess(_ => Task.FromResult(expectedValue.ToResult()));
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -224,10 +151,10 @@ public class ResultTests
     {
         // Arrange
         var expectedValue = _faker.Random.Word();
-        var resultIn = Result<string>.Success(expectedValue);
+        var resultIn = expectedValue.ToResult();
 
         // Act
-        var result = resultIn.OnFailure(_ => Result<string>.Failure(_testSecondError));
+        var result = resultIn.OnFailure(_ => _testSecondError.ToResult<string>());
 
         // Assert
         result.Should().BeOfType<Result<string>>();
@@ -238,14 +165,14 @@ public class ResultTests
     public void GivenOnFailure_WhenResultIsFailure_ThenExecuteNext()
     {
         // Arrange
-        var resultIn = Result<string>.Failure(_testFirstError);
+        var resultIn = _testFirstError.ToResult<string>();
         var expectedError = ResultError.None;
 
         // Act
         var result = resultIn.OnFailure(error =>
         {
             expectedError = error;
-            return Result<string>.Failure(_testSecondError);
+            return _testSecondError.ToResult<string>();
         });
 
         // Assert
@@ -259,10 +186,10 @@ public class ResultTests
     {
         // Arrange
         var expectedValue = _faker.Random.Word();
-        var resultIn = Result<string>.Success(expectedValue);
+        var resultIn = expectedValue.ToResult();
 
         // Act
-        var result = await resultIn.OnFailure(_ => Task.FromResult(Result<string>.Failure(_testSecondError)));
+        var result = await resultIn.OnFailure(_ => Task.FromResult(_testSecondError.ToResult<string>()));
 
         // Assert
         result.Should().BeOfType<Result<string>>();
@@ -273,14 +200,14 @@ public class ResultTests
     public async Task GivenOnFailureAsync_WhenResultIsFailure_ThenExecuteNext()
     {
         // Arrange
-        var resultIn = Result<string>.Failure(_testFirstError);
+        var resultIn = _testFirstError.ToResult<string>();
         var expectedError = ResultError.None;
 
         // Act
         var result = await resultIn.OnFailure(error =>
         {
             expectedError = error;
-            return Task.FromResult(Result<string>.Failure(_testSecondError));
+            return Task.FromResult(_testSecondError.ToResult<string>());
         });
 
         // Assert
@@ -294,10 +221,10 @@ public class ResultTests
     {
         // Arrange
         var expectedValue = _faker.Random.Word();
-        var resultIn = Result<string>.Success(expectedValue);
+        var resultIn = expectedValue.ToResult();
 
         // Act
-        var result = resultIn.Switch(_ => Result<int>.Success(_faker.Random.Int()), Result<int>.Failure);
+        var result = resultIn.Switch(_ => _faker.Random.Int(), e => e.ToResult<int>());
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -308,10 +235,10 @@ public class ResultTests
     public void GivenSwitchOfTOut_WhenResultIsFailure_ThenExecuteFailureNext()
     {
         // Arrange
-        var resultIn = Result<string>.Failure(_testFirstError);
+        var resultIn = _testFirstError.ToResult<int>();
 
         // Act
-        var result = resultIn.Switch(_ => Result<int>.Success(_faker.Random.Int()), Result<int>.Failure);
+        var result = resultIn.Switch(_ => _faker.Random.Int(), e => e.ToResult<int>());
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -323,12 +250,12 @@ public class ResultTests
     {
         // Arrange
         var expectedValue = _faker.Random.Word();
-        var resultIn = Result<string>.Success(expectedValue);
+        var resultIn = expectedValue.ToResult();
 
         // Act
         var result = await resultIn.Switch(
-            _ => Task.FromResult(Result<int>.Success(_faker.Random.Int())),
-            e => Task.FromResult(Result<int>.Failure(e)));
+            _ => Task.FromResult(_faker.Random.Int().ToResult()),
+            e => Task.FromResult(e.ToResult<int>()));
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -339,12 +266,12 @@ public class ResultTests
     public async Task GivenSwitchOfTOutAsync_WhenResultIsFailure_ThenExecuteFailureNext()
     {
         // Arrange
-        var resultIn = Result<string>.Failure(_testFirstError);
+        var resultIn = _testFirstError.ToResult<string>();
 
         // Act
         var result = await resultIn.Switch(
-            _ => Task.FromResult(Result<int>.Success(_faker.Random.Int())),
-            e => Task.FromResult(Result<int>.Failure(e)));
+            _ => Task.FromResult(_faker.Random.Int().ToResult()),
+            e => Task.FromResult(e.ToResult<int>()));
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -355,7 +282,7 @@ public class ResultTests
     public void GivenEquals_WhenSameResult_ThenReturnTrue()
     {
         // Arrange
-        var result = Result<string>.Success(_faker.Random.Hash());
+        var result = _faker.Random.Hash().ToResult();
 
         // Act
         var isEqual = result.Equals(result);
@@ -369,10 +296,10 @@ public class ResultTests
     {
         // Arrange
         var hash = _faker.Random.Hash();
-        var result = Result<string>.Success(hash);
+        var result = hash.ToResult();
 
         // Act
-        var isEqual = result.Equals(Result<string>.Success(hash));
+        var isEqual = result.Equals(hash.ToResult());
 
         // Assert
         isEqual.Should().BeTrue();
@@ -383,10 +310,10 @@ public class ResultTests
     {
         // Arrange
         var hash = _faker.Random.Hash();
-        var result = Result<string>.Success(hash);
+        var result = hash.ToResult();
 
         // Act
-        var isEqual = result.Equals((object)Result<string>.Success(hash));
+        var isEqual = result.Equals((object)hash.ToResult());
 
         // Assert
         isEqual.Should().BeTrue();
@@ -396,10 +323,10 @@ public class ResultTests
     public void GivenEquals_WhenDifferentObject_ThenReturnFalse()
     {
         // Arrange
-        var result = Result<string>.Success(_faker.Random.Hash());
+        var result = _faker.Random.Hash().ToResult();
 
         // Act
-        var isEqual = result.Equals((object)Result<string>.Success(_faker.Random.Hash()));
+        var isEqual = result.Equals((object)_faker.Random.Hash().ToResult());
 
         // Assert
         isEqual.Should().BeFalse();
@@ -410,10 +337,10 @@ public class ResultTests
     {
         // Arrange
         var hash = _faker.Random.Hash();
-        var result = Result<string>.Success(hash);
+        var result = hash.ToResult();
 
         // Act
-        var isEqual = result == Result<string>.Success(hash);
+        var isEqual = result == hash;
 
         // Assert
         isEqual.Should().BeTrue();
@@ -423,10 +350,10 @@ public class ResultTests
     public void GivenEqualOperator_WhenDifferentObject_ThenReturnFalse()
     {
         // Arrange
-        var result = Result<string>.Success(_faker.Random.Hash());
+        var result = _faker.Random.Hash().ToResult();
 
         // Act
-        var isEqual = result == Result<string>.Success(_faker.Random.Hash());
+        var isEqual = result == _faker.Random.Hash();
 
         // Assert
         isEqual.Should().BeFalse();
@@ -436,10 +363,10 @@ public class ResultTests
     public void GivenNotEqualOperator_WhenDifferentValues_ThenReturnTrue()
     {
         // Arrange
-        var result = Result<string>.Success(_faker.Random.Hash());
+        var result = _faker.Random.Hash().ToResult();
 
         // Act
-        var isEqual = result != Result<string>.Success(_faker.Random.Hash());
+        var isEqual = result != _faker.Random.Hash();
 
         // Assert
         isEqual.Should().BeTrue();
@@ -450,10 +377,10 @@ public class ResultTests
     {
         // Arrange
         var hash = _faker.Random.Hash();
-        var result = Result<string>.Success(hash);
+        var result = hash.ToResult();
 
         // Act
-        var isEqual = result != Result<string>.Success(hash);
+        var isEqual = result != hash;
 
         // Assert
         isEqual.Should().BeFalse();
@@ -464,10 +391,10 @@ public class ResultTests
     {
         // Arrange
         var hash = _faker.Random.Hash();
-        var result = Result<string>.Success(hash);
+        var result = hash.ToResult();
 
         // Act
-        var isEqual = result.GetHashCode() == Result<string>.Success(hash).GetHashCode();
+        var isEqual = result.GetHashCode() == hash.ToResult().GetHashCode();
 
         // Assert
         isEqual.Should().BeTrue();

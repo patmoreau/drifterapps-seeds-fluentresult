@@ -14,7 +14,19 @@ public static partial class ResultExtensions
     public static async Task<Result<T>> ToResult<T>(this Task<T> source)
     {
         var result = await source;
-        return Result<T>.Success(result);
+        return result;
+    }
+
+    /// <summary>
+    /// Converts the source object to a <see cref="Result{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the source object.</typeparam>
+    /// <param name="source">The source object to convert.</param>
+    /// <returns>A successful result containing the source object.</returns>
+    public static async Task<Result<T>> ToResult<T>(this Task<ResultError> source)
+    {
+        var result = await source;
+        return result;
     }
 
     /// <summary>
@@ -30,7 +42,7 @@ public static partial class ResultExtensions
         Func<TIn, Task<Result<TOut>>> next)
     {
         var result = await resultTask;
-        return result.IsSuccess ? await next(result.Value) : Result<TOut>.Failure(result.Error);
+        return result.IsSuccess ? await next(result.Value) : result.Error;
     }
 
     /// <summary>
@@ -76,7 +88,7 @@ public static partial class ResultExtensions
     {
         var result = await source;
         return await result.Switch(onSuccess: async r => await selector(r),
-            onFailure: e => Task.FromResult(Result<TResult>.Failure(e)));
+            onFailure: e => Task.FromResult((Result<TResult>)e));
     }
 
     /// <summary>
@@ -103,7 +115,6 @@ public static partial class ResultExtensions
                 // Select() just passes the error through as a failed Result<TResult>
                 return collectionResult.Select(v => resultSelector(r, v));
             },
-            onFailure: e => Task.FromResult(Result<TResult>.Failure(e)));
-        // error -> return a failed Result<TResult>
+            onFailure: e => Task.FromResult((Result<TResult>)e));
     }
 }

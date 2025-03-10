@@ -37,15 +37,21 @@ You can create and handle results using the `Result` class and its extension met
 ```csharp
 using DrifterApps.Seeds.FluentResult;
 
-// Creating a success result
-var successResult = Result<int>.Success(42);
+// Creating a success result by implicit conversion
+Result<int> successResult = 42;
 
-// Creating a failure result
-var failureResult = Result<int>.Failure(new ResultError("Error.Code", "Error description"));
+// Creating a success result by ToResult extension method
+var successResult = 45.ToResult<int>();
+
+// Creating a failure result by implicit conversion
+Result<int> failureResult = new ResultError("Error.Code", "Error description");
+
+// Creating a failure result by ToResult extension method
+failureResult = new ResultError("Error.Code", "Error description").ToResult<int>();
 
 // Handling success and failure
-var finalResult = successResult.OnSuccess(value => Result<string>.Success(value.ToString()))
-                               .OnFailure(error => Result<string>.Failure(error));
+var finalResult = successResult.OnSuccess(value => (Result<string>)value.ToString())
+                               .OnFailure(error => (Result<string>)error);
 ```
 
 ### Aggregating Results
@@ -56,8 +62,8 @@ You can aggregate multiple results using the ResultAggregate class.
 using DrifterApps.Seeds.FluentResult;
 
 var resultAggregate = ResultAggregate.Create();
-var successResult = Result<Nothing>.Success();
-var failureResult = Result<Nothing>.Failure(new ResultError("Error.Code", "Error description"));
+Result<Nothing> successResult = Nothing.Value;
+Result<Nothing> failureResult = new ResultError("Error.Code", "Error description");
 
 resultAggregate.AddResult(successResult);
 resultAggregate.AddResult(failureResult);
@@ -73,10 +79,10 @@ You can handle results asynchronously using the extension methods provided in Re
 ```csharp
 using DrifterApps.Seeds.FluentResult;
 
-var resultTask = Task.FromResult(Result<int>.Success(42));
+var resultTask = Task.FromResult((Result<int>)42);
 
-var finalResult = await resultTask.OnSuccess(async value => await Task.FromResult(Result<string>.Success(value.ToString())))
-                                  .OnFailure(async error => await Task.FromResult(Result<string>.Failure(error)));
+var finalResult = await resultTask.OnSuccess(async value => await Task.FromResult((Result<string>)value.ToString()))
+                                  .OnFailure(async error => await Task.FromResult((Result<string>)error));
 ```
 
 ### Ensuring Validation
@@ -87,7 +93,7 @@ You can ensure that a specific validation function returns true using the `Ensur
 using DrifterApps.Seeds.FluentResult;
 
 var aggregate = ResultAggregate.Create();
-aggregate.AddResult(Result<Nothing>.Failure(new ResultError("Error.Code", "Initial error")));
+aggregate.AddResult(new ResultError("Error.Code", "Initial error"));
 
 // Ensure validation with IgnoreOnFailure option
 var result = aggregate.Ensure(() => true, new ResultError("Validation.Error", "Validation failed"), EnsureOnFailure.IgnoreOnFailure);

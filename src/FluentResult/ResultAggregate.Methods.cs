@@ -20,7 +20,7 @@ public partial record ResultAggregate
 
         Result<Nothing> Func()
         {
-            return !validation() ? Result<Nothing>.Failure(error) : Result<Nothing>.Success();
+            return !validation() ? error : Nothing.Value;
         }
     }
 

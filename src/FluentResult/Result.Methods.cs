@@ -8,8 +8,7 @@ public partial struct Result<T>
     /// <typeparam name="TOut">The type of the result.</typeparam>
     /// <param name="next">The function to execute if the result is successful.</param>
     /// <returns>The result of the next function or a failure result.</returns>
-    public Result<TOut> OnSuccess<TOut>(Func<T, Result<TOut>> next) =>
-        IsSuccess ? next(Value) : Result<TOut>.Failure(Error);
+    public Result<TOut> OnSuccess<TOut>(Func<T, Result<TOut>> next) => IsSuccess ? next(Value) : Error;
 
     /// <summary>
     ///     Executes the next function if the result is successful and returns a result of type <typeparamref name="TOut" />.
@@ -18,7 +17,7 @@ public partial struct Result<T>
     /// <param name="next">The function to execute if the result is successful.</param>
     /// <returns>The result of the next function or a failure result.</returns>
     public Task<Result<TOut>> OnSuccess<TOut>(Func<T, Task<Result<TOut>>> next) =>
-        IsSuccess ? next(Value) : Task.FromResult(Result<TOut>.Failure(Error));
+        IsSuccess ? next(Value) : Task.FromResult((Result<TOut>)Error);
 
     /// <summary>
     ///     Executes the next function if the result is a failure.

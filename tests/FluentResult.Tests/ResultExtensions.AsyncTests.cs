@@ -4,7 +4,6 @@ namespace FluentResult.Tests;
 
 public partial class ResultExtensionsTests
 {
-
     [Fact]
     public async Task GivenToResultAsync_WhenInvoked_ThenReturnSuccess()
     {
@@ -20,14 +19,27 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
+    public async Task GivenToResultAsync_WhenInvokedWithResultError_ThenReturnFailure()
+    {
+        // Arrange
+        var numberTask = Task.FromResult(_testFirstError);
+
+        // Act
+        var result = await numberTask.ToResult<string>();
+
+        // Assert
+        result.Should().BeFailure().And.WithError(_testFirstError);
+    }
+
+    [Fact]
     public async Task GivenAsyncOnSuccessOfTInTOut_WhenResultIsSuccess_ThenExecuteNext()
     {
         // Arrange
         var expectedValue = _faker.Random.Int();
-        var resultIn = Task.FromResult(Result<string>.Success(_faker.Random.Word()));
+        var resultIn = Task.FromResult(_faker.Random.Word().ToResult());
 
         // Act
-        var result = await resultIn.OnSuccess(value => Task.FromResult(Result<int>.Success(expectedValue)));
+        var result = await resultIn.OnSuccess(value => Task.FromResult(expectedValue.ToResult()));
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -39,10 +51,10 @@ public partial class ResultExtensionsTests
     {
         // Arrange
         var expectedValue = _faker.Random.Int();
-        var resultIn = Task.FromResult(Result<string>.Failure(_testFirstError));
+        var resultIn = Task.FromResult(_testFirstError.ToResult<int>());
 
         // Act
-        var result = await resultIn.OnSuccess(value => Task.FromResult(Result<int>.Success(expectedValue)));
+        var result = await resultIn.OnSuccess(value => Task.FromResult(expectedValue.ToResult()));
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -54,10 +66,10 @@ public partial class ResultExtensionsTests
     {
         // Arrange
         var expectedValue = _faker.Random.Word();
-        var resultIn = Task.FromResult(Result<string>.Success(expectedValue));
+        var resultIn = Task.FromResult(expectedValue.ToResult());
 
         // Act
-        var result = await resultIn.OnFailure(_ => Task.FromResult(Result<string>.Failure(_testSecondError)));
+        var result = await resultIn.OnFailure(_ => Task.FromResult(_testSecondError.ToResult<string>()));
 
         // Assert
         result.Should().BeOfType<Result<string>>();
@@ -68,14 +80,14 @@ public partial class ResultExtensionsTests
     public async Task GivenAsyncOnFailureOfTIn_WhenResultIsFailure_ThenExecuteNext()
     {
         // Arrange
-        var resultIn = Task.FromResult(Result<string>.Failure(_testFirstError));
+        var resultIn = Task.FromResult(_testFirstError.ToResult<string>());
         var expectedError = ResultError.None;
 
         // Act
         var result = await resultIn.OnFailure(error =>
         {
             expectedError = error;
-            return Task.FromResult(Result<string>.Failure(_testSecondError));
+            return Task.FromResult(_testSecondError.ToResult<string>());
         });
 
         // Assert
@@ -89,11 +101,11 @@ public partial class ResultExtensionsTests
     {
         // Arrange
         var expectedValue = _faker.Random.Word();
-        var resultIn = Task.FromResult(Result<string>.Success(expectedValue));
+        var resultIn = Task.FromResult(expectedValue.ToResult());
 
         // Act
-        var result = await resultIn.Switch(_ => Task.FromResult(Result<int>.Success(_faker.Random.Int())),
-            error => Task.FromResult(Result<int>.Failure(error)));
+        var result = await resultIn.Switch(_ => Task.FromResult(_faker.Random.Int().ToResult()),
+            error => Task.FromResult(error.ToResult<int>()));
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -104,11 +116,11 @@ public partial class ResultExtensionsTests
     public async Task GivenAsyncSwitchOfTInTOut_WhenResultIsFailure_ThenExecuteFailureNext()
     {
         // Arrange
-        var resultIn = Task.FromResult(Result<string>.Failure(_testFirstError));
+        var resultIn = Task.FromResult(_testFirstError.ToResult<string>());
 
         // Act
-        var result = await resultIn.Switch(_ => Task.FromResult(Result<int>.Success(_faker.Random.Int())),
-            error => Task.FromResult(Result<int>.Failure(error)));
+        var result = await resultIn.Switch(_ => Task.FromResult(_faker.Random.Int().ToResult()),
+            error => Task.FromResult(error.ToResult<int>()));
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -123,12 +135,12 @@ public partial class ResultExtensionsTests
         var expectedString = number.ToString(CultureInfo.InvariantCulture);
 
         // Act
-        var methodResult = await Task.FromResult(Result<int>.Success(number))
+        var methodResult = await Task.FromResult(number.ToResult())
             .Select(n => Task.FromResult(n.ToString(CultureInfo.InvariantCulture)));
-        var methodManyResult = await Task.FromResult(Result<int>.Success(number))
-            .SelectMany(i => Task.FromResult(Result<decimal>.Success(i)), (_, d) => d.ToString(CultureInfo.InvariantCulture));
-        var queryResult = await (from intResult in Task.FromResult(Result<int>.Success(number))
-            from stringResult in Task.FromResult(Result<string>.Success(intResult.ToString(CultureInfo.InvariantCulture)))
+        var methodManyResult = await Task.FromResult(number.ToResult())
+            .SelectMany(i => Task.FromResult(((decimal)i).ToResult()), (_, d) => d.ToString(CultureInfo.InvariantCulture));
+        var queryResult = await (from intResult in Task.FromResult(number.ToResult())
+            from stringResult in Task.FromResult(intResult.ToString(CultureInfo.InvariantCulture).ToResult())
             select stringResult);
 
         // Assert
@@ -146,12 +158,12 @@ public partial class ResultExtensionsTests
         // Arrange
 
         // Act
-        var methodResult = await Task.FromResult(Result<int>.Failure(_testFirstError))
+        var methodResult = await Task.FromResult(_testFirstError.ToResult<int>())
             .Select(n => Task.FromResult(n.ToString(CultureInfo.InvariantCulture)));
-        var methodManyResult = await Task.FromResult(Result<int>.Failure(_testFirstError))
-            .SelectMany(i => Task.FromResult(Result<decimal>.Success(i)), (_, d) => d.ToString(CultureInfo.InvariantCulture));
-        var queryResult = await (from intResult in Task.FromResult(Result<int>.Failure(_testFirstError))
-            from stringResult in Task.FromResult(Result<string>.Success(intResult.ToString(CultureInfo.InvariantCulture)))
+        var methodManyResult = await Task.FromResult(_testFirstError.ToResult<int>())
+            .SelectMany(i => Task.FromResult(((decimal)i).ToResult()), (_, d) => d.ToString(CultureInfo.InvariantCulture));
+        var queryResult = await (from intResult in Task.FromResult(_testFirstError.ToResult<int>())
+            from stringResult in Task.FromResult(intResult.ToString(CultureInfo.InvariantCulture).ToResult())
             select stringResult);
 
         // Assert
