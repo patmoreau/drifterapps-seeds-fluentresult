@@ -16,7 +16,26 @@ public static partial class ResultExtensions
     /// <typeparam name="T">The type of the source object.</typeparam>
     /// <param name="source">The source object to convert.</param>
     /// <returns>A successful result containing the source object.</returns>
-    public static Result<T> ToResult<T>(this T source) => Result<T>.Success(source);
+    public static Result<T> ToResult<T>(this T source)
+    {
+        var type = typeof(T);
+        var isNullable = Nullable.GetUnderlyingType(type) != null;
+        if (!isNullable && source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+        return source;
+    }
+
+    /// <summary>
+    /// Converts the source object to a <see cref="Result{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the source object.</typeparam>
+    /// <param name="error">The <see cref="ResultError"/> to convert.</param>
+    /// <returns>A successful result containing the source object.</returns>
+    public static Result<T> ToResult<T>(this ResultError error) => error == ResultError.None
+        ? throw new ArgumentException("Invalid error", nameof(error))
+        : error;
 
     /// <summary>
     /// Projects each element of a sequence into a new form.
@@ -27,7 +46,7 @@ public static partial class ResultExtensions
     /// <param name="selector">The mapping/selector method.</param>
     /// <returns>A result of the selector function or a failure result.</returns>
     public static Result<TResult> Select<TFrom, TResult>(this Result<TFrom> source, Func<TFrom, TResult> selector) =>
-        source.Switch(onSuccess: r => selector(r), onFailure: Result<TResult>.Failure);
+        source.Switch(onSuccess: r => selector(r), onFailure: r => (Result<TResult>)r);
 
     /// <summary>
     /// Projects each element of a sequence to a <see cref="Result{TMiddle}"/> and flattens the resulting sequences into one sequence.
@@ -51,5 +70,5 @@ public static partial class ResultExtensions
                 // Select() just passes the error through as a failed Result<TResult>
                 return result.Select(v => resultSelector(r, v));
             },
-            onFailure: Result<TResult>.Failure); // error -> return a failed Result<TResult>
+            onFailure: r => (Result<TResult>)r); // error -> return a failed Result<TResult>
 }

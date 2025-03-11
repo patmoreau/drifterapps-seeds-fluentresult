@@ -3,36 +3,22 @@ namespace DrifterApps.Seeds.FluentResult;
 public partial struct Result<T>
 {
     /// <summary>
-    ///     Creates a new instance of <see cref="Result{T}" /> representing a successful operation.
+    /// Implicitly converts a value of type <typeparamref name="T"/> to a <see cref="Result{T}"/>.
     /// </summary>
-    /// <returns>A new instance of <see cref="Result{T}" /> representing a successful operation.</returns>
-    public static Result<T> Success() => new(true, ResultError.None, default);
+    /// <param name="value">The value to convert.</param>
+    /// <returns>A successful <see cref="Result{T}"/> containing the value.</returns>
+    public static implicit operator Result<T>(T value) => new(true, ResultError.None, value);
 
     /// <summary>
-    ///     Creates a new instance of <see cref="Result{T}" /> representing a successful operation.
+    /// Implicitly converts a <see cref="ResultError"/> to a <see cref="Result{T}"/>.
     /// </summary>
-    /// <param name="value">The value associated with the successful operation.</param>
-    /// <returns>A new instance of <see cref="Result{T}" /> representing a successful operation.</returns>
-    /// <exception cref="ArgumentNullException">value cannot be null</exception>
-    public static Result<T> Success(T value)
-    {
-        ArgumentNullException.ThrowIfNull(value);
-        return new Result<T>(true, ResultError.None, value);
-    }
+    /// <param name="error">The error to convert.</param>
+    /// <returns>A failed <see cref="Result{T}"/> containing the error.</returns>
+    public static implicit operator Result<T>(ResultError error) =>  new(false, error, default);
 
     /// <summary>
-    ///     Creates a new instance of <see cref="Result{T}" /> representing a failed operation.
+    /// Converts the current instance to a <see cref="Result{T}"/>.
     /// </summary>
-    /// <param name="error">The error associated with the failed operation.</param>
-    /// <returns>A new instance of <see cref="Result{T}" /> representing a failed operation.</returns>
-    public static Result<T> Failure(ResultError error) =>
-     error == ResultError.None
-            ? throw new ArgumentException("Invalid error", nameof(error))
-            : new Result<T>(false, error, default);
-
-    public static implicit operator Result<T>(T value) => Success(value);
-
-    public static implicit operator Result<T>(ResultError error) => Failure(error);
-
-    public Result<T> ToResult() => IsSuccess ? Success(Value) : Failure(Error);
+    /// <returns>A successful or failed <see cref="Result{T}"/> based on the current instance.</returns>
+    public Result<T> ToResult() => IsSuccess ? Value : (Result<T>)Error;
 }

@@ -26,7 +26,7 @@ public class ResultAggregateTests
     {
         // Arrange
         var resultAggregate = ResultAggregate.Create();
-        var successResult = Result<Nothing>.Success();
+        Result<Nothing> successResult = Nothing.Value;
 
         // Act
         resultAggregate.AddResult(successResult);
@@ -42,7 +42,7 @@ public class ResultAggregateTests
     {
         // Arrange
         var resultAggregate = ResultAggregate.Create();
-        var failureResult = Result<Nothing>.Failure(new ResultError(Faker.Random.Word(), Faker.Lorem.Sentence()));
+        Result<Nothing> failureResult = new ResultError(Faker.Random.Word(), Faker.Lorem.Sentence());
 
         // Act
         resultAggregate.AddResult(failureResult);
@@ -58,8 +58,8 @@ public class ResultAggregateTests
     {
         // Arrange
         var resultAggregate = ResultAggregate.Create();
-        var successResult = Result<Nothing>.Success();
-        var failureResult = Result<Nothing>.Failure(new ResultError(Faker.Random.Word(), Faker.Lorem.Sentence()));
+        Result<Nothing> successResult = Nothing.Value;
+        Result<Nothing> failureResult = new ResultError(Faker.Random.Word(), Faker.Lorem.Sentence());
 
         // Act
         resultAggregate.AddResult(successResult);
@@ -76,7 +76,7 @@ public class ResultAggregateTests
     {
         // Arrange
         var aggregate = ResultAggregate.Create();
-        aggregate.AddResult(Result<Nothing>.Failure(_testFirstError));
+        aggregate.AddResult(_testFirstError);
 
         // Act
         var result = aggregate.Ensure(() => true, _testSecondError, EnsureOnFailure.IgnoreOnFailure);
@@ -90,7 +90,7 @@ public class ResultAggregateTests
     {
         // Arrange
         var aggregate = ResultAggregate.Create();
-        aggregate.AddResult(Result<Nothing>.Failure(_testFirstError));
+        aggregate.AddResult(_testFirstError);
 
         // Act
         var result = aggregate.Ensure(SuccessfulValidation(), EnsureOnFailure.IgnoreOnFailure);
@@ -104,7 +104,7 @@ public class ResultAggregateTests
     {
         // Arrange
         var aggregate = ResultAggregate.Create();
-        aggregate.AddResult(Result<Nothing>.Failure(_testFirstError));
+        aggregate.AddResult(_testFirstError);
 
         // Act
         var result = aggregate.Ensure(() => true, _testSecondError, EnsureOnFailure.ValidateOnFailure);
@@ -119,7 +119,7 @@ public class ResultAggregateTests
     {
         // Arrange
         var aggregate = ResultAggregate.Create();
-        aggregate.AddResult(Result<Nothing>.Failure(_testFirstError));
+        aggregate.AddResult(_testFirstError);
 
         // Act
         var result = aggregate.Ensure(SuccessfulValidation(), EnsureOnFailure.ValidateOnFailure);
@@ -168,7 +168,7 @@ public class ResultAggregateTests
         var resultAggregate = ResultAggregate.Create();
 
         // Act
-        var result = resultAggregate.Switch(Result<Nothing>.Success, Result<Nothing>.Failure);
+        var result = resultAggregate.Switch(() => Nothing.Value, r => (Result<Nothing>)r);
 
         // Assert
         result.Should().BeSuccessful();
@@ -181,10 +181,10 @@ public class ResultAggregateTests
         var error = Faker.Random.Word();
         var description = Faker.Lorem.Sentence();
         var resultAggregate = ResultAggregate.Create();
-        resultAggregate.AddResult(Result<Nothing>.Failure(new ResultError(error, description)));
+        resultAggregate.AddResult(new ResultError(error, description));
 
         // Act
-        var result = resultAggregate.Switch(Result<Nothing>.Success, Result<Nothing>.Failure);
+        var result = resultAggregate.Switch(() => Nothing.Value, r => (Result<Nothing>)r);
 
         // Assert
         result.Should()
@@ -205,11 +205,11 @@ public class ResultAggregateTests
         var description1 = Faker.Lorem.Sentence();
         var description2 = Faker.Lorem.Sentence();
         var resultAggregate = ResultAggregate.Create();
-        resultAggregate.AddResult(Result<Nothing>.Failure(new ResultError(error1, description1)));
-        resultAggregate.AddResult(Result<Nothing>.Failure(new ResultError(error2, description2)));
+        resultAggregate.AddResult(new ResultError(error1, description1));
+        resultAggregate.AddResult(new ResultError(error2, description2));
 
         // Act
-        var result = resultAggregate.Switch(Result<Nothing>.Success, Result<Nothing>.Failure);
+        var result = resultAggregate.Switch(() => Nothing.Value, r => (Result<Nothing>)r);
 
         // Assert
         result.Should()
@@ -236,11 +236,11 @@ public class ResultAggregateTests
         var description1 = Faker.Lorem.Sentence();
         var description2 = Faker.Lorem.Sentence();
         var resultAggregate = ResultAggregate.Create();
-        resultAggregate.AddResult(Result<Nothing>.Failure(new ResultError(error, description1)));
-        resultAggregate.AddResult(Result<Nothing>.Failure(new ResultError(error, description2)));
+        resultAggregate.AddResult(new ResultError(error, description1));
+        resultAggregate.AddResult(new ResultError(error, description2));
 
         // Act
-        var result = resultAggregate.Switch(Result<Nothing>.Success, Result<Nothing>.Failure);
+        var result = resultAggregate.Switch(() => Nothing.Value, r => (Result<Nothing>) r);
 
         // Assert
         result.Should()
@@ -253,8 +253,8 @@ public class ResultAggregateTests
             .And.Subject.Should().Contain(description1).And.Contain(description2);
     }
 
-    private static Func<Result<Nothing>> SuccessfulValidation() => Result<Nothing>.Success;
+    private static Func<Result<Nothing>> SuccessfulValidation() => () => Nothing.Value;
 
     private static Func<Result<Nothing>> FailedValidation(ResultError resultError) =>
-        () => Result<Nothing>.Failure(resultError);
+        () => (Result<Nothing>) resultError;
 }

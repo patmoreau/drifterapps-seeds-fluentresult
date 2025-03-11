@@ -86,7 +86,7 @@ public class ResultErrorTests
         var error2 = new ResultError(code, description);
 
         // Act
-        var result = Result<Nothing>.Failure(error1);
+        Result<Nothing> result = error1;
 
         // Assert
         result.Should().BeFailure().And.WithError(error2);
