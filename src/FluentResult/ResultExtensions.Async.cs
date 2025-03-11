@@ -46,6 +46,26 @@ public static partial class ResultExtensions
     }
 
     /// <summary>
+    ///     Executes the next function if the result is successful, passing the result value to the next function and returning
+    ///     a result of type <see cref="Nothing"/>.
+    /// </summary>
+    /// <typeparam name="TIn">The type of the input result value.</typeparam>
+    /// <param name="resultTask">The task that returns a result of type TIn.</param>
+    /// <param name="next">The function to execute if the result is successful.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public static async Task<Result<Nothing>> OnSuccess<TIn>(this Task<Result<TIn>> resultTask, Func<TIn, Task> next)
+    {
+        var result = await resultTask;
+        if (result.IsFailure)
+        {
+            return result.Error;
+        }
+
+        await next(result.Value);
+        return Nothing.Value;
+    }
+
+    /// <summary>
     ///     Executes the next function if the result is a failure, passing the error to the next function.
     /// </summary>
     /// <typeparam name="TIn">The type of the input result value.</typeparam>
@@ -59,8 +79,30 @@ public static partial class ResultExtensions
         return result.IsFailure ? await next(result.Error) : result;
     }
 
+    /// <summary>
+    ///     Executes the next function if the result is a failure, passing the error to the next function.
+    /// </summary>
+    /// <typeparam name="TIn">The type of the input result value.</typeparam>
+    /// <param name="resultTask">The task that returns a result of type TIn.</param>
+    /// <param name="next">The function to execute if the result is a failure.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public static async Task<Result<Nothing>> OnFailure<TIn>(this Task<Result<TIn>> resultTask,
+        Func<ResultError, Task> next)
+    {
+        var result = await resultTask;
+        if (result.IsSuccess)
+        {
+            return Nothing.Value;
+        }
+
+        await next(result.Error);
+        return Nothing.Value;
+    }
+
+    /// <summary>
     ///     Matches the result to either the onSuccess or onFailure function, passing the result value to the onSuccess
     ///     function and returning a result of type TOut.
+    /// </summary>
     /// <typeparam name="TIn">The type of the input result value.</typeparam>
     /// <typeparam name="TOut">The type of the result returned by the onSuccess or onFailure function.</typeparam>
     /// <param name="resultTask">The task that returns a result of type TIn.</param>
@@ -76,6 +118,31 @@ public static partial class ResultExtensions
     }
 
     /// <summary>
+    ///     Matches the result to either the onSuccess or onFailure function, passing the result value to the onSuccess
+    ///     function and returning a result of type TOut.
+    /// </summary>
+    /// <typeparam name="TIn">The type of the input result value.</typeparam>
+    /// <param name="resultTask">The task that returns a result of type TIn.</param>
+    /// <param name="onSuccess">The function to execute if the result is successful.</param>
+    /// <param name="onFailure">The function to execute if the result is a failure.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public static async Task<Result<Nothing>> Switch<TIn>(this Task<Result<TIn>> resultTask,
+        Func<TIn, Task> onSuccess, Func<ResultError, Task> onFailure)
+    {
+        var result = await resultTask;
+        if (result.IsSuccess)
+        {
+            await onSuccess(result.Value);
+        }
+        else
+        {
+            await onFailure(result.Error);
+        }
+
+        return Nothing.Value;
+    }
+
+    /// <summary>
     /// Projects each element of a sequence into a new form.
     /// </summary>
     /// <typeparam name="TFrom">The type of the input value.</typeparam>
@@ -88,7 +155,7 @@ public static partial class ResultExtensions
     {
         var result = await source;
         return await result.Switch(onSuccess: async r => await selector(r),
-            onFailure: e => Task.FromResult((Result<TResult>)e));
+            onFailure: e => Task.FromResult((Result<TResult>) e));
     }
 
     /// <summary>
@@ -115,6 +182,6 @@ public static partial class ResultExtensions
                 // Select() just passes the error through as a failed Result<TResult>
                 return collectionResult.Select(v => resultSelector(r, v));
             },
-            onFailure: e => Task.FromResult((Result<TResult>)e));
+            onFailure: e => Task.FromResult((Result<TResult>) e));
     }
 }

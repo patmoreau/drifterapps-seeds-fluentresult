@@ -94,7 +94,7 @@ public class ResultTests
         Result<string> resultIn = _faker.Random.Word();
 
         // Act
-        var result = resultIn.OnSuccess(_ => (Result<int>)expectedValue);
+        var result = resultIn.OnSuccess(_ => (Result<int>) expectedValue);
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -143,6 +143,62 @@ public class ResultTests
 
         // Assert
         result.Should().BeOfType<Result<int>>();
+        result.Should().BeFailure().And.WithError(_testFirstError);
+    }
+
+    [Fact]
+    public void GivenOnSuccessWithNoOut_WhenResultIsSuccess_ThenExecuteNext()
+    {
+        // Arrange
+        Result<string> resultIn = _faker.Random.Word();
+
+        // Act
+        var result = resultIn.OnSuccess(_ => { });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful().And.WithValue(Nothing.Value);
+    }
+
+    [Fact]
+    public void GivenOnSuccessWithNoOut_WhenResultIsFailure_ThenReturnFailure()
+    {
+        // Arrange
+        var resultIn = _testFirstError.ToResult<string>();
+
+        // Act
+        var result = resultIn.OnSuccess(_ => { });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeFailure().And.WithError(_testFirstError);
+    }
+
+    [Fact]
+    public async Task GivenOnSuccessWithNoOutAsync_WhenResultIsSuccess_ThenExecuteNext()
+    {
+        // Arrange
+        var resultIn = _faker.Random.Word().ToResult();
+
+        // Act
+        var result = await resultIn.OnSuccess(_ => Task.CompletedTask);
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful().And.WithValue(Nothing.Value);
+    }
+
+    [Fact]
+    public async Task GivenOnSuccessWithNoOutAsync_WhenResultIsFailure_ThenReturnFailure()
+    {
+        // Arrange
+        var resultIn = _testFirstError.ToResult<string>();
+
+        // Act
+        var result = await resultIn.OnSuccess(_ => Task.CompletedTask);
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
         result.Should().BeFailure().And.WithError(_testFirstError);
     }
 
@@ -217,6 +273,63 @@ public class ResultTests
     }
 
     [Fact]
+    public void GivenOnFailureWithNoOut_WhenResultIsSuccess_ThenReturnSuccess()
+    {
+        // Arrange
+        var resultIn = _faker.Random.Word().ToResult();
+
+        // Act
+        var result = resultIn.OnFailure(_ => { });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful();
+    }
+
+    [Fact]
+    public void GivenOnFailureWithNoOut_WhenResultIsFailure_ThenExecuteNext()
+    {
+        // Arrange
+        var resultIn = _testFirstError.ToResult<string>();
+
+        // Act
+        var result = resultIn.OnFailure(_ => { });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful();
+    }
+
+    [Fact]
+    public async Task GivenOnFailureWithNoOutAsync_WhenResultIsSuccess_ThenReturnSuccess()
+    {
+        // Arrange
+        var expectedValue = _faker.Random.Word();
+        var resultIn = expectedValue.ToResult();
+
+        // Act
+        var result = await resultIn.OnFailure(_ => Task.CompletedTask);
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful();
+    }
+
+    [Fact]
+    public async Task GivenOnFailureWithNoOutAsync_WhenResultIsFailure_ThenExecuteNext()
+    {
+        // Arrange
+        var resultIn = _testFirstError.ToResult<string>();
+
+        // Act
+        var result = await resultIn.OnFailure(_ => Task.CompletedTask);
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful();
+    }
+
+    [Fact]
     public void GivenSwitchOfTOut_WhenResultIsSuccess_ThenExecuteSuccessNext()
     {
         // Arrange
@@ -279,6 +392,100 @@ public class ResultTests
     }
 
     [Fact]
+    public void GivenSwitchWithNoTOut_WhenResultIsSuccess_ThenExecuteSuccessNext()
+    {
+        // Arrange
+        var expectedValue = _faker.Random.Word();
+        var resultIn = expectedValue.ToResult();
+        var expectedSuccess = false;
+        var expectedFailure = false;
+
+        // Act
+        var result = resultIn.Switch(_ => { expectedSuccess = true; }, _ => { expectedFailure = true; });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful();
+        expectedSuccess.Should().BeTrue();
+        expectedFailure.Should().BeFalse();
+    }
+
+    [Fact]
+    public void GivenSwitchWithNoTOut_WhenResultIsFailure_ThenExecuteFailureNext()
+    {
+        // Arrange
+        var resultIn = _testFirstError.ToResult<int>();
+        var expectedSuccess = false;
+        var expectedFailure = false;
+
+        // Act
+        var result = resultIn.Switch(_ => { expectedSuccess = true; }, _ => { expectedFailure = true; });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful();
+        expectedSuccess.Should().BeFalse();
+        expectedFailure.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task GivenSwitchWithNoTOutAsync_WhenResultIsSuccess_ThenExecuteSuccessNext()
+    {
+        // Arrange
+        var expectedValue = _faker.Random.Word();
+        var resultIn = expectedValue.ToResult();
+        var expectedSuccess = false;
+        var expectedFailure = false;
+
+        // Act
+        var result = await resultIn.Switch(
+            _ =>
+            {
+                expectedSuccess = true;
+                return Task.CompletedTask;
+            },
+            _ =>
+            {
+                expectedFailure = true;
+                return Task.CompletedTask;
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful();
+        expectedSuccess.Should().BeTrue();
+        expectedFailure.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task GivenSwitchWithNoTOutAsync_WhenResultIsFailure_ThenExecuteFailureNext()
+    {
+        // Arrange
+        var resultIn = _testFirstError.ToResult<string>();
+        var expectedSuccess = false;
+        var expectedFailure = false;
+
+        // Act
+        var result = await resultIn.Switch(
+            _ =>
+            {
+                expectedSuccess = true;
+                return Task.CompletedTask;
+            },
+            _ =>
+            {
+                expectedFailure = true;
+                return Task.CompletedTask;
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful();
+        expectedSuccess.Should().BeFalse();
+        expectedFailure.Should().BeTrue();
+    }
+
+    [Fact]
     public void GivenEquals_WhenSameResult_ThenReturnTrue()
     {
         // Arrange
@@ -313,7 +520,7 @@ public class ResultTests
         var result = hash.ToResult();
 
         // Act
-        var isEqual = result.Equals((object)hash.ToResult());
+        var isEqual = result.Equals((object) hash.ToResult());
 
         // Assert
         isEqual.Should().BeTrue();
@@ -326,7 +533,7 @@ public class ResultTests
         var result = _faker.Random.Hash().ToResult();
 
         // Act
-        var isEqual = result.Equals((object)_faker.Random.Hash().ToResult());
+        var isEqual = result.Equals((object) _faker.Random.Hash().ToResult());
 
         // Assert
         isEqual.Should().BeFalse();

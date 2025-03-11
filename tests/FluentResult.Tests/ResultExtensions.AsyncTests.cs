@@ -39,7 +39,7 @@ public partial class ResultExtensionsTests
         var resultIn = Task.FromResult(_faker.Random.Word().ToResult());
 
         // Act
-        var result = await resultIn.OnSuccess(value => Task.FromResult(expectedValue.ToResult()));
+        var result = await resultIn.OnSuccess(_ => Task.FromResult(expectedValue.ToResult()));
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -54,11 +54,51 @@ public partial class ResultExtensionsTests
         var resultIn = Task.FromResult(_testFirstError.ToResult<int>());
 
         // Act
-        var result = await resultIn.OnSuccess(value => Task.FromResult(expectedValue.ToResult()));
+        var result = await resultIn.OnSuccess(_ => Task.FromResult(expectedValue.ToResult()));
 
         // Assert
         result.Should().BeOfType<Result<int>>();
         result.Should().BeFailure().And.WithError(_testFirstError);
+    }
+
+    [Fact]
+    public async Task GivenAsyncOnSuccessOfTInWithNoTOut_WhenResultIsSuccess_ThenExecuteNext()
+    {
+        // Arrange
+        var resultIn = Task.FromResult(_faker.Random.Word().ToResult());
+        var nextCalled = false;
+
+        // Act
+        var result = await resultIn.OnSuccess(_ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful();
+        nextCalled.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task GivenAsyncOnSuccessOfTInWithNoTOut_WhenResultIsFailure_ThenReturnFailure()
+    {
+        // Arrange
+        var resultIn = Task.FromResult(_testFirstError.ToResult<int>());
+        var nextCalled = false;
+
+        // Act
+        var result = await resultIn.OnSuccess(_ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeFailure();
+        nextCalled.Should().BeFalse();
     }
 
     [Fact]
@@ -97,6 +137,47 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
+    public async Task GivenAsyncOnFailureOfTInWithNoTOut_WhenResultIsSuccess_ThenReturnSuccess()
+    {
+        // Arrange
+        var expectedValue = _faker.Random.Word();
+        var resultIn = Task.FromResult(expectedValue.ToResult());
+        var nextCalled = false;
+
+        // Act
+        var result = await resultIn.OnFailure(_ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful();
+        nextCalled.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task GivenAsyncOnFailureOfTInWithNoTOut_WhenResultIsFailure_ThenExecuteNext()
+    {
+        // Arrange
+        var resultIn = Task.FromResult(_testFirstError.ToResult<string>());
+        var nextCalled = false;
+
+        // Act
+        var result = await resultIn.OnFailure(_ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful();
+        nextCalled.Should().BeTrue();
+    }
+
+    [Fact]
     public async Task GivenAsyncSwitchOfTInTOut_WhenResultIsSuccess_ThenExecuteSuccessNext()
     {
         // Arrange
@@ -125,6 +206,63 @@ public partial class ResultExtensionsTests
         // Assert
         result.Should().BeOfType<Result<int>>();
         result.Should().BeFailure().And.WithError(_testFirstError);
+    }
+
+    [Fact]
+    public async Task GivenAsyncSwitchOfTInWithNoTOut_WhenResultIsSuccess_ThenExecuteSuccessNext()
+    {
+        // Arrange
+        var expectedValue = _faker.Random.Word();
+        var resultIn = Task.FromResult(expectedValue.ToResult());
+        var onSuccessCalled = false;
+        var onFailureCalled = false;
+
+        // Act
+        var result = await resultIn.Switch(
+            _ =>
+            {
+                onSuccessCalled = true;
+                return Task.CompletedTask;
+            },
+            _ =>
+            {
+                onFailureCalled = true;
+                return Task.CompletedTask;
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful();
+        onSuccessCalled.Should().BeTrue();
+        onFailureCalled.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task GivenAsyncSwitchOfTInWithNoTOut_WhenResultIsFailure_ThenExecuteFailureNext()
+    {
+        // Arrange
+        var resultIn = Task.FromResult(_testFirstError.ToResult<string>());
+        var onSuccessCalled = false;
+        var onFailureCalled = false;
+
+        // Act
+        var result = await resultIn.Switch(
+            _ =>
+            {
+                onSuccessCalled = true;
+                return Task.CompletedTask;
+            },
+            _ =>
+            {
+                onFailureCalled = true;
+                return Task.CompletedTask;
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.Should().BeSuccessful();
+        onSuccessCalled.Should().BeFalse();
+        onFailureCalled.Should().BeTrue();
     }
 
     [Fact]
