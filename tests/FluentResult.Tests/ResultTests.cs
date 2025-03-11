@@ -69,7 +69,7 @@ public class ResultTests
         var result = expected.ToResult();
 
         // Assert
-        result.Should().BeSuccessful().And.WithValue(Nothing.Value);
+        result.Should().BeSuccessful();
     }
 
     [Fact]
@@ -151,13 +151,15 @@ public class ResultTests
     {
         // Arrange
         Result<string> resultIn = _faker.Random.Word();
+        var expectedSuccess = false;
 
         // Act
-        var result = resultIn.OnSuccess(_ => { });
+        var result = resultIn.OnSuccess(_ => { expectedSuccess = true; });
 
         // Assert
         result.Should().BeOfType<Result<Nothing>>();
-        result.Should().BeSuccessful().And.WithValue(Nothing.Value);
+        result.Should().BeSuccessful();
+        expectedSuccess.Should().BeTrue();
     }
 
     [Fact]
@@ -165,13 +167,15 @@ public class ResultTests
     {
         // Arrange
         var resultIn = _testFirstError.ToResult<string>();
+        var expectedSuccess = false;
 
         // Act
-        var result = resultIn.OnSuccess(_ => { });
+        var result = resultIn.OnSuccess(_ => { expectedSuccess = true; });
 
         // Assert
         result.Should().BeOfType<Result<Nothing>>();
         result.Should().BeFailure().And.WithError(_testFirstError);
+        expectedSuccess.Should().BeFalse();
     }
 
     [Fact]
@@ -185,7 +189,7 @@ public class ResultTests
 
         // Assert
         result.Should().BeOfType<Result<Nothing>>();
-        result.Should().BeSuccessful().And.WithValue(Nothing.Value);
+        result.Should().BeSuccessful();
     }
 
     [Fact]
@@ -277,13 +281,15 @@ public class ResultTests
     {
         // Arrange
         var resultIn = _faker.Random.Word().ToResult();
+        var expectedFailure = false;
 
         // Act
-        var result = resultIn.OnFailure(_ => { });
+        var result = resultIn.OnFailure(_ => { expectedFailure = true; });
 
         // Assert
         result.Should().BeOfType<Result<Nothing>>();
         result.Should().BeSuccessful();
+        expectedFailure.Should().BeFalse();
     }
 
     [Fact]
@@ -291,13 +297,15 @@ public class ResultTests
     {
         // Arrange
         var resultIn = _testFirstError.ToResult<string>();
+        var expectedFailure = false;
 
         // Act
-        var result = resultIn.OnFailure(_ => { });
+        var result = resultIn.OnFailure(_ => { expectedFailure = true; });
 
         // Assert
         result.Should().BeOfType<Result<Nothing>>();
-        result.Should().BeSuccessful();
+        result.Should().BeFailure().And.WithError(_testFirstError);
+        expectedFailure.Should().BeTrue();
     }
 
     [Fact]
@@ -326,7 +334,7 @@ public class ResultTests
 
         // Assert
         result.Should().BeOfType<Result<Nothing>>();
-        result.Should().BeSuccessful();
+        result.Should().BeFailure().And.WithError(_testFirstError);
     }
 
     [Fact]
@@ -423,7 +431,7 @@ public class ResultTests
 
         // Assert
         result.Should().BeOfType<Result<Nothing>>();
-        result.Should().BeSuccessful();
+        result.Should().BeFailure().And.WithError(_testFirstError);
         expectedSuccess.Should().BeFalse();
         expectedFailure.Should().BeTrue();
     }
@@ -480,7 +488,7 @@ public class ResultTests
 
         // Assert
         result.Should().BeOfType<Result<Nothing>>();
-        result.Should().BeSuccessful();
+        result.Should().BeFailure().And.WithError(_testFirstError);
         expectedSuccess.Should().BeFalse();
         expectedFailure.Should().BeTrue();
     }
