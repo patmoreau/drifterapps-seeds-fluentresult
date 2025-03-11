@@ -24,6 +24,7 @@ public static partial class ResultExtensions
         {
             throw new ArgumentNullException(nameof(source));
         }
+
         return source;
     }
 
@@ -46,7 +47,7 @@ public static partial class ResultExtensions
     /// <param name="selector">The mapping/selector method.</param>
     /// <returns>A result of the selector function or a failure result.</returns>
     public static Result<TResult> Select<TFrom, TResult>(this Result<TFrom> source, Func<TFrom, TResult> selector) =>
-        source.Switch(onSuccess: r => selector(r), onFailure: r => (Result<TResult>)r);
+        source.Switch(onSuccess: r => selector(r), onFailure: r => (Result<TResult>) r);
 
     /// <summary>
     /// Projects each element of a sequence to a <see cref="Result{TMiddle}"/> and flattens the resulting sequences into one sequence.
@@ -70,5 +71,5 @@ public static partial class ResultExtensions
                 // Select() just passes the error through as a failed Result<TResult>
                 return result.Select(v => resultSelector(r, v));
             },
-            onFailure: r => (Result<TResult>)r); // error -> return a failed Result<TResult>
+            onFailure: r => (Result<TResult>) r); // error -> return a failed Result<TResult>
 }

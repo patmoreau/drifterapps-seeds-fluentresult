@@ -17,7 +17,39 @@ public partial struct Result<T>
     /// <param name="next">The function to execute if the result is successful.</param>
     /// <returns>The result of the next function or a failure result.</returns>
     public Task<Result<TOut>> OnSuccess<TOut>(Func<T, Task<Result<TOut>>> next) =>
-        IsSuccess ? next(Value) : Task.FromResult((Result<TOut>)Error);
+        IsSuccess ? next(Value) : Task.FromResult((Result<TOut>) Error);
+
+    /// <summary>
+    ///     Executes the next action if the result is successful and returns a result of type <see cref="Nothing"/> />.
+    /// </summary>
+    /// <param name="next">The function to execute if the result is successful.</param>
+    /// <returns>The result of the next function or a failure result.</returns>
+    public Result<Nothing> OnSuccess(Action<T> next)
+    {
+        if (IsFailure)
+        {
+            return Error;
+        }
+
+        next(Value);
+        return Nothing.Value;
+    }
+
+    /// <summary>
+    ///     Executes the next action if the result is successful and returns a result of type <see cref="Nothing" />.
+    /// </summary>
+    /// <param name="next">The function to execute if the result is successful.</param>
+    /// <returns>The result of the next function or a failure result.</returns>
+    public async Task<Result<Nothing>> OnSuccess(Func<T, Task> next)
+    {
+        if (IsFailure)
+        {
+            return Error;
+        }
+
+        await next(Value);
+        return Nothing.Value;
+    }
 
     /// <summary>
     ///     Executes the next function if the result is a failure.
@@ -33,6 +65,36 @@ public partial struct Result<T>
     /// <returns>The result of the next function or the initial result.</returns>
     public Task<Result<T>> OnFailure(Func<ResultError, Task<Result<T>>> next) =>
         IsFailure ? next(Error) : Task.FromResult(this);
+
+    /// <summary>
+    ///     Executes the next function if the result is a failure.
+    /// </summary>
+    /// <param name="next">The function to execute if the result is a failure.</param>
+    /// <returns>The result of the next function or the initial result.</returns>
+    public Result<Nothing> OnFailure(Action<ResultError> next)
+    {
+        if (IsSuccess)
+        {
+            return Nothing.Value;
+        }
+        next(Error);
+        return Nothing.Value;
+    }
+
+    /// <summary>
+    ///     Executes the next function if the result is a failure.
+    /// </summary>
+    /// <param name="next">The function to execute if the result is a failure.</param>
+    /// <returns>The result of the next function or the initial result.</returns>
+    public async Task<Result<Nothing>> OnFailure(Func<ResultError, Task> next)
+    {
+        if (IsSuccess)
+        {
+            return Nothing.Value;
+        }
+        await next(Error);
+        return Nothing.Value;
+    }
 
     /// <summary>
     ///     Matches the result to the appropriate function based on success or failure and returns a result of type
@@ -56,4 +118,44 @@ public partial struct Result<T>
     public Task<Result<TOut>> Switch<TOut>(Func<T, Task<Result<TOut>>> onSuccess,
         Func<ResultError, Task<Result<TOut>>> onFailure) =>
         IsSuccess ? onSuccess(Value) : onFailure(Error);
+
+    /// <summary>
+    ///     Matches the result to the appropriate function based on success or failure and returns a result of type
+    ///     <See cref="Nothing" />.
+    /// </summary>
+    /// <param name="onSuccess">The function to execute if the result is successful.</param>
+    /// <param name="onFailure">The function to execute if the result is a failure.</param>
+    /// <returns>The result of the appropriate function.</returns>
+    public Result<Nothing> Switch(Action<T> onSuccess, Action<ResultError> onFailure)
+    {
+        if (IsSuccess)
+        {
+            onSuccess(Value);
+        }
+        else
+        {
+            onFailure(Error);
+        }
+        return Nothing.Value;
+    }
+
+    /// <summary>
+    ///     Matches the result to the appropriate function based on success or failure and returns a result of type
+    ///     <see cref="Nothing" />.
+    /// </summary>
+    /// <param name="onSuccess">The function to execute if the result is successful.</param>
+    /// <param name="onFailure">The function to execute if the result is a failure.</param>
+    /// <returns>The result of the appropriate function.</returns>
+    public async Task<Result<Nothing>> Switch(Func<T, Task> onSuccess, Func<ResultError, Task> onFailure)
+    {
+        if (IsSuccess)
+        {
+            await onSuccess(Value);
+        }
+        else
+        {
+            await onFailure(Error);
+        }
+        return Nothing.Value;
+    }
 }
