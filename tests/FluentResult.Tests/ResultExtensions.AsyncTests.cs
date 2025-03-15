@@ -8,7 +8,7 @@ public partial class ResultExtensionsTests
     public async Task GivenToResultAsync_WhenInvoked_ThenReturnSuccess()
     {
         // Arrange
-        var number = _faker.Random.Int();
+        var number = Faker.Random.Int();
         var numberTask = Task.FromResult(number);
 
         // Act
@@ -19,264 +19,308 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
+    public void GivenToResultAsync_WhenInvokedForResultError_ThenThrowInvalidOperationException()
+    {
+        // Arrange
+        var error = TestFirstError;
+        var numberTask = Task.FromResult(error);
+
+        // Act
+        var action = () => numberTask.ToResult();
+
+        // Assert
+        action.Should()
+            .ThrowAsync<InvalidOperationException>().WithMessage("ResultError is not allowed.");
+    }
+
+    [Fact]
     public async Task GivenToResultAsync_WhenInvokedWithResultError_ThenReturnFailure()
     {
         // Arrange
-        var numberTask = Task.FromResult(_testFirstError);
+        var numberTask = Task.FromResult(TestFirstError);
 
         // Act
         var result = await numberTask.ToResult<string>();
 
         // Assert
-        result.Should().BeFailure().And.WithError(_testFirstError);
+        result.Should().BeFailure().And.WithError(TestFirstError);
     }
 
-    [Fact]
-    public async Task GivenAsyncOnSuccessOfTInTOut_WhenResultIsSuccess_ThenExecuteNext()
+    public static TheoryData<Result<int>, bool, bool> MatchData =>
+        new()
+        {
+            {Faker.Random.Int().ToResult(), true, false},
+            {TestFirstError.ToResult<int>(), false, true}
+        };
+
+    [Theory]
+    [MemberData(nameof(MatchData))]
+    public async Task GivenAsyncMatchOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedSuccess, bool expectedFailure)
     {
         // Arrange
-        var expectedValue = _faker.Random.Int();
-        var resultIn = Task.FromResult(_faker.Random.Word().ToResult());
+        var calledSuccess = false;
+        var calledFailure = false;
 
         // Act
-        var result = await resultIn.OnSuccess(_ => Task.FromResult(expectedValue.ToResult()));
+        var result = await Task.FromResult(resultIn).Match(_ => { calledSuccess = true; },
+            _ => { calledFailure = true; });
 
         // Assert
         result.Should().BeOfType<Result<int>>();
-        result.Should().BeSuccessful().And.WithValue(expectedValue);
+        result.IsSuccess.Should().Be(expectedSuccess);
+        result.IsFailure.Should().Be(expectedFailure);
+        calledSuccess.Should().Be(expectedSuccess);
+        calledFailure.Should().Be(expectedFailure);
     }
 
-    [Fact]
-    public async Task GivenAsyncOnSuccessOfTInTOut_WhenResultIsFailure_ThenReturnFailure()
+    [Theory]
+    [MemberData(nameof(MatchData))]
+    public async Task GivenAsyncMatchOfTInTOut_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedSuccess, bool expectedFailure)
     {
         // Arrange
-        var expectedValue = _faker.Random.Int();
-        var resultIn = Task.FromResult(_testFirstError.ToResult<int>());
+        var calledSuccess = false;
+        var calledFailure = false;
 
         // Act
-        var result = await resultIn.OnSuccess(_ => Task.FromResult(expectedValue.ToResult()));
-
-        // Assert
-        result.Should().BeOfType<Result<int>>();
-        result.Should().BeFailure().And.WithError(_testFirstError);
-    }
-
-    [Fact]
-    public async Task GivenAsyncOnSuccessOfTInWithNoTOut_WhenResultIsSuccess_ThenExecuteNext()
-    {
-        // Arrange
-        var resultIn = Task.FromResult(_faker.Random.Word().ToResult());
-        var nextCalled = false;
-
-        // Act
-        var result = await resultIn.OnSuccess(_ =>
-        {
-            nextCalled = true;
-            return Task.CompletedTask;
-        });
-
-        // Assert
-        result.Should().BeOfType<Result<Nothing>>();
-        result.Should().BeSuccessful();
-        nextCalled.Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task GivenAsyncOnSuccessOfTInWithNoTOut_WhenResultIsFailure_ThenReturnFailure()
-    {
-        // Arrange
-        var resultIn = Task.FromResult(_testFirstError.ToResult<int>());
-        var nextCalled = false;
-
-        // Act
-        var result = await resultIn.OnSuccess(_ =>
-        {
-            nextCalled = true;
-            return Task.CompletedTask;
-        });
-
-        // Assert
-        result.Should().BeOfType<Result<Nothing>>();
-        result.Should().BeFailure();
-        nextCalled.Should().BeFalse();
-    }
-
-    [Fact]
-    public async Task GivenAsyncOnFailureOfTIn_WhenResultIsSuccess_ThenReturnSuccess()
-    {
-        // Arrange
-        var expectedValue = _faker.Random.Word();
-        var resultIn = Task.FromResult(expectedValue.ToResult());
-
-        // Act
-        var result = await resultIn.OnFailure(_ => Task.FromResult(_testSecondError.ToResult<string>()));
-
-        // Assert
-        result.Should().BeOfType<Result<string>>();
-        result.Should().BeSuccessful();
-    }
-
-    [Fact]
-    public async Task GivenAsyncOnFailureOfTIn_WhenResultIsFailure_ThenExecuteNext()
-    {
-        // Arrange
-        var resultIn = Task.FromResult(_testFirstError.ToResult<string>());
-        var expectedError = ResultError.None;
-
-        // Act
-        var result = await resultIn.OnFailure(error =>
-        {
-            expectedError = error;
-            return Task.FromResult(_testSecondError.ToResult<string>());
-        });
-
-        // Assert
-        result.Should().BeOfType<Result<string>>();
-        result.Should().BeFailure().And.WithError(_testSecondError);
-        expectedError.Should().Be(_testFirstError);
-    }
-
-    [Fact]
-    public async Task GivenAsyncOnFailureOfTInWithNoTOut_WhenResultIsSuccess_ThenReturnSuccess()
-    {
-        // Arrange
-        var expectedValue = _faker.Random.Word();
-        var resultIn = Task.FromResult(expectedValue.ToResult());
-        var nextCalled = false;
-
-        // Act
-        var result = await resultIn.OnFailure(_ =>
-        {
-            nextCalled = true;
-            return Task.CompletedTask;
-        });
-
-        // Assert
-        result.Should().BeOfType<Result<Nothing>>();
-        result.Should().BeSuccessful();
-        nextCalled.Should().BeFalse();
-    }
-
-    [Fact]
-    public async Task GivenAsyncOnFailureOfTInWithNoTOut_WhenResultIsFailure_ThenExecuteNext()
-    {
-        // Arrange
-        var resultIn = Task.FromResult(_testFirstError.ToResult<string>());
-        var nextCalled = false;
-
-        // Act
-        var result = await resultIn.OnFailure(_ =>
-        {
-            nextCalled = true;
-            return Task.CompletedTask;
-        });
-
-        // Assert
-        result.Should().BeOfType<Result<Nothing>>();
-        result.Should().BeSuccessful();
-        nextCalled.Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task GivenAsyncSwitchOfTInTOut_WhenResultIsSuccess_ThenExecuteSuccessNext()
-    {
-        // Arrange
-        var expectedValue = _faker.Random.Word();
-        var resultIn = Task.FromResult(expectedValue.ToResult());
-
-        // Act
-        var result = await resultIn.Switch(_ => Task.FromResult(_faker.Random.Int().ToResult()),
-            error => Task.FromResult(error.ToResult<int>()));
-
-        // Assert
-        result.Should().BeOfType<Result<int>>();
-        result.Should().BeSuccessful();
-    }
-
-    [Fact]
-    public async Task GivenAsyncSwitchOfTInTOut_WhenResultIsFailure_ThenExecuteFailureNext()
-    {
-        // Arrange
-        var resultIn = Task.FromResult(_testFirstError.ToResult<string>());
-
-        // Act
-        var result = await resultIn.Switch(_ => Task.FromResult(_faker.Random.Int().ToResult()),
-            error => Task.FromResult(error.ToResult<int>()));
-
-        // Assert
-        result.Should().BeOfType<Result<int>>();
-        result.Should().BeFailure().And.WithError(_testFirstError);
-    }
-
-    [Fact]
-    public async Task GivenAsyncSwitchOfTInWithNoTOut_WhenResultIsSuccess_ThenExecuteSuccessNext()
-    {
-        // Arrange
-        var expectedValue = _faker.Random.Word();
-        var resultIn = Task.FromResult(expectedValue.ToResult());
-        var onSuccessCalled = false;
-        var onFailureCalled = false;
-
-        // Act
-        var result = await resultIn.Switch(
+        var result = await Task.FromResult(resultIn).Match(
             _ =>
             {
-                onSuccessCalled = true;
-                return Task.CompletedTask;
+                calledSuccess = true;
+                return Nothing.Value.ToResult();
             },
-            _ =>
+            error =>
             {
-                onFailureCalled = true;
-                return Task.CompletedTask;
+                calledFailure = true;
+                return error.ToResult<Nothing>();
             });
 
         // Assert
         result.Should().BeOfType<Result<Nothing>>();
-        result.Should().BeSuccessful();
-        onSuccessCalled.Should().BeTrue();
-        onFailureCalled.Should().BeFalse();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        result.IsFailure.Should().Be(expectedFailure);
+        calledSuccess.Should().Be(expectedSuccess);
+        calledFailure.Should().Be(expectedFailure);
     }
 
-    [Fact]
-    public async Task GivenAsyncSwitchOfTInWithNoTOut_WhenResultIsFailure_ThenExecuteFailureNext()
+    [Theory]
+    [MemberData(nameof(MatchData))]
+    public async Task GivenAsyncMatchOfTInWithNoTOut_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedSuccess, bool expectedFailure)
     {
         // Arrange
-        var resultIn = Task.FromResult(_testFirstError.ToResult<string>());
-        var onSuccessCalled = false;
-        var onFailureCalled = false;
+        var calledSuccess = false;
+        var calledFailure = false;
 
         // Act
-        var result = await resultIn.Switch(
+        var result = await Task.FromResult(resultIn).Match(
             _ =>
             {
-                onSuccessCalled = true;
+                calledSuccess = true;
                 return Task.CompletedTask;
             },
             _ =>
             {
-                onFailureCalled = true;
+                calledFailure = true;
                 return Task.CompletedTask;
             });
 
         // Assert
+        result.Should().BeOfType<Result<int>>();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        result.IsFailure.Should().Be(expectedFailure);
+        calledSuccess.Should().Be(expectedSuccess);
+        calledFailure.Should().Be(expectedFailure);
+    }
+
+    [Theory]
+    [MemberData(nameof(MatchData))]
+    public async Task GivenAsyncMatchOfTInWithTaskTOut_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedSuccess, bool expectedFailure)
+    {
+        // Arrange
+        var calledSuccess = false;
+        var calledFailure = false;
+
+        // Act
+        var result = await Task.FromResult(resultIn).Match(
+            _ =>
+            {
+                calledSuccess = true;
+                return Nothing.Task.ToResult();
+            },
+            error =>
+            {
+                calledFailure = true;
+                return error.ToResult<Nothing>().ToTask();
+            });
+
+        // Assert
         result.Should().BeOfType<Result<Nothing>>();
-        result.Should().BeSuccessful();
-        onSuccessCalled.Should().BeFalse();
-        onFailureCalled.Should().BeTrue();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        result.IsFailure.Should().Be(expectedFailure);
+        calledSuccess.Should().Be(expectedSuccess);
+        calledFailure.Should().Be(expectedFailure);
+    }
+
+    public static TheoryData<Result<int>, bool> OnSuccessData =>
+        new()
+        {
+            {Faker.Random.Int().ToResult(), true},
+            {TestFirstError.ToResult<int>(), false}
+        };
+
+    [Theory]
+    [MemberData(nameof(OnSuccessData))]
+    public async Task GivenAsyncOnSuccessOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedSuccess)
+    {
+        // Arrange
+        var calledSuccess = false;
+
+        // Act
+        var result = await Task.FromResult(resultIn).OnSuccess(
+            _ =>
+            {
+                calledSuccess = true;
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<int>>();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        calledSuccess.Should().Be(expectedSuccess);
+    }
+
+    [Theory]
+    [MemberData(nameof(OnSuccessData))]
+    public async Task GivenAsyncOnSuccessOfTInTOut_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedSuccess)
+    {
+        // Arrange
+        var calledSuccess = false;
+
+        // Act
+        var result = await Task.FromResult(resultIn).OnSuccess(
+            _ =>
+            {
+                calledSuccess = true;
+                return Nothing.Value.ToResult();
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        calledSuccess.Should().Be(expectedSuccess);
+    }
+
+    [Theory]
+    [MemberData(nameof(OnSuccessData))]
+    public async Task GivenAsyncOnSuccessOfTInWithNoTOut_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedSuccess)
+    {
+        // Arrange
+        var calledSuccess = false;
+
+        // Act
+        var result = await Task.FromResult(resultIn).OnSuccess(
+            _ =>
+            {
+                calledSuccess = true;
+                return Task.CompletedTask;
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<int>>();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        calledSuccess.Should().Be(expectedSuccess);
+    }
+
+    [Theory]
+    [MemberData(nameof(OnSuccessData))]
+    public async Task GivenAsyncOnSuccessOfTInTaskTOut_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedSuccess)
+    {
+        // Arrange
+        var calledSuccess = false;
+
+        // Act
+        var result = await Task.FromResult(resultIn).OnSuccess(
+            _ =>
+            {
+                calledSuccess = true;
+                return Nothing.Task.ToResult();
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        calledSuccess.Should().Be(expectedSuccess);
+    }
+
+    public static TheoryData<Result<int>, bool> OnFailureData =>
+        new()
+        {
+            {Faker.Random.Int().ToResult(), false},
+            {TestFirstError.ToResult<int>(), true}
+        };
+
+    [Theory]
+    [MemberData(nameof(OnFailureData))]
+    public async Task GivenAsyncOnFailureVoid_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedfailure)
+    {
+        // Arrange
+        var calledFailure = false;
+
+        // Act
+        var result = await Task.FromResult(resultIn).OnFailure(
+            _ =>
+            {
+                calledFailure = true;
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<int>>();
+        result.IsFailure.Should().Be(expectedfailure);
+        calledFailure.Should().Be(expectedfailure);
+    }
+
+    [Theory]
+    [MemberData(nameof(OnFailureData))]
+    public async Task GivenAsyncOnFailureOfTask_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedfailure)
+    {
+        // Arrange
+        var calledFailure = false;
+
+        // Act
+        var result = await Task.FromResult(resultIn).OnFailure(
+            _ =>
+            {
+                calledFailure = true;
+                return Task.CompletedTask;
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<int>>();
+        result.IsFailure.Should().Be(expectedfailure);
+        calledFailure.Should().Be(expectedfailure);
     }
 
     [Fact]
     public async Task GivenAsyncSelect_WhenResultIsSuccess_ThenExecuteSuccessNext()
     {
         // Arrange
-        var number = _faker.Random.Int();
+        var number = Faker.Random.Int();
         var expectedString = number.ToString(CultureInfo.InvariantCulture);
 
         // Act
         var methodResult = await Task.FromResult(number.ToResult())
             .Select(n => Task.FromResult(n.ToString(CultureInfo.InvariantCulture)));
         var methodManyResult = await Task.FromResult(number.ToResult())
-            .SelectMany(i => Task.FromResult(((decimal)i).ToResult()), (_, d) => d.ToString(CultureInfo.InvariantCulture));
+            .SelectMany(i => Task.FromResult(((decimal) i).ToResult()),
+                (_, d) => d.ToString(CultureInfo.InvariantCulture));
         var queryResult = await (from intResult in Task.FromResult(number.ToResult())
             from stringResult in Task.FromResult(intResult.ToString(CultureInfo.InvariantCulture).ToResult())
             select stringResult);
@@ -296,20 +340,21 @@ public partial class ResultExtensionsTests
         // Arrange
 
         // Act
-        var methodResult = await Task.FromResult(_testFirstError.ToResult<int>())
+        var methodResult = await Task.FromResult(TestFirstError.ToResult<int>())
             .Select(n => Task.FromResult(n.ToString(CultureInfo.InvariantCulture)));
-        var methodManyResult = await Task.FromResult(_testFirstError.ToResult<int>())
-            .SelectMany(i => Task.FromResult(((decimal)i).ToResult()), (_, d) => d.ToString(CultureInfo.InvariantCulture));
-        var queryResult = await (from intResult in Task.FromResult(_testFirstError.ToResult<int>())
+        var methodManyResult = await Task.FromResult(TestFirstError.ToResult<int>())
+            .SelectMany(i => Task.FromResult(((decimal) i).ToResult()),
+                (_, d) => d.ToString(CultureInfo.InvariantCulture));
+        var queryResult = await (from intResult in Task.FromResult(TestFirstError.ToResult<int>())
             from stringResult in Task.FromResult(intResult.ToString(CultureInfo.InvariantCulture).ToResult())
             select stringResult);
 
         // Assert
         methodResult.Should().BeOfType<Result<string>>()
-            .And.BeFailure().And.WithError(_testFirstError);
+            .And.BeFailure().And.WithError(TestFirstError);
         methodManyResult.Should().BeOfType<Result<string>>()
-            .And.BeFailure().And.WithError(_testFirstError);
+            .And.BeFailure().And.WithError(TestFirstError);
         queryResult.Should().BeOfType<Result<string>>()
-            .And.BeFailure().And.WithError(_testFirstError);
+            .And.BeFailure().And.WithError(TestFirstError);
     }
 }

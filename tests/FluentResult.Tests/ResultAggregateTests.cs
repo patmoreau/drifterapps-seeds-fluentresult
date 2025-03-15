@@ -1,13 +1,16 @@
 // ReSharper disable RedundantArgumentDefaultValue
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace FluentResult.Tests;
 
 [UnitTest]
+[SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
 public class ResultAggregateTests
 {
     private static readonly Faker Faker = new();
-    private readonly ResultError _testFirstError = new(Faker.Random.Word(), Faker.Lorem.Sentence());
-    private readonly ResultError _testSecondError = new(Faker.Random.Word(), Faker.Lorem.Sentence());
+    private static readonly ResultError TestFirstError = new(Faker.Random.Word(), Faker.Lorem.Sentence());
+    private static readonly ResultError TestSecondError = new(Faker.Random.Word(), Faker.Lorem.Sentence());
 
     [Fact]
     public void Create_WithNoResults_ReturnsEmptyAggregate()
@@ -76,10 +79,10 @@ public class ResultAggregateTests
     {
         // Arrange
         var aggregate = ResultAggregate.Create();
-        aggregate.AddResult(_testFirstError);
+        aggregate.AddResult(TestFirstError);
 
         // Act
-        var result = aggregate.Ensure(() => true, _testSecondError, EnsureOnFailure.IgnoreOnFailure);
+        var result = aggregate.Ensure(() => true, TestSecondError, EnsureOnFailure.IgnoreOnFailure);
 
         //Assert
         result.Results.Should().ContainSingle();
@@ -90,7 +93,7 @@ public class ResultAggregateTests
     {
         // Arrange
         var aggregate = ResultAggregate.Create();
-        aggregate.AddResult(_testFirstError);
+        aggregate.AddResult(TestFirstError);
 
         // Act
         var result = aggregate.Ensure(SuccessfulValidation(), EnsureOnFailure.IgnoreOnFailure);
@@ -104,10 +107,10 @@ public class ResultAggregateTests
     {
         // Arrange
         var aggregate = ResultAggregate.Create();
-        aggregate.AddResult(_testFirstError);
+        aggregate.AddResult(TestFirstError);
 
         // Act
-        var result = aggregate.Ensure(() => true, _testSecondError, EnsureOnFailure.ValidateOnFailure);
+        var result = aggregate.Ensure(() => true, TestSecondError, EnsureOnFailure.ValidateOnFailure);
 
         //Assert
         result.Results.Where(x => x.IsFailure).Should().ContainSingle();
@@ -119,7 +122,7 @@ public class ResultAggregateTests
     {
         // Arrange
         var aggregate = ResultAggregate.Create();
-        aggregate.AddResult(_testFirstError);
+        aggregate.AddResult(TestFirstError);
 
         // Act
         var result = aggregate.Ensure(SuccessfulValidation(), EnsureOnFailure.ValidateOnFailure);
@@ -137,8 +140,8 @@ public class ResultAggregateTests
 
         // Act
         var result = aggregate
-            .Ensure(() => true, _testFirstError)
-            .Ensure(() => false, _testSecondError);
+            .Ensure(() => true, TestFirstError)
+            .Ensure(() => false, TestSecondError);
 
         //Assert
         result.Results.Where(x => x.IsFailure).Should().ContainSingle();
@@ -154,50 +157,282 @@ public class ResultAggregateTests
         // Act
         var result = aggregate
             .Ensure(SuccessfulValidation())
-            .Ensure(FailedValidation(_testSecondError));
+            .Ensure(FailedValidation(TestSecondError));
 
         //Assert
         result.Results.Where(x => x.IsFailure).Should().ContainSingle();
         result.Results.Where(x => x.IsSuccess).Should().ContainSingle();
     }
 
-    [Fact]
-    public void GivenSwitch_WhenNoFailureResults_ThenReturnsSuccess()
+    public static TheoryData<ResultAggregate, bool, bool> MatchData =>
+        new()
+        {
+            {ResultAggregate.Create(), true, false},
+            {CreateWithErrors(), false, true}
+        };
+
+    [Theory]
+    [MemberData(nameof(MatchData))]
+    public void GivenMatchOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(ResultAggregate resultIn,
+        bool expectedSuccess, bool expectedFailure)
     {
         // Arrange
-        var resultAggregate = ResultAggregate.Create();
+        var calledSuccess = false;
+        var calledFailure = false;
 
         // Act
-        var result = resultAggregate.Switch(() => Nothing.Value, r => (Result<Nothing>)r);
+        var result = resultIn.Match(
+            () => { calledSuccess = true; },
+            _ => { calledFailure = true; });
 
         // Assert
-        result.Should().BeSuccessful();
+        result.Should().BeOfType<Result<Nothing>>();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        result.IsFailure.Should().Be(expectedFailure);
+        calledSuccess.Should().Be(expectedSuccess);
+        calledFailure.Should().Be(expectedFailure);
+    }
+
+    [Theory]
+    [MemberData(nameof(MatchData))]
+    public void GivenMatchOfTOut_WhenInvoked_ThenAppropriateMethodIsCalled(ResultAggregate resultIn,
+        bool expectedSuccess, bool expectedFailure)
+    {
+        // Arrange
+        var calledSuccess = false;
+        var calledFailure = false;
+
+        // Act
+        var result = resultIn.Match(
+            () =>
+            {
+                calledSuccess = true;
+                return Nothing.Value.ToResult();
+            },
+            error =>
+            {
+                calledFailure = true;
+                return error.ToResult<Nothing>();
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        result.IsFailure.Should().Be(expectedFailure);
+        calledSuccess.Should().Be(expectedSuccess);
+        calledFailure.Should().Be(expectedFailure);
+    }
+
+    [Theory]
+    [MemberData(nameof(MatchData))]
+    public async Task GivenMatchOfTask_WhenInvoked_ThenAppropriateMethodIsCalled(ResultAggregate resultIn,
+        bool expectedSuccess, bool expectedFailure)
+    {
+        // Arrange
+        var calledSuccess = false;
+        var calledFailure = false;
+
+        // Act
+        var result = await resultIn.Match(
+            () =>
+            {
+                calledSuccess = true;
+                return Task.CompletedTask;
+            },
+            _ =>
+            {
+                calledFailure = true;
+                return Task.CompletedTask;
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        result.IsFailure.Should().Be(expectedFailure);
+        calledSuccess.Should().Be(expectedSuccess);
+        calledFailure.Should().Be(expectedFailure);
+    }
+
+    [Theory]
+    [MemberData(nameof(MatchData))]
+    public async Task GivenMatchOfTaskTOut_WhenInvoked_ThenAppropriateMethodIsCalled(ResultAggregate resultIn,
+        bool expectedSuccess, bool expectedFailure)
+    {
+        // Arrange
+        var calledSuccess = false;
+        var calledFailure = false;
+
+        // Act
+        var result = await resultIn.Match(
+            () =>
+            {
+                calledSuccess = true;
+                return Nothing.Task.ToResult();
+            },
+            error =>
+            {
+                calledFailure = true;
+                return error.ToResult<Nothing>().ToTask();
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        result.IsFailure.Should().Be(expectedFailure);
+        calledSuccess.Should().Be(expectedSuccess);
+        calledFailure.Should().Be(expectedFailure);
+    }
+
+    public static TheoryData<ResultAggregate, bool> OnSuccessData =>
+        new()
+        {
+            {ResultAggregate.Create(), true},
+            {CreateWithErrors(), false}
+        };
+
+    [Theory]
+    [MemberData(nameof(OnSuccessData))]
+    public void GivenOnSuccessOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(ResultAggregate resultIn,
+        bool expectedSuccess)
+    {
+        // Arrange
+        // Arrange
+        var calledSuccess = false;
+
+        // Act
+        var result = resultIn.OnSuccess(
+            () =>
+            {
+                calledSuccess = true;
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        calledSuccess.Should().Be(expectedSuccess);
+    }
+
+    [Theory]
+    [MemberData(nameof(OnSuccessData))]
+    public void GivenOnSuccessOfTOut_WhenInvoked_ThenAppropriateMethodIsCalled(ResultAggregate resultIn,
+        bool expectedSuccess)
+    {
+        // Arrange
+        // Arrange
+        var calledSuccess = false;
+
+        // Act
+        var result = resultIn.OnSuccess(
+            () =>
+            {
+                calledSuccess = true;
+                return Nothing.Value.ToResult();
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        calledSuccess.Should().Be(expectedSuccess);
+    }
+
+    [Theory]
+    [MemberData(nameof(OnSuccessData))]
+    public async Task GivenOnSuccessOfTask_WhenInvoked_ThenAppropriateMethodIsCalled(ResultAggregate resultIn,
+        bool expectedSuccess)
+    {
+        // Arrange
+        // Arrange
+        var calledSuccess = false;
+
+        // Act
+        var result = await resultIn.OnSuccess(
+            () =>
+            {
+                calledSuccess = true;
+                return Task.CompletedTask;
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        calledSuccess.Should().Be(expectedSuccess);
+    }
+
+    [Theory]
+    [MemberData(nameof(OnSuccessData))]
+    public async Task GivenOnSuccessOfTaskTOut_WhenInvoked_ThenAppropriateMethodIsCalled(ResultAggregate resultIn,
+        bool expectedSuccess)
+    {
+        // Arrange
+        // Arrange
+        var calledSuccess = false;
+
+        // Act
+        var result = await resultIn.OnSuccess(
+            () =>
+            {
+                calledSuccess = true;
+                return Nothing.Task.ToResult();
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.IsSuccess.Should().Be(expectedSuccess);
+        calledSuccess.Should().Be(expectedSuccess);
+    }
+
+    public static TheoryData<ResultAggregate, bool> OnFailureData =>
+        new()
+        {
+            {ResultAggregate.Create(), false},
+            {CreateWithErrors(), true}
+        };
+
+    [Theory]
+    [MemberData(nameof(OnFailureData))]
+    public void GivenOnFailureOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(ResultAggregate resultIn,
+        bool expectedFailure)
+    {
+        // Arrange
+        var calledFailure = false;
+
+        // Act
+        var result = resultIn.OnFailure(
+            _ =>
+            {
+                calledFailure = true;
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.IsFailure.Should().Be(expectedFailure);
+        calledFailure.Should().Be(expectedFailure);
+    }
+
+    [Theory]
+    [MemberData(nameof(OnFailureData))]
+    public async Task GivenOnFailureOfTask_WhenInvoked_ThenAppropriateMethodIsCalled(ResultAggregate resultIn,
+        bool expectedFailure)
+    {
+        // Arrange
+        var calledFailure = false;
+
+        // Act
+        var result = await resultIn.OnFailure(
+            _ =>
+            {
+                calledFailure = true;
+                return Task.CompletedTask;
+            });
+
+        // Assert
+        result.Should().BeOfType<Result<Nothing>>();
+        result.IsFailure.Should().Be(expectedFailure);
+        calledFailure.Should().Be(expectedFailure);
     }
 
     [Fact]
-    public void GivenSwitch_WhenSingleFailureResult_ThenReturnsValidationError()
-    {
-        // Arrange
-        var error = Faker.Random.Word();
-        var description = Faker.Lorem.Sentence();
-        var resultAggregate = ResultAggregate.Create();
-        resultAggregate.AddResult(new ResultError(error, description));
-
-        // Act
-        var result = resultAggregate.Switch(() => Nothing.Value, r => (Result<Nothing>)r);
-
-        // Assert
-        result.Should()
-            .BeFailure()
-            .And.Subject
-            .Error.Should().BeOfType<ResultErrorAggregate>()
-            .Which
-            .Errors.Should().ContainKey(error)
-            .And.ContainSingle(description);
-    }
-
-    [Fact]
-    public void GivenSwitch_WhenMultipleFailureResults_ThenReturnsValidationError()
+    public void GivenToErrorAggregate_WhenMultipleFailureResults_ThenReturnsValidationError()
     {
         // Arrange
         var error1 = Faker.Random.Word();
@@ -209,27 +444,21 @@ public class ResultAggregateTests
         resultAggregate.AddResult(new ResultError(error2, description2));
 
         // Act
-        var result = resultAggregate.Switch(() => Nothing.Value, r => (Result<Nothing>)r);
+        var result = resultAggregate.ToErrorAggregate<Nothing>();
 
         // Assert
-        result.Should()
-            .BeFailure()
-            .And.Subject
-            .Error.Should().BeOfType<ResultErrorAggregate>()
+        result.Should().BeOfType<ResultErrorAggregate>()
             .Which
             .Errors.Should().ContainKey(error1)
             .WhoseValue.Should().ContainSingle(description1);
-        result.Should()
-            .BeFailure()
-            .And.Subject
-            .Error.Should().BeOfType<ResultErrorAggregate>()
+        result.Should().BeOfType<ResultErrorAggregate>()
             .Which
             .Errors.Should().ContainKey(error2)
             .WhoseValue.Should().ContainSingle(description2);
     }
 
     [Fact]
-    public void GivenSwitch_WhenDuplicateFailureResults_ThenReturnsValidationErrorWithAggregatedDescriptions()
+    public void GivenToErrorAggregate_WhenDuplicateFailureResults_ThenReturnsValidationErrorWithAggregatedDescriptions()
     {
         // Arrange
         var error = Faker.Random.Word();
@@ -240,17 +469,25 @@ public class ResultAggregateTests
         resultAggregate.AddResult(new ResultError(error, description2));
 
         // Act
-        var result = resultAggregate.Switch(() => Nothing.Value, r => (Result<Nothing>) r);
+        var result = resultAggregate.ToErrorAggregate<Nothing>();
 
         // Assert
-        result.Should()
-            .BeFailure()
-            .And.Subject
-            .Error.Should().BeOfType<ResultErrorAggregate>()
+        result.Should().BeOfType<ResultErrorAggregate>()
             .Which
             .Errors.Should().ContainKey(error)
             .WhoseValue.Should().HaveCount(2)
             .And.Subject.Should().Contain(description1).And.Contain(description2);
+    }
+
+    private static ResultAggregate CreateWithErrors()
+    {
+        var aggregate = ResultAggregate.Create();
+        for (var i = 0; i < Faker.Random.Int(1, 5); i++)
+        {
+            aggregate.AddResult(new ResultError(Faker.Lorem.Word(), Faker.Lorem.Sentence()));
+        }
+
+        return aggregate;
     }
 
     private static Func<Result<Nothing>> SuccessfulValidation() => () => Nothing.Value;

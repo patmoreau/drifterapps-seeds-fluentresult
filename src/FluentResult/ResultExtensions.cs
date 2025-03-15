@@ -16,8 +16,15 @@ public static partial class ResultExtensions
     /// <typeparam name="T">The type of the source object.</typeparam>
     /// <param name="source">The source object to convert.</param>
     /// <returns>A successful result containing the source object.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the source object is null and <typeparamref name="T"/> is not nullable.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when <typeparamref name="T"/> is <see cref="ResultError"/>.</exception>
     public static Result<T> ToResult<T>(this T source)
     {
+        if (typeof(T) == typeof(ResultError))
+        {
+            throw new InvalidOperationException("ResultError is not allowed.");
+        }
+
         var type = typeof(T);
         var isNullable = Nullable.GetUnderlyingType(type) != null;
         if (!isNullable && source is null)
@@ -34,6 +41,7 @@ public static partial class ResultExtensions
     /// <typeparam name="T">The type of the source object.</typeparam>
     /// <param name="error">The <see cref="ResultError"/> to convert.</param>
     /// <returns>A successful result containing the source object.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the source object is null.</exception>
     public static Result<T> ToResult<T>(this ResultError error) => error == ResultError.None
         ? throw new ArgumentException("Invalid error", nameof(error))
         : error;
@@ -47,7 +55,7 @@ public static partial class ResultExtensions
     /// <param name="selector">The mapping/selector method.</param>
     /// <returns>A result of the selector function or a failure result.</returns>
     public static Result<TResult> Select<TFrom, TResult>(this Result<TFrom> source, Func<TFrom, TResult> selector) =>
-        source.Switch(onSuccess: r => selector(r), onFailure: r => (Result<TResult>) r);
+        source.Match(onSuccess: r => selector(r), onFailure: r => (Result<TResult>) r);
 
     /// <summary>
     /// Projects each element of a sequence to a <see cref="Result{TMiddle}"/> and flattens the resulting sequences into one sequence.
@@ -61,7 +69,7 @@ public static partial class ResultExtensions
     /// <returns>A result of the result selector function or a failure result.</returns>
     public static Result<TResult> SelectMany<TSource, TMiddle, TResult>(this Result<TSource> source,
         Func<TSource, Result<TMiddle>> collectionSelector, Func<TSource, TMiddle, TResult> resultSelector) =>
-        source.Switch(
+        source.Match(
             onSuccess: r =>
             {
                 var result = collectionSelector(r);
