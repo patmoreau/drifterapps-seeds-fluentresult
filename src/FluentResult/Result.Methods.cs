@@ -3,7 +3,7 @@ namespace DrifterApps.Seeds.FluentResult;
 public partial struct Result<T>
 {
     /// <summary>
-    ///     Matches the result to the appropriate action based on success or failure.
+    /// Executes onSuccess if this is a successful result, or onFailure if it is failed.
     /// </summary>
     /// <param name="onSuccess">The action to execute if the result is successful.</param>
     /// <param name="onFailure">The action to execute if the result is a failure.</param>
@@ -23,8 +23,7 @@ public partial struct Result<T>
     }
 
     /// <summary>
-    ///     Matches the result to the appropriate function based on success or failure and returns a result of type
-    ///     <typeparamref name="TOut" />.
+    /// Executes onSuccess if this is a successful result, or onFailure if it is failed, returning a new typed result.
     /// </summary>
     /// <typeparam name="TOut">The type of the result.</typeparam>
     /// <param name="onSuccess">The function to execute if the result is successful.</param>
@@ -34,7 +33,7 @@ public partial struct Result<T>
         IsSuccess ? onSuccess(Value) : onFailure(Error);
 
     /// <summary>
-    ///     Matches the result to the appropriate action based on success or failure.
+    /// Asynchronously executes the corresponding function based on success or failure.
     /// </summary>
     /// <param name="onSuccess">The action to execute if the result is successful.</param>
     /// <param name="onFailure">The action to execute if the result is a failure.</param>
@@ -54,8 +53,7 @@ public partial struct Result<T>
     }
 
     /// <summary>
-    ///     Matches the result to the appropriate function based on success or failure and returns a result of type
-    ///     <typeparamref name="TOut" />.
+    /// Asynchronously executes the corresponding function based on success or failure, returning a new typed result.
     /// </summary>
     /// <typeparam name="TOut">The type of the result.</typeparam>
     /// <param name="onSuccess">The function to execute if the result is successful.</param>
@@ -65,13 +63,13 @@ public partial struct Result<T>
         Func<ResultError, Task<Result<TOut>>> onFailure) => IsSuccess ? onSuccess(Value) : onFailure(Error);
 
     /// <summary>
-    ///     Executes the onSuccess function if the result is successful.
+    /// Calls onSuccess if the result is success, returning the original result.
     /// </summary>
     /// <param name="onSuccess">The function to execute if the result is successful.</param>
     public Result<T> OnSuccess(Action<T> onSuccess) => Match(onSuccess, _ => { });
 
     /// <summary>
-    ///     Executes the onSuccess function if the result is successful and returns a result of type <typeparamref name="TOut" />.
+    /// Calls onSuccess if the result is success, returning a new typed result or a failure.
     /// </summary>
     /// <typeparam name="TOut">The type of the result.</typeparam>
     /// <param name="onSuccess">The function to execute if the result is successful.</param>
@@ -79,29 +77,29 @@ public partial struct Result<T>
     public Result<TOut> OnSuccess<TOut>(Func<T, Result<TOut>> onSuccess) => Match(onSuccess, error => error);
 
     /// <summary>
-    ///     Executes the onSuccess function if the result is successful.
+    /// Asynchronously calls onSuccess if the result is success, returning the original result.
     /// </summary>
     /// <param name="onSuccess">The function to execute if the result is successful.</param>
     /// <returns><see cref="Task"/></returns>
     public Task<Result<T>> OnSuccess(Func<T, Task> onSuccess) => Match(onSuccess, _ => Task.CompletedTask);
 
     /// <summary>
-    ///     Executes the onSuccess function if the result is successful and returns a result of type <typeparamref name="TOut" />.
+    /// Asynchronously calls onSuccess if the result is success, returning a new typed result or a failure.
     /// </summary>
     /// <typeparam name="TOut">The type of the result.</typeparam>
     /// <param name="onSuccess">The function to execute if the result is successful.</param>
     /// <returns>The result of the onSuccess function or a failure result.</returns>
     public Task<Result<TOut>> OnSuccess<TOut>(Func<T, Task<Result<TOut>>> onSuccess) =>
-        Match(onSuccess, error => Task.FromResult((Result<TOut>) error));
+        Match(onSuccess, error => Task.FromResult((Result<TOut>)error));
 
     /// <summary>
-    ///     Executes the onFailure function if the result is successful.
+    /// Calls onFailure if the result is failure, returning the original result.
     /// </summary>
     /// <param name="onFailure">The function to execute if the result is successful.</param>
     public Result<T> OnFailure(Action<ResultError> onFailure) => Match(_ => { }, onFailure);
 
     /// <summary>
-    ///     Executes the onFailure function if the result is successful.
+    /// Asynchronously calls onFailure if the result is failure, returning the original result.
     /// </summary>
     /// <param name="onFailure">The function to execute if the result is successful.</param>
     /// <returns><see cref="Task"/></returns>

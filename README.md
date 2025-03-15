@@ -16,6 +16,7 @@ Some of my inspirations comes from [Andrew Lock's Series: Working with the resul
   - [Basic Result Handling](#basic-result-handling)
   - [Aggregating Results](#aggregating-results)
   - [Asynchronous Result Handling](#asynchronous-result-handling)
+  - [Matching Results]
   - [Ensuring Validation](#ensuring-validation)
 - [Contributing](#contributing)
 - [License](#license)
@@ -25,7 +26,7 @@ Some of my inspirations comes from [Andrew Lock's Series: Working with the resul
 To install FluentResult, you can use the NuGet package manager:
 
 ```sh
-dotnet add package FluentResult
+dotnet add package DrifterApps.Seeds.FluentResult
 ```
 
 ## Usage
@@ -83,6 +84,21 @@ var resultTask = Task.FromResult((Result<int>)42);
 
 var finalResult = await resultTask.OnSuccess(async value => await Task.FromResult((Result<string>)value.ToString()))
                                   .OnFailure(async error => await Task.FromResult((Result<string>)error));
+```
+
+### Matching Results
+
+You can perform different actions based on success or failure:
+
+```csharp
+using DrifterApps.Seeds.FluentResult;
+
+Result<int> result = 42;
+
+result.Match(
+    onSuccess: value => Console.WriteLine($"Success with value: {value}"),
+    onFailure: error => Console.WriteLine($"Error: {error.Code} - {error.Message}")
+);
 ```
 
 ### Ensuring Validation

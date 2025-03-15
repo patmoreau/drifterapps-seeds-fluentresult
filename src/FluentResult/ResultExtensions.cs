@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace DrifterApps.Seeds.FluentResult;
 
 /// <summary>
-///     Provides extension methods for handling results.
+/// Offers a set of extension methods for converting objects into results, handling result errors, and performing transformations.
 /// </summary>
 [SuppressMessage("Minor Code Smell", "S4136:Method overloads should be grouped together")]
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
@@ -11,7 +11,7 @@ namespace DrifterApps.Seeds.FluentResult;
 public static partial class ResultExtensions
 {
     /// <summary>
-    /// Converts the source object to a <see cref="Result{T}"/>.
+    /// Converts an instance of <typeparamref name="T"/> to a successful result unless it is <see cref="ResultError"/> or null for a non-nullable type.
     /// </summary>
     /// <typeparam name="T">The type of the source object.</typeparam>
     /// <param name="source">The source object to convert.</param>
@@ -36,7 +36,7 @@ public static partial class ResultExtensions
     }
 
     /// <summary>
-    /// Converts the source object to a <see cref="Result{T}"/>.
+    /// Creates a result of type <typeparamref name="T"/> from a <see cref="ResultError"/> unless the error is <see cref="ResultError.None"/>.
     /// </summary>
     /// <typeparam name="T">The type of the source object.</typeparam>
     /// <param name="error">The <see cref="ResultError"/> to convert.</param>
@@ -47,7 +47,7 @@ public static partial class ResultExtensions
         : error;
 
     /// <summary>
-    /// Projects each element of a sequence into a new form.
+    /// Applies a mapping function to a successful result or propagates errors.
     /// </summary>
     /// <typeparam name="TFrom">The type of the input value.</typeparam>
     /// <typeparam name="TResult">The type of the result.</typeparam>
@@ -55,10 +55,10 @@ public static partial class ResultExtensions
     /// <param name="selector">The mapping/selector method.</param>
     /// <returns>A result of the selector function or a failure result.</returns>
     public static Result<TResult> Select<TFrom, TResult>(this Result<TFrom> source, Func<TFrom, TResult> selector) =>
-        source.Match(onSuccess: r => selector(r), onFailure: r => (Result<TResult>) r);
+        source.Match(onSuccess: r => selector(r), onFailure: r => (Result<TResult>)r);
 
     /// <summary>
-    /// Projects each element of a sequence to a <see cref="Result{TMiddle}"/> and flattens the resulting sequences into one sequence.
+    /// Performs a select-many operation, extracting intermediate results and combining them into a final result.
     /// </summary>
     /// <typeparam name="TSource">The type of the input value.</typeparam>
     /// <typeparam name="TMiddle">The type of the intermediate result.</typeparam>
@@ -79,5 +79,5 @@ public static partial class ResultExtensions
                 // Select() just passes the error through as a failed Result<TResult>
                 return result.Select(v => resultSelector(r, v));
             },
-            onFailure: r => (Result<TResult>) r); // error -> return a failed Result<TResult>
+            onFailure: r => (Result<TResult>)r); // error -> return a failed Result<TResult>
 }

@@ -48,6 +48,9 @@ public record ResultError
         Description = description;
     }
 
+    /// <summary>
+    /// Represents the absence of any error.
+    /// </summary>
     public static readonly ResultError None = new(string.Empty, string.Empty);
 
     /// <summary>The error code.</summary>

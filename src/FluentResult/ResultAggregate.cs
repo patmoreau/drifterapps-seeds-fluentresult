@@ -1,7 +1,7 @@
 namespace DrifterApps.Seeds.FluentResult;
 
 /// <summary>
-/// Represents an aggregate of <see cref="Result{Nothing}"/> results.
+/// Collects multiple <see cref="Result{Nothing}"/> instances, enabling combined success or failure checks.
 /// </summary>
 public partial record ResultAggregate
 {

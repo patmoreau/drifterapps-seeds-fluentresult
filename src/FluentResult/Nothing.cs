@@ -20,6 +20,9 @@ public readonly struct Nothing : IEquatable<Nothing>, IComparable<Nothing>, ICom
     /// <summary>
     ///     Task from a <see cref="Nothing" /> type.
     /// </summary>
+    /// <remarks>
+    ///     This property returns a completed task with the <see cref="Nothing" /> value.
+    /// </remarks>
     public static Task<Nothing> Task { get; } = System.Threading.Tasks.Task.FromResult(PrivateValue);
 
     /// <summary>
