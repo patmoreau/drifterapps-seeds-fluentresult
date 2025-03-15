@@ -1,8 +1,10 @@
 # <img alt='paper plane icons' src='./icon.png' height='10%' width='10%'> FluentResult
 
-FluentResult is a C# library that provides a fluent API for handling results of operations, including success and failure cases. It includes various utilities and extensions to simplify error handling and result aggregation.
+FluentResult is a C# library that provides a fluent API for handling results of operations, including success and
+failure cases. It includes various utilities and extensions to simplify error handling and result aggregation.
 
-Some of my inspirations comes from [Andrew Lock's Series: Working with the result pattern](https://andrewlock.net/series/working-with-the-result-pattern/)
+Some of my inspirations comes
+from [Andrew Lock's Series: Working with the result pattern](https://andrewlock.net/series/working-with-the-result-pattern/)
 
 [![Build and Publish NuGet Package](https://github.com/patmoreau/drifterapps-seeds-fluentresult/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/patmoreau/drifterapps-seeds-fluentresult/actions/workflows/ci-cd.yml)
 [![CodeQL](https://github.com/patmoreau/drifterapps-seeds-fluentresult/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/patmoreau/drifterapps-seeds-fluentresult/actions/workflows/codeql-analysis.yml)
@@ -13,11 +15,11 @@ Some of my inspirations comes from [Andrew Lock's Series: Working with the resul
 
 - [Installation](#installation)
 - [Usage](#usage)
-  - [Basic Result Handling](#basic-result-handling)
-  - [Aggregating Results](#aggregating-results)
-  - [Asynchronous Result Handling](#asynchronous-result-handling)
-  - [Matching Results]
-  - [Ensuring Validation](#ensuring-validation)
+    - [Basic Result Handling](#basic-result-handling)
+    - [Aggregating Results](#aggregating-results)
+    - [Asynchronous Result Handling](#asynchronous-result-handling)
+    - [Matching Results]
+    - [Ensuring Validation](#ensuring-validation)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -103,7 +105,8 @@ result.Match(
 
 ### Ensuring Validation
 
-You can ensure that a specific validation function returns true using the `Ensure` method. If the validation fails, it adds a failure result to the source.
+You can ensure that a specific validation function returns true using the `Ensure` method. If the validation fails, it
+adds a failure result to the source.
 
 ```csharp
 using DrifterApps.Seeds.FluentResult;

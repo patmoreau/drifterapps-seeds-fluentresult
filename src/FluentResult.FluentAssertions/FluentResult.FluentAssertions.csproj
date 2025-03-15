@@ -8,11 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="FluentAssertions"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FluentResult\FluentResult.csproj" />
+        <ProjectReference Include="..\FluentResult\FluentResult.csproj"/>
     </ItemGroup>
 
 </Project>

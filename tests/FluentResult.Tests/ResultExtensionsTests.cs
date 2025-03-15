@@ -88,7 +88,7 @@ public partial class ResultExtensionsTests
         var methodResult = number.ToResult()
             .Select(n => n.ToString(CultureInfo.InvariantCulture));
         var methodManyResult = number.ToResult()
-            .SelectMany(i => ((decimal)i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
+            .SelectMany(i => ((decimal) i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
         var queryResult = from intResult in number.ToResult()
             from stringResult in intResult.ToString(CultureInfo.InvariantCulture).ToResult()
             select stringResult;
@@ -111,7 +111,7 @@ public partial class ResultExtensionsTests
         var methodResult = TestFirstError.ToResult<int>()
             .Select(n => n.ToString(CultureInfo.InvariantCulture));
         var methodManyResult = TestFirstError.ToResult<int>()
-            .SelectMany(i => ((decimal)i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
+            .SelectMany(i => ((decimal) i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
         var queryResult = from intResult in TestFirstError.ToResult<int>()
             from stringResult in intResult.ToString(CultureInfo.InvariantCulture).ToResult()
             select stringResult;

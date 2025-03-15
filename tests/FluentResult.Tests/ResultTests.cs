@@ -7,6 +7,27 @@ public class ResultTests
     private static readonly ResultError TestFirstError = new("TestFirstError", "Test Error");
     private static readonly ResultError TestSecondError = new("TestSecondError", "Test Error");
 
+    public static TheoryData<Result<int>, bool, bool> MatchData =>
+        new()
+        {
+            {Faker.Random.Int().ToResult(), true, false},
+            {TestFirstError.ToResult<int>(), false, true}
+        };
+
+    public static TheoryData<Result<int>, bool> OnSuccessData =>
+        new()
+        {
+            {Faker.Random.Int().ToResult(), true},
+            {TestFirstError.ToResult<int>(), false}
+        };
+
+    public static TheoryData<Result<int>, bool> OnFailureData =>
+        new()
+        {
+            {Faker.Random.Int().ToResult(), false},
+            {TestFirstError.ToResult<int>(), true}
+        };
+
     [Fact]
     public void GivenValue_WhenSuccess_ThenGetGoodValue()
     {
@@ -23,7 +44,7 @@ public class ResultTests
     public void GivenValue_WhenFailure_ThenThrowException()
     {
         // Arrange
-        var error = ResultTests.CreateError();
+        var error = CreateError();
         var result = error.ToResult<string>();
 
         // Act
@@ -151,15 +172,8 @@ public class ResultTests
         result.Should().Be(Nothing.Value);
     }
 
-    public static TheoryData<Result<int>, bool, bool> MatchOfVoidData =>
-        new()
-        {
-            {Faker.Random.Int().ToResult(), true, false},
-            {TestFirstError.ToResult<int>(), false, true}
-        };
-
     [Theory]
-    [MemberData(nameof(MatchOfVoidData))]
+    [MemberData(nameof(MatchData))]
     public void GivenMatchOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn, bool expectedSuccess,
         bool expectedFailure)
     {
@@ -175,15 +189,8 @@ public class ResultTests
         calledFailure.Should().Be(expectedFailure);
     }
 
-    public static TheoryData<Result<int>, bool, bool> MatchOfTOutData =>
-        new()
-        {
-            {Faker.Random.Int().ToResult(), true, false},
-            {TestFirstError.ToResult<int>(), false, true}
-        };
-
     [Theory]
-    [MemberData(nameof(MatchOfTOutData))]
+    [MemberData(nameof(MatchData))]
     public void GivenMatchOfTOut_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
         bool expectedSuccess, bool expectedFailure)
     {
@@ -198,15 +205,8 @@ public class ResultTests
         result.IsFailure.Should().Be(expectedFailure);
     }
 
-    public static TheoryData<Result<int>, bool, bool> MatchOfTaskData =>
-        new()
-        {
-            {Faker.Random.Int().ToResult(), true, false},
-            {TestFirstError.ToResult<int>(), false, true}
-        };
-
     [Theory]
-    [MemberData(nameof(MatchOfTaskData))]
+    [MemberData(nameof(MatchData))]
     public async Task GivenMatchOfTask_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
         bool expectedSuccess, bool expectedFailure)
     {
@@ -230,22 +230,16 @@ public class ResultTests
         calledFailure.Should().Be(expectedFailure);
     }
 
-    public static TheoryData<Result<int>, bool, bool> MatchOfTaskOfTOutData =>
-        new()
-        {
-            {Faker.Random.Int().ToResult(), true, false},
-            {TestFirstError.ToResult<int>(), false, true}
-        };
-
     [Theory]
-    [MemberData(nameof(MatchOfTaskOfTOutData))]
+    [MemberData(nameof(MatchData))]
     public async Task GivenMatchOfTaskOfTOut_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
         bool expectedSuccess, bool expectedFailure)
     {
         // Arrange
 
         // Act
-        var result = await resultIn.Match(_ => Task.FromResult(Faker.Random.Word().ToResult()), _ => Task.FromResult(TestSecondError.ToResult<string>()));
+        var result = await resultIn.Match(_ => Task.FromResult(Faker.Random.Word().ToResult()),
+            _ => Task.FromResult(TestSecondError.ToResult<string>()));
 
         // Assert
         result.Should().BeOfType<Result<string>>();
@@ -253,16 +247,10 @@ public class ResultTests
         result.IsFailure.Should().Be(expectedFailure);
     }
 
-    public static TheoryData<Result<int>, bool> OnSuccessData =>
-        new()
-        {
-            {Faker.Random.Int().ToResult(), true},
-            {TestFirstError.ToResult<int>(), false}
-        };
-
     [Theory]
     [MemberData(nameof(OnSuccessData))]
-    public void GivenOnSuccessOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn, bool expectedSuccess)
+    public void GivenOnSuccessOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedSuccess)
     {
         // Arrange
         var calledSuccess = false;
@@ -276,7 +264,8 @@ public class ResultTests
 
     [Theory]
     [MemberData(nameof(OnSuccessData))]
-    public void GivenOnSuccessOfTOut_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn, bool expectedSuccess)
+    public void GivenOnSuccessOfTOut_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedSuccess)
     {
         // Arrange
 
@@ -290,7 +279,8 @@ public class ResultTests
 
     [Theory]
     [MemberData(nameof(OnSuccessData))]
-    public async Task GivenOnSuccessOfTask_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn, bool expectedSuccess)
+    public async Task GivenOnSuccessOfTask_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedSuccess)
     {
         // Arrange
         var calledSuccess = false;
@@ -308,7 +298,8 @@ public class ResultTests
 
     [Theory]
     [MemberData(nameof(OnSuccessData))]
-    public async Task GivenOnSuccessOfTaskOfTOut_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn, bool expectedSuccess)
+    public async Task GivenOnSuccessOfTaskOfTOut_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedSuccess)
     {
         // Arrange
         var calledSuccess = false;
@@ -326,16 +317,10 @@ public class ResultTests
         calledSuccess.Should().Be(expectedSuccess);
     }
 
-    public static TheoryData<Result<int>, bool> OnFailureData =>
-        new()
-        {
-            {Faker.Random.Int().ToResult(), false},
-            {TestFirstError.ToResult<int>(), true}
-        };
-
     [Theory]
     [MemberData(nameof(OnFailureData))]
-    public void GivenOnFailureOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn, bool expectedFailure)
+    public void GivenOnFailureOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedFailure)
     {
         // Arrange
         var calledFailure = false;
@@ -351,7 +336,8 @@ public class ResultTests
 
     [Theory]
     [MemberData(nameof(OnFailureData))]
-    public async Task GivenOnFailureOfTask_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn, bool expectedFailure)
+    public async Task GivenOnFailureOfTask_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
+        bool expectedFailure)
     {
         // Arrange
         var calledFailure = false;

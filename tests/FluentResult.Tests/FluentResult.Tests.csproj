@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\FluentResult.FluentAssertions\FluentResult.FluentAssertions.csproj" />
+        <ProjectReference Include="..\..\src\FluentResult.FluentAssertions\FluentResult.FluentAssertions.csproj"/>
         <ProjectReference Include="..\..\src\FluentResult\FluentResult.csproj"/>
     </ItemGroup>
 
@@ -39,15 +39,15 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="xunit.runner.visualstudio">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="ResultExtensions.AsyncTests.cs">
-        <DependentUpon>ResultExtensionsTests.cs</DependentUpon>
-      </Compile>
+        <Compile Update="ResultExtensions.AsyncTests.cs">
+            <DependentUpon>ResultExtensionsTests.cs</DependentUpon>
+        </Compile>
     </ItemGroup>
 
 </Project>

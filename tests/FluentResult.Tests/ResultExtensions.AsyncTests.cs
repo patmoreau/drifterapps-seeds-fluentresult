@@ -4,6 +4,27 @@ namespace FluentResult.Tests;
 
 public partial class ResultExtensionsTests
 {
+    public static TheoryData<Result<int>, bool, bool> MatchData =>
+        new()
+        {
+            {Faker.Random.Int().ToResult(), true, false},
+            {TestFirstError.ToResult<int>(), false, true}
+        };
+
+    public static TheoryData<Result<int>, bool> OnSuccessData =>
+        new()
+        {
+            {Faker.Random.Int().ToResult(), true},
+            {TestFirstError.ToResult<int>(), false}
+        };
+
+    public static TheoryData<Result<int>, bool> OnFailureData =>
+        new()
+        {
+            {Faker.Random.Int().ToResult(), false},
+            {TestFirstError.ToResult<int>(), true}
+        };
+
     [Fact]
     public async Task GivenToResultAsync_WhenInvoked_ThenReturnSuccess()
     {
@@ -45,13 +66,6 @@ public partial class ResultExtensionsTests
         // Assert
         result.Should().BeFailure().And.WithError(TestFirstError);
     }
-
-    public static TheoryData<Result<int>, bool, bool> MatchData =>
-        new()
-        {
-            {Faker.Random.Int().ToResult(), true, false},
-            {TestFirstError.ToResult<int>(), false, true}
-        };
 
     [Theory]
     [MemberData(nameof(MatchData))]
@@ -164,13 +178,6 @@ public partial class ResultExtensionsTests
         calledFailure.Should().Be(expectedFailure);
     }
 
-    public static TheoryData<Result<int>, bool> OnSuccessData =>
-        new()
-        {
-            {Faker.Random.Int().ToResult(), true},
-            {TestFirstError.ToResult<int>(), false}
-        };
-
     [Theory]
     [MemberData(nameof(OnSuccessData))]
     public async Task GivenAsyncOnSuccessOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
@@ -181,10 +188,7 @@ public partial class ResultExtensionsTests
 
         // Act
         var result = await Task.FromResult(resultIn).OnSuccess(
-            _ =>
-            {
-                calledSuccess = true;
-            });
+            _ => { calledSuccess = true; });
 
         // Assert
         result.Should().BeOfType<Result<int>>();
@@ -258,13 +262,6 @@ public partial class ResultExtensionsTests
         calledSuccess.Should().Be(expectedSuccess);
     }
 
-    public static TheoryData<Result<int>, bool> OnFailureData =>
-        new()
-        {
-            {Faker.Random.Int().ToResult(), false},
-            {TestFirstError.ToResult<int>(), true}
-        };
-
     [Theory]
     [MemberData(nameof(OnFailureData))]
     public async Task GivenAsyncOnFailureVoid_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,
@@ -275,10 +272,7 @@ public partial class ResultExtensionsTests
 
         // Act
         var result = await Task.FromResult(resultIn).OnFailure(
-            _ =>
-            {
-                calledFailure = true;
-            });
+            _ => { calledFailure = true; });
 
         // Assert
         result.Should().BeOfType<Result<int>>();

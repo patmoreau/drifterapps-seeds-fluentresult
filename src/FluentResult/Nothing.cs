@@ -83,8 +83,14 @@ public readonly struct Nothing : IEquatable<Nothing>, IComparable<Nothing>, ICom
     /// </summary>
     /// <param name="first">The first object.</param>
     /// <param name="second">The second object.</param>
-    /// <c>true</c> if the <paramref name="first" /> object is equal to the <paramref name="second" /> object; otherwise,
-    /// <c>false</c>.
+    /// <c>true</c>
+    /// if the
+    /// <paramref name="first" />
+    /// object is equal to the
+    /// <paramref name="second" />
+    /// object; otherwise,
+    /// <c>false</c>
+    /// .
     public static bool operator ==(Nothing first, Nothing second) => true;
 
     /// <summary>
@@ -92,8 +98,14 @@ public readonly struct Nothing : IEquatable<Nothing>, IComparable<Nothing>, ICom
     /// </summary>
     /// <param name="first">The first object.</param>
     /// <param name="second">The second object.</param>
-    /// <c>true</c> if the <paramref name="first" /> object is not equal to the <paramref name="second" />
-    /// object; otherwise, <c>false</c>.
+    /// <c>true</c>
+    /// if the
+    /// <paramref name="first" />
+    /// object is not equal to the
+    /// <paramref name="second" />
+    /// object; otherwise,
+    /// <c>false</c>
+    /// .
     public static bool operator !=(Nothing first, Nothing second) => false;
 
     /// <summary>
@@ -101,8 +113,14 @@ public readonly struct Nothing : IEquatable<Nothing>, IComparable<Nothing>, ICom
     /// </summary>
     /// <param name="first">The first object.</param>
     /// <param name="second">The second object.</param>
-    /// <c>true</c> if the <paramref name="first" /> object is lower than the <paramref name="second" />
-    /// object; otherwise, <c>false</c>.
+    /// <c>true</c>
+    /// if the
+    /// <paramref name="first" />
+    /// object is lower than the
+    /// <paramref name="second" />
+    /// object; otherwise,
+    /// <c>false</c>
+    /// .
     public static bool operator <(Nothing first, Nothing second) => false;
 
     /// <summary>
@@ -110,8 +128,14 @@ public readonly struct Nothing : IEquatable<Nothing>, IComparable<Nothing>, ICom
     /// </summary>
     /// <param name="first">The first object.</param>
     /// <param name="second">The second object.</param>
-    /// <c>true</c> if the <paramref name="first" /> object is greater than the <paramref name="second" />
-    /// object; otherwise, <c>false</c>.
+    /// <c>true</c>
+    /// if the
+    /// <paramref name="first" />
+    /// object is greater than the
+    /// <paramref name="second" />
+    /// object; otherwise,
+    /// <c>false</c>
+    /// .
     public static bool operator >(Nothing first, Nothing second) => false;
 
     /// <summary>
@@ -120,8 +144,14 @@ public readonly struct Nothing : IEquatable<Nothing>, IComparable<Nothing>, ICom
     /// </summary>
     /// <param name="first">The first object.</param>
     /// <param name="second">The second object.</param>
-    /// <c>true</c> if the <paramref name="first" /> object is lower than or equal to the <paramref name="second" />
-    /// object; otherwise, <c>false</c>.
+    /// <c>true</c>
+    /// if the
+    /// <paramref name="first" />
+    /// object is lower than or equal to the
+    /// <paramref name="second" />
+    /// object; otherwise,
+    /// <c>false</c>
+    /// .
     public static bool operator <=(Nothing first, Nothing second) => true;
 
     /// <summary>
@@ -130,8 +160,14 @@ public readonly struct Nothing : IEquatable<Nothing>, IComparable<Nothing>, ICom
     /// </summary>
     /// <param name="first">The first object.</param>
     /// <param name="second">The second object.</param>
-    /// <c>true</c> if the <paramref name="first" /> object is greater than or equal to the <paramref name="second" />
-    /// object; otherwise, <c>false</c>.
+    /// <c>true</c>
+    /// if the
+    /// <paramref name="first" />
+    /// object is greater than or equal to the
+    /// <paramref name="second" />
+    /// object; otherwise,
+    /// <c>false</c>
+    /// .
     public static bool operator >=(Nothing first, Nothing second) => true;
 
     /// <summary>

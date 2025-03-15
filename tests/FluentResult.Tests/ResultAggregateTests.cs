@@ -12,6 +12,27 @@ public class ResultAggregateTests
     private static readonly ResultError TestFirstError = new(Faker.Random.Word(), Faker.Lorem.Sentence());
     private static readonly ResultError TestSecondError = new(Faker.Random.Word(), Faker.Lorem.Sentence());
 
+    public static TheoryData<ResultAggregate, bool, bool> MatchData =>
+        new()
+        {
+            {ResultAggregate.Create(), true, false},
+            {CreateWithErrors(), false, true}
+        };
+
+    public static TheoryData<ResultAggregate, bool> OnSuccessData =>
+        new()
+        {
+            {ResultAggregate.Create(), true},
+            {CreateWithErrors(), false}
+        };
+
+    public static TheoryData<ResultAggregate, bool> OnFailureData =>
+        new()
+        {
+            {ResultAggregate.Create(), false},
+            {CreateWithErrors(), true}
+        };
+
     [Fact]
     public void Create_WithNoResults_ReturnsEmptyAggregate()
     {
@@ -164,13 +185,6 @@ public class ResultAggregateTests
         result.Results.Where(x => x.IsSuccess).Should().ContainSingle();
     }
 
-    public static TheoryData<ResultAggregate, bool, bool> MatchData =>
-        new()
-        {
-            {ResultAggregate.Create(), true, false},
-            {CreateWithErrors(), false, true}
-        };
-
     [Theory]
     [MemberData(nameof(MatchData))]
     public void GivenMatchOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(ResultAggregate resultIn,
@@ -283,13 +297,6 @@ public class ResultAggregateTests
         calledFailure.Should().Be(expectedFailure);
     }
 
-    public static TheoryData<ResultAggregate, bool> OnSuccessData =>
-        new()
-        {
-            {ResultAggregate.Create(), true},
-            {CreateWithErrors(), false}
-        };
-
     [Theory]
     [MemberData(nameof(OnSuccessData))]
     public void GivenOnSuccessOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(ResultAggregate resultIn,
@@ -301,10 +308,7 @@ public class ResultAggregateTests
 
         // Act
         var result = resultIn.OnSuccess(
-            () =>
-            {
-                calledSuccess = true;
-            });
+            () => { calledSuccess = true; });
 
         // Assert
         result.Should().BeOfType<Result<Nothing>>();
@@ -381,13 +385,6 @@ public class ResultAggregateTests
         calledSuccess.Should().Be(expectedSuccess);
     }
 
-    public static TheoryData<ResultAggregate, bool> OnFailureData =>
-        new()
-        {
-            {ResultAggregate.Create(), false},
-            {CreateWithErrors(), true}
-        };
-
     [Theory]
     [MemberData(nameof(OnFailureData))]
     public void GivenOnFailureOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(ResultAggregate resultIn,
@@ -398,10 +395,7 @@ public class ResultAggregateTests
 
         // Act
         var result = resultIn.OnFailure(
-            _ =>
-            {
-                calledFailure = true;
-            });
+            _ => { calledFailure = true; });
 
         // Assert
         result.Should().BeOfType<Result<Nothing>>();

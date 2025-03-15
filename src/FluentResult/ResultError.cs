@@ -16,6 +16,11 @@ namespace DrifterApps.Seeds.FluentResult;
 public record ResultError
 {
     /// <summary>
+    ///     Represents the absence of any error.
+    /// </summary>
+    public static readonly ResultError None = new(string.Empty, string.Empty);
+
+    /// <summary>
     ///     Represents an error with a code and description.
     /// </summary>
     /// <param name="code">The error code.</param>
@@ -48,11 +53,6 @@ public record ResultError
         Description = description;
     }
 
-    /// <summary>
-    /// Represents the absence of any error.
-    /// </summary>
-    public static readonly ResultError None = new(string.Empty, string.Empty);
-
     /// <summary>The error code.</summary>
     public string Code { get; }
 
@@ -60,7 +60,7 @@ public record ResultError
     public string Description { get; }
 
     /// <summary>
-    /// Deconstructs the <see cref="ResultError"/> into its code and description.
+    ///     Deconstructs the <see cref="ResultError" /> into its code and description.
     /// </summary>
     /// <param name="code">The error code.</param>
     /// <param name="description">The error description.</param>

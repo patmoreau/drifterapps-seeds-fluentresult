@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using DrifterApps.Seeds.FluentResult;
 using FluentAssertions.Execution;
 using FluentAssertions.Primitives;
@@ -24,7 +25,7 @@ public static class ResultAssertionsExtensions
     /// <summary>
     ///     Asserts that the specified result is successful.
     /// </summary>
-    /// <typeparam name="TValue">The type of <see cref="Result{T}"/></typeparam>
+    /// <typeparam name="TValue">The type of <see cref="Result{T}" /></typeparam>
     /// <param name="assertion">The assertion scope.</param>
     /// <param name="subject">The result to assert.</param>
     /// <returns>A <see cref="Continuation" /> for further assertions.</returns>
@@ -36,7 +37,7 @@ public static class ResultAssertionsExtensions
     /// <summary>
     ///     Asserts that the specified result is a failure.
     /// </summary>
-    /// <typeparam name="TValue">The type of <see cref="Result{T}"/></typeparam>
+    /// <typeparam name="TValue">The type of <see cref="Result{T}" /></typeparam>
     /// <param name="assertion">The assertion scope.</param>
     /// <param name="subject">The result to assert.</param>
     /// <returns>A <see cref="Continuation" /> for further assertions.</returns>
@@ -48,7 +49,7 @@ public static class ResultAssertionsExtensions
     /// <summary>
     ///     Asserts that the specified error is as expected.
     /// </summary>
-    /// <typeparam name="TValue">The type of <see cref="Result{T}"/></typeparam>
+    /// <typeparam name="TValue">The type of <see cref="Result{T}" /></typeparam>
     /// <param name="assertion">The assertion scope.</param>
     /// <param name="subject">The result to assert.</param>
     /// <param name="resultError">The <see cref="ResultError" /> to assert</param>
@@ -71,6 +72,7 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
     /// <summary>
     ///     Gets the identifier for the assertion.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     protected override string Identifier => "result";
 
     /// <summary>
