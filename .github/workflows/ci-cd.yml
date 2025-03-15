@@ -126,7 +126,7 @@ jobs:
           path: ./tests-results/**/*.trx
 
       - name: Test Report
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         id: test-results
         if: always()
         with:
