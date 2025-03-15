@@ -5,15 +5,14 @@ namespace FluentResult.Tests;
 [UnitTest]
 public partial class ResultExtensionsTests
 {
-    private readonly Faker _faker = new();
-    private readonly ResultError _testFirstError = new("TestFirstError", "Test Error");
-    private readonly ResultError _testSecondError = new("TestSecondError", "Test Error");
+    private static readonly Faker Faker = new();
+    private static readonly ResultError TestFirstError = new("TestFirstError", "Test Error");
 
     [Fact]
     public void GivenToResult_WhenInvoked_ThenReturnSuccess()
     {
         // Arrange
-        var number = _faker.Random.Int();
+        var number = Faker.Random.Int();
 
         // Act
         var result = number.ToResult();
@@ -38,15 +37,29 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
+    public void GivenToResult_WhenTypeIsResultError_ThenThrowInvalidOperationException()
+    {
+        // Arrange
+
+        // Act
+        var action = () => TestFirstError.ToResult();
+
+        // Assert
+        action.Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage("ResultError is not allowed.");
+    }
+
+    [Fact]
     public void GivenToResult_WhenInvokedWithResultError_ThenReturnFailure()
     {
         // Arrange
 
         // Act
-        var result = _testFirstError.ToResult<string>();
+        var result = TestFirstError.ToResult<string>();
 
         // Assert
-        result.Should().BeFailure().And.WithError(_testFirstError);
+        result.Should().BeFailure().And.WithError(TestFirstError);
     }
 
     [Fact]
@@ -68,14 +81,14 @@ public partial class ResultExtensionsTests
     public void GivenSelect_WhenResultIsSuccess_ThenExecuteSuccessNext()
     {
         // Arrange
-        var number = _faker.Random.Int();
+        var number = Faker.Random.Int();
         var expectedString = number.ToString(CultureInfo.InvariantCulture);
 
         // Act
         var methodResult = number.ToResult()
             .Select(n => n.ToString(CultureInfo.InvariantCulture));
         var methodManyResult = number.ToResult()
-            .SelectMany(i => ((decimal)i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
+            .SelectMany(i => ((decimal) i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
         var queryResult = from intResult in number.ToResult()
             from stringResult in intResult.ToString(CultureInfo.InvariantCulture).ToResult()
             select stringResult;
@@ -95,20 +108,20 @@ public partial class ResultExtensionsTests
         // Arrange
 
         // Act
-        var methodResult = _testFirstError.ToResult<int>()
+        var methodResult = TestFirstError.ToResult<int>()
             .Select(n => n.ToString(CultureInfo.InvariantCulture));
-        var methodManyResult = _testFirstError.ToResult<int>()
-            .SelectMany(i => ((decimal)i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
-        var queryResult = from intResult in _testFirstError.ToResult<int>()
+        var methodManyResult = TestFirstError.ToResult<int>()
+            .SelectMany(i => ((decimal) i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
+        var queryResult = from intResult in TestFirstError.ToResult<int>()
             from stringResult in intResult.ToString(CultureInfo.InvariantCulture).ToResult()
             select stringResult;
 
         // Assert
         methodResult.Should().BeOfType<Result<string>>()
-            .And.BeFailure().And.WithError(_testFirstError);
+            .And.BeFailure().And.WithError(TestFirstError);
         methodManyResult.Should().BeOfType<Result<string>>()
-            .And.BeFailure().And.WithError(_testFirstError);
+            .And.BeFailure().And.WithError(TestFirstError);
         queryResult.Should().BeOfType<Result<string>>()
-            .And.BeFailure().And.WithError(_testFirstError);
+            .And.BeFailure().And.WithError(TestFirstError);
     }
 }

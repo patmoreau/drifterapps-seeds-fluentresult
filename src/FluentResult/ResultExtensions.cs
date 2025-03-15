@@ -3,7 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 namespace DrifterApps.Seeds.FluentResult;
 
 /// <summary>
-///     Provides extension methods for handling results.
+///     Offers a set of extension methods for converting objects into results, handling result errors, and performing
+///     transformations.
 /// </summary>
 [SuppressMessage("Minor Code Smell", "S4136:Method overloads should be grouped together")]
 [SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
@@ -11,13 +12,24 @@ namespace DrifterApps.Seeds.FluentResult;
 public static partial class ResultExtensions
 {
     /// <summary>
-    /// Converts the source object to a <see cref="Result{T}"/>.
+    ///     Converts an instance of <typeparamref name="T" /> to a successful result unless it is <see cref="ResultError" /> or
+    ///     null for a non-nullable type.
     /// </summary>
     /// <typeparam name="T">The type of the source object.</typeparam>
     /// <param name="source">The source object to convert.</param>
     /// <returns>A successful result containing the source object.</returns>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown when the source object is null and <typeparamref name="T" /> is not
+    ///     nullable.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">Thrown when <typeparamref name="T" /> is <see cref="ResultError" />.</exception>
     public static Result<T> ToResult<T>(this T source)
     {
+        if (typeof(T) == typeof(ResultError))
+        {
+            throw new InvalidOperationException("ResultError is not allowed.");
+        }
+
         var type = typeof(T);
         var isNullable = Nullable.GetUnderlyingType(type) != null;
         if (!isNullable && source is null)
@@ -29,17 +41,19 @@ public static partial class ResultExtensions
     }
 
     /// <summary>
-    /// Converts the source object to a <see cref="Result{T}"/>.
+    ///     Creates a result of type <typeparamref name="T" /> from a <see cref="ResultError" /> unless the error is
+    ///     <see cref="ResultError.None" />.
     /// </summary>
     /// <typeparam name="T">The type of the source object.</typeparam>
-    /// <param name="error">The <see cref="ResultError"/> to convert.</param>
+    /// <param name="error">The <see cref="ResultError" /> to convert.</param>
     /// <returns>A successful result containing the source object.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the source object is null.</exception>
     public static Result<T> ToResult<T>(this ResultError error) => error == ResultError.None
         ? throw new ArgumentException("Invalid error", nameof(error))
         : error;
 
     /// <summary>
-    /// Projects each element of a sequence into a new form.
+    ///     Applies a mapping function to a successful result or propagates errors.
     /// </summary>
     /// <typeparam name="TFrom">The type of the input value.</typeparam>
     /// <typeparam name="TResult">The type of the result.</typeparam>
@@ -47,22 +61,22 @@ public static partial class ResultExtensions
     /// <param name="selector">The mapping/selector method.</param>
     /// <returns>A result of the selector function or a failure result.</returns>
     public static Result<TResult> Select<TFrom, TResult>(this Result<TFrom> source, Func<TFrom, TResult> selector) =>
-        source.Switch(onSuccess: r => selector(r), onFailure: r => (Result<TResult>) r);
+        source.Match(r => selector(r), r => (Result<TResult>) r);
 
     /// <summary>
-    /// Projects each element of a sequence to a <see cref="Result{TMiddle}"/> and flattens the resulting sequences into one sequence.
+    ///     Performs a select-many operation, extracting intermediate results and combining them into a final result.
     /// </summary>
     /// <typeparam name="TSource">The type of the input value.</typeparam>
     /// <typeparam name="TMiddle">The type of the intermediate result.</typeparam>
     /// <typeparam name="TResult">The type of the final result.</typeparam>
     /// <param name="source">The target for the extension.</param>
-    /// <param name="collectionSelector">How to map to the <see cref="Result{TMiddle}"/> type.</param>
-    /// <param name="resultSelector">How to map a <typeparamref name="TMiddle"/> to a <typeparamref name="TResult"/>.</param>
+    /// <param name="collectionSelector">How to map to the <see cref="Result{TMiddle}" /> type.</param>
+    /// <param name="resultSelector">How to map a <typeparamref name="TMiddle" /> to a <typeparamref name="TResult" />.</param>
     /// <returns>A result of the result selector function or a failure result.</returns>
     public static Result<TResult> SelectMany<TSource, TMiddle, TResult>(this Result<TSource> source,
         Func<TSource, Result<TMiddle>> collectionSelector, Func<TSource, TMiddle, TResult> resultSelector) =>
-        source.Switch(
-            onSuccess: r =>
+        source.Match(
+            r =>
             {
                 var result = collectionSelector(r);
 
@@ -71,5 +85,5 @@ public static partial class ResultExtensions
                 // Select() just passes the error through as a failed Result<TResult>
                 return result.Select(v => resultSelector(r, v));
             },
-            onFailure: r => (Result<TResult>) r); // error -> return a failed Result<TResult>
+            r => (Result<TResult>) r); // error -> return a failed Result<TResult>
 }

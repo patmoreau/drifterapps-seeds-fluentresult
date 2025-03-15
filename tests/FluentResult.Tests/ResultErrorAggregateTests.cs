@@ -52,7 +52,8 @@ public class ResultErrorAggregateTests
         result.Should().BeFalse();
     }
 
-    [Theory, ClassData(typeof(EqualsData))]
+    [Theory]
+    [ClassData(typeof(EqualsData))]
     public void GivenEquals_WhenComparingToOther_ThenReturnsExpected(
         string because,
         string codeSelf, string descriptionSelf, Dictionary<string, string[]> validationErrorsSelf,
@@ -105,7 +106,7 @@ public class ResultErrorAggregateTests
                 codeSelf, descriptionSelf, new Dictionary<string, string[]>
                 {
                     {propertySelf, [messageSelf]},
-                    {Faker.Random.Hash(), [Faker.Lorem.Sentence()]},
+                    {Faker.Random.Hash(), [Faker.Lorem.Sentence()]}
                 }, false);
             Add("different validation", codeSelf, descriptionSelf, errorSelf,
                 codeSelf, descriptionSelf, new Dictionary<string, string[]> {{propertySelf, [Faker.Lorem.Sentence()]}},
@@ -113,7 +114,7 @@ public class ResultErrorAggregateTests
             Add("different validation count", codeSelf, descriptionSelf, errorSelf, codeSelf, descriptionSelf,
                 new Dictionary<string, string[]>
                 {
-                    {propertySelf, [messageSelf, Faker.Lorem.Sentence()]},
+                    {propertySelf, [messageSelf, Faker.Lorem.Sentence()]}
                 }, false);
         }
     }

@@ -6,11 +6,6 @@ namespace DrifterApps.Seeds.FluentResult;
 public record ResultErrorAggregate : ResultError
 {
     /// <summary>
-    /// Gets the dictionary of errors by error codes.
-    /// </summary>
-    public IReadOnlyDictionary<string, string[]> Errors { get; }
-
-    /// <summary>
     ///     Represents an list of errors.
     /// </summary>
     /// <param name="code">The error code.</param>
@@ -21,21 +16,27 @@ public record ResultErrorAggregate : ResultError
         : base(code, description) => Errors = errors;
 
     /// <summary>
-    /// Determines whether the specified <see cref="ResultErrorAggregate"/> is equal to the current instance.
+    ///     Gets the dictionary of errors by error codes.
     /// </summary>
-    /// <param name="other">The <see cref="ResultErrorAggregate"/> to compare with the current instance.</param>
+    public IReadOnlyDictionary<string, string[]> Errors { get; }
+
+    /// <summary>
+    ///     Determines whether the specified <see cref="ResultErrorAggregate" /> is equal to the current instance.
+    /// </summary>
+    /// <param name="other">The <see cref="ResultErrorAggregate" /> to compare with the current instance.</param>
     /// <returns>
-    /// <c>true</c> if the specified <see cref="ResultErrorAggregate"/> is equal to the current instance; otherwise, <c>false</c>.
+    ///     <c>true</c> if the specified <see cref="ResultErrorAggregate" /> is equal to the current instance; otherwise,
+    ///     <c>false</c>.
     /// </returns>
     public virtual bool Equals(ResultErrorAggregate? other) =>
         other is not null &&
         (ReferenceEquals(this, other) || (base.Equals(other) && AreErrorAggregateEqual(other.Errors)));
 
     /// <summary>
-    /// Computes the hash code for the current instance.
+    ///     Computes the hash code for the current instance.
     /// </summary>
     /// <returns>
-    /// A hash code for the current instance.
+    ///     A hash code for the current instance.
     /// </returns>
     public override int GetHashCode() =>
         Errors.Aggregate(base.GetHashCode(),
