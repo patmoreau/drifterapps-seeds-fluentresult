@@ -38,8 +38,8 @@ jobs:
 
     outputs:
       version: ${{ steps.gitversion.outputs.majorMinorPatch }}
-      assembly-version: ${{ steps.gitversion.outputs.AssemblySemFileVer }}
-      nuget-version: ${{ steps.gitversion.outputs.NuGetVersionV2 }}
+      assembly-version: ${{ steps.gitversion.outputs.assemblySemVer }}
+      nuget-version: ${{ steps.gitversion.outputs.semVer }}
 
     steps:
       - uses: actions/checkout@v6
@@ -64,14 +64,11 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v4.2.0
         with:
-          useConfigFile: true
           configFilePath: GitVersion.yml
 
       - name: Display GitVersion outputs
         run: |
-          echo "MajorMinorPatch: ${{ steps.gitversion.outputs.MajorMinorPatch }}"
-          echo "AssemblySemFileVer: ${{ steps.gitversion.outputs.AssemblySemFileVer }}"
-          echo "NuGetVersionV2: ${{ steps.gitversion.outputs.NuGetVersionV2 }}"
+          echo "All outputs: ${{ toJSON(steps.gitversion.outputs) }}"
 
       - name: Enable workflow commands
         run: |
