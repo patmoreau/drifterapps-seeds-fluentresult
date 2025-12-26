@@ -43,7 +43,7 @@ jobs:
 
       - name: Save report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dotnet-format-report
           path: ./linter-report/*
