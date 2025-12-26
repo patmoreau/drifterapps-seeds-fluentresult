@@ -30,7 +30,7 @@ jobs:
     if: ${{ needs.check_changes.outputs.code_was_changed == 'true' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
