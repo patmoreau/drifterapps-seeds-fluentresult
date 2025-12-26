@@ -7,7 +7,7 @@ commit-message-incrementing: Enabled
 next-version: 1.1.0
 branches:
   pull-request:
-    tag: beta
+    label: beta
 ignore:
   sha: []
   commits-before: 2021-03-01T00:00:00Z
