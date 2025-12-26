@@ -51,7 +51,7 @@ jobs:
           echo "::stop-commands::`echo -n ${{ github.token }} | sha256sum | head -c 64`"
 
       - name: Ensure .NET Installed
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
 
@@ -102,7 +102,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
           global-json-file: global.json
@@ -196,17 +196,17 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Ensure .NET 8 Installed
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '8.x'
 
       - name: Ensure .NET 9 Installed
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '9.x'
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
         env:
