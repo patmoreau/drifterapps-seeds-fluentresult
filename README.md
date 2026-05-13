@@ -8,8 +8,7 @@ from [Andrew Lock's Series: Working with the result pattern](https://andrewlock.
 
 [![Build and Publish NuGet Package](https://github.com/patmoreau/drifterapps-seeds-fluentresult/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/patmoreau/drifterapps-seeds-fluentresult/actions/workflows/ci-cd.yml)
 [![CodeQL](https://github.com/patmoreau/drifterapps-seeds-fluentresult/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/patmoreau/drifterapps-seeds-fluentresult/actions/workflows/codeql-analysis.yml)
-![.Net 8 Tests results](https://gist.githubusercontent.com/patmoreau/51a2fc9fd8b7ed500ed3b6aabe0fc2d6/raw/seeds-fluent-result-tests-badge-net8.0.svg)
-![.Net 9 Tests results](https://gist.githubusercontent.com/patmoreau/51a2fc9fd8b7ed500ed3b6aabe0fc2d6/raw/seeds-fluent-result-tests-badge-net9.0.svg)
+![.Net 10 Tests results](https://gist.githubusercontent.com/patmoreau/51a2fc9fd8b7ed500ed3b6aabe0fc2d6/raw/seeds-fluent-result-tests-badge-net10.0.svg)
 
 ## Table of Contents
 
