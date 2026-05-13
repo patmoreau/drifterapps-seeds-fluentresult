@@ -4,7 +4,7 @@ This repository contains **DrifterApps.Seeds.FluentResult**, a Railway-Oriented 
 
 **Package:** `DrifterApps.Seeds.FluentResult`
 **Namespace:** `using DrifterApps.Seeds.FluentResult;`
-**Targets:** .NET 8, 9, 10
+**Targets:** .NET 10
 
 ## Core Types
 
