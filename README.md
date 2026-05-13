@@ -18,8 +18,9 @@ from [Andrew Lock's Series: Working with the result pattern](https://andrewlock.
     - [Basic Result Handling](#basic-result-handling)
     - [Aggregating Results](#aggregating-results)
     - [Asynchronous Result Handling](#asynchronous-result-handling)
-    - [Matching Results]
+    - [Matching Results](#matching-results)
     - [Ensuring Validation](#ensuring-validation)
+- [AI Coding Assistants](#ai-coding-assistants)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -125,6 +126,39 @@ bool isFailure = result.IsFailure; // false
 
 bool isValidationSuccess = resultWithValidation.IsSuccess; // false
 bool isValidationFailure = resultWithValidation.IsFailure; // true
+```
+
+## AI Coding Assistants
+
+This repository ships instruction files for the most common AI coding assistants. If you are using this library in your own project, copy the file for your IDE into your repository so your AI assistant understands the Result pattern and generates correct code without prompting.
+
+| IDE / Tool | Instruction file | Where to copy it in your project |
+| --- | --- | --- |
+| **Claude Code** | [CLAUDE.md](https://github.com/patmoreau/drifterapps-seeds-fluentresult/blob/main/CLAUDE.md) | `CLAUDE.md` at the project root |
+| **GitHub Copilot** | [copilot-instructions.md](https://github.com/patmoreau/drifterapps-seeds-fluentresult/blob/main/.github/copilot-instructions.md) | `.github/copilot-instructions.md` |
+| **Cursor** | [fluentresult.mdc](https://github.com/patmoreau/drifterapps-seeds-fluentresult/blob/main/.cursor/rules/fluentresult.mdc) | `.cursor/rules/fluentresult.mdc` |
+| **Windsurf** | [fluentresult.md](https://github.com/patmoreau/drifterapps-seeds-fluentresult/blob/main/.windsurf/rules/fluentresult.md) | `.windsurf/rules/fluentresult.md` |
+| **JetBrains AI (Junie)** | [guidelines.md](https://github.com/patmoreau/drifterapps-seeds-fluentresult/blob/main/.junie/guidelines.md) | `.junie/guidelines.md` |
+
+> **Tip:** you only need the file for the IDE you are using.
+
+### Quick copy via curl
+
+```sh
+# Claude Code
+curl -sLo CLAUDE.md https://raw.githubusercontent.com/patmoreau/drifterapps-seeds-fluentresult/main/CLAUDE.md
+
+# GitHub Copilot
+mkdir -p .github && curl -sLo .github/copilot-instructions.md https://raw.githubusercontent.com/patmoreau/drifterapps-seeds-fluentresult/main/.github/copilot-instructions.md
+
+# Cursor
+mkdir -p .cursor/rules && curl -sLo .cursor/rules/fluentresult.mdc https://raw.githubusercontent.com/patmoreau/drifterapps-seeds-fluentresult/main/.cursor/rules/fluentresult.mdc
+
+# Windsurf
+mkdir -p .windsurf/rules && curl -sLo .windsurf/rules/fluentresult.md https://raw.githubusercontent.com/patmoreau/drifterapps-seeds-fluentresult/main/.windsurf/rules/fluentresult.md
+
+# JetBrains AI (Junie)
+mkdir -p .junie && curl -sLo .junie/guidelines.md https://raw.githubusercontent.com/patmoreau/drifterapps-seeds-fluentresult/main/.junie/guidelines.md
 ```
 
 ## Contributing

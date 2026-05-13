@@ -1,0 +1,125 @@
+---
+description: Coding rules for DrifterApps.Seeds.FluentResult — Railway-Oriented Programming Result pattern for .NET
+globs:
+  - "**/*.cs"
+alwaysApply: false
+---
+
+# DrifterApps.Seeds.FluentResult — Cursor Rules
+
+Railway-Oriented Programming (ROP) Result pattern for .NET.
+
+**Package:** `DrifterApps.Seeds.FluentResult`
+**Namespace:** `using DrifterApps.Seeds.FluentResult;`
+**Targets:** .NET 8, 9, 10
+
+## Core Types
+
+| Type | Purpose |
+|---|---|
+| `Result<T>` | Success with value `T` **or** failure with `ResultError` |
+| `ResultError` | Error: `Code` + `Description` strings |
+| `Nothing` | Unit/void — use when there's no meaningful return value |
+| `ResultAggregate` | Batch validation container |
+| `ResultErrorAggregate` | Grouped errors produced from `ResultAggregate` |
+| `EnsureOnFailure` | `ValidateOnFailure` (default) or `IgnoreOnFailure` |
+
+## Creating Results
+
+```csharp
+// Success
+Result<int> r1 = 42;
+Result<int> r2 = value.ToResult();
+Result<Nothing> r3 = Nothing.Value;
+
+// Failure
+Result<int> f1 = new ResultError("Domain.NotFound", "Entity was not found");
+Result<int> f2 = someError.ToResult<int>();
+```
+
+Domain error pattern:
+
+```csharp
+internal static class UserErrors
+{
+    internal static ResultError NotFound(Guid id) =>
+        new("User.NotFound", $"User '{id}' was not found.");
+
+    internal static readonly ResultError InvalidEmail =
+        new("User.InvalidEmail", "The email address is invalid.");
+}
+```
+
+## Composition API
+
+```csharp
+// Match — branch at the end of a pipeline
+result.Match(
+    onSuccess: value => DoSomething(value),
+    onFailure: error  => HandleError(error)
+);
+
+Result<TOut> out = result.Match<TOut>(
+    onSuccess: value => Convert(value).ToResult(),
+    onFailure: error  => error.ToResult<TOut>()
+);
+
+// OnSuccess — happy-path continuation
+result.OnSuccess(value => SideEffect(value));               // pass-through
+Result<TOut> r = result.OnSuccess(v => Convert(v).ToResult()); // transform
+
+// OnFailure — observe error, result unchanged
+result.OnFailure(error => logger.LogError(error.Code));
+
+// Select — pure transform (cannot fail)
+Result<string> s = intResult.Select(i => i.ToString());
+
+// SelectMany — LINQ query syntax for pipelines
+var result = from order    in GetOrder(orderId)
+             from customer in GetCustomer(order.CustomerId)
+             select new OrderDto(order, customer);
+```
+
+## Async
+
+```csharp
+var result = await GetUserAsync(userId)   // Task<Result<User>>
+    .OnSuccess(user => ValidateAsync(user))
+    .OnSuccess(user => SaveAsync(user))
+    .OnFailure(err  => LogAsync(err));
+
+Result<int> r = await Task.FromResult(42).ToResult();
+Task<Result<int>> task = (Result<int>)42; // implicit
+```
+
+## Aggregation
+
+```csharp
+var agg = ResultAggregate.Create();
+agg.AddResult(ValidateEmail(email));
+agg
+    .Ensure(() => password.Length >= 8, new ResultError("Pwd.Short", "Min 8 chars"))
+    .Ensure(() => age >= 18,            new ResultError("Age.Young", "Must be 18+"),
+            EnsureOnFailure.IgnoreOnFailure);
+
+if (agg.IsFailure)
+    return agg.ToErrorAggregate<User>().ToResult<User>();
+```
+
+## Testing
+
+```csharp
+// Package: DrifterApps.Seeds.FluentResult.FluentAssertions
+result.Should().BeSuccessful().And.WithValue(expected);
+result.Should().BeFailure().And.WithError(expectedError);
+```
+
+## Rules
+
+- Return `Result<T>` from every failable method
+- Use `Nothing` for void operations
+- Never throw for expected domain failures
+- Never access `result.Value` without checking `result.IsSuccess` first
+- Never return `null`
+- Always provide both `Code` and `Description` in `ResultError`
+- Prefer LINQ query syntax over nested `OnSuccess` for multi-step pipelines
