@@ -3,7 +3,6 @@
     <PropertyGroup>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
-        <TargetFrameworks>net10.0</TargetFrameworks>
         <AssemblyName>DrifterApps.Seeds.FluentResult.Tests</AssemblyName>
         <RootNamespace>FluentResult.Tests</RootNamespace>
     </PropertyGroup>
