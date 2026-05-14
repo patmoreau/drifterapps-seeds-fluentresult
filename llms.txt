@@ -1,0 +1,15 @@
+# DrifterApps.Seeds.FluentResult
+
+> Railway-Oriented Programming (ROP) Result pattern library for .NET 10. Every operation that can fail returns `Result<T>` — a discriminated union of success (carrying `T`) or failure (carrying `ResultError`) — instead of throwing exceptions or returning null.
+
+Package: `DrifterApps.Seeds.FluentResult`
+Namespace: `DrifterApps.Seeds.FluentResult`
+Testing package: `DrifterApps.Seeds.FluentResult.FluentAssertions`
+
+## Docs
+
+- [README](README.md): Installation, quickstart, and overview
+- [API Reference](docs/API.md): All types, method signatures, and implicit conversions
+- [Examples](docs/EXAMPLES.md): Real-world patterns — domain model, repository, service layer, ASP.NET Core, MediatR, async pipelines, and test examples
+- [AI Guidelines](docs/AI-GUIDELINES.md): Rules for AI coding assistants — when to apply the pattern, anti-patterns, async chaining, performance, and integration gotchas
+- [Architecture](ARCHITECTURE.md): Design decisions — why `Result<T>` is a struct, LINQ integration, async strategy, and explicit scope boundaries
