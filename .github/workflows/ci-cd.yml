@@ -126,7 +126,7 @@ jobs:
         if: always()
         with:
           name: Tests on .NET ${{ matrix.framework }}
-          path: ./tests-results/*.xml
+          path: ./tests-results/test-results.xml
           reporter: dotnet-trx
 
       - name: Code Coverage Summary Report ${{ matrix.framework }}
