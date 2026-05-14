@@ -111,14 +111,14 @@ jobs:
         run: dotnet build --no-restore --configuration Release --framework ${{ matrix.framework }} /property:Version=${{ env.ASSEMBLY_VERSION }}
 
       - name: Tests
-        run: dotnet test --no-restore --no-build --configuration Release --framework ${{ matrix.framework }} --logger 'trx;verbosity=normal' --results-directory ./tests-results --collect 'XPlat Code Coverage'
+        run: dotnet test --no-restore --no-build --configuration Release --framework ${{ matrix.framework }} --report-xunit-trx --report-xunit-trx-filename test-results.xml --results-directory ./tests-results --coverage --coverage-output-format cobertura
 
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: Test Results for .NET ${{ matrix.framework }}
-          path: ./tests-results/**/*.trx
+          path: ./tests-results/*.xml
 
       - name: Test Report
         uses: dorny/test-reporter@v3
@@ -126,8 +126,13 @@ jobs:
         if: always()
         with:
           name: Tests on .NET ${{ matrix.framework }}
-          path: ./tests-results/**/*.trx
+          path: ./tests-results/*.xml
           reporter: dotnet-trx
+
+      - name: Code Coverage Summary Report ${{ matrix.framework }}
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: ./tests-results/*.cobertura.xml
 
       - name: Set badge color
         shell: bash
