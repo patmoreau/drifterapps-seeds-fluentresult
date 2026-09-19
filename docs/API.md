@@ -293,7 +293,19 @@ Extends `ResultError` with a dictionary grouping all collected error description
 | `Description` | `string` | Aggregate description, e.g. `"Errors occurred"` |
 | `Errors` | `IReadOnlyDictionary<string, string[]>` | Each key is an error code; each value is an array of descriptions |
 
-The `Code` follows the pattern `"{TypeName}.Errors"` where `TypeName` is the type argument passed to `ToErrorAggregate<T>()`.
+You never construct a `ResultErrorAggregate` from a `ResultAggregate` yourself — `Match`, `OnSuccess`, and `OnFailure` build it for you and hand it to the failure branch.
+
+The `Code` follows the pattern `"{TypeName}.Errors"`, where `TypeName` is the name of the result type produced by the call that surfaced the aggregate:
+
+```csharp
+// TOut is User  ->  Code == "User.Errors"
+Result<User> result = aggregate.OnSuccess<User>(() => CreateUser(email, password));
+
+// Non-generic overloads produce Result<Nothing>  ->  Code == "Nothing.Errors"
+Result<Nothing> logged = aggregate.OnFailure(errors => logger.LogError(errors.Code));
+```
+
+To name the aggregate after a domain type, use the generic overload whose `TOut` is that type.
 
 ---
 

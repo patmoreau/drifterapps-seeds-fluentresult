@@ -86,9 +86,11 @@ It is a `record` (not a struct) because it is mutable (via `AddResult`) and may 
 
 Use `Ensure` in fluent validation chains. Use `AddResult` when the result comes from an existing method.
 
-### `ToErrorAggregate<T>()`
+### Naming the aggregated error
 
-The type parameter `T` names the aggregate — `ToErrorAggregate<User>()` produces code `"User.Errors"`. This mirrors how ASP.NET Core's `ValidationProblemDetails` groups errors: the outer code identifies the failing entity; the inner dictionary maps field codes to messages.
+`ToErrorAggregate<T>()` is **internal** by design. Callers never build a `ResultErrorAggregate` directly; `Match`, `OnSuccess`, and `OnFailure` construct it and pass it to the failure branch. Keeping it internal means the aggregate cannot be produced in a state the terminal methods did not create.
+
+The type parameter `T` names the aggregate, and it is inferred from the result type of the call that surfaced it — `aggregate.OnSuccess<User>(...)` produces code `"User.Errors"`, while the non-generic overloads produce `Result<Nothing>` and so code `"Nothing.Errors"`. This mirrors how ASP.NET Core's `ValidationProblemDetails` groups errors: the outer code identifies the failing entity; the inner dictionary maps field codes to messages.
 
 ---
 
@@ -120,7 +122,7 @@ err.Code.StartsWith("User.") => NotFound / Conflict / ...
 err.Code.StartsWith("Order.") => ...
 ```
 
-Aggregate error codes follow `"TypeName.Errors"` — produced automatically by `ToErrorAggregate<T>()`.
+Aggregate error codes follow `"TypeName.Errors"` — produced automatically when a `ResultAggregate` fails, with `TypeName` taken from the result type of the `Match` / `OnSuccess` / `OnFailure` call.
 
 ---
 
