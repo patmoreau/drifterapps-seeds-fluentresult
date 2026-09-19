@@ -38,9 +38,17 @@ public record ResultErrorAggregate : ResultError
     /// <returns>
     ///     A hash code for the current instance.
     /// </returns>
+    /// <remarks>
+    ///     Entries are folded with XOR so that the hash code does not depend on the order in which the errors were
+    ///     added, matching the key-order-independent comparison performed by
+    ///     <see cref="Equals(ResultErrorAggregate)" />. The descriptions of a single entry are order sensitive, as
+    ///     they are compared with <see cref="Enumerable.SequenceEqual{TSource}(IEnumerable{TSource},IEnumerable{TSource})" />.
+    /// </remarks>
     public override int GetHashCode() =>
         Errors.Aggregate(base.GetHashCode(),
-            (current, error) => error.Value.Aggregate(HashCode.Combine(current, error.Key), HashCode.Combine));
+            (current, error) => current ^
+                                error.Value.Aggregate(StringComparer.Ordinal.GetHashCode(error.Key),
+                                    HashCode.Combine));
 
     private bool AreErrorAggregateEqual(IReadOnlyDictionary<string, string[]> other)
     {

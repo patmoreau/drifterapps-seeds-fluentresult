@@ -52,6 +52,31 @@ public class ResultErrorAggregateTests
         result.Should().BeFalse();
     }
 
+    [Fact]
+    public void GivenGetHashCode_WhenErrorsAddedInDifferentOrder_ThenReturnsSameHashCode()
+    {
+        // Arrange
+        var code = Faker.Random.Word();
+        var description = Faker.Lorem.Sentence();
+        var firstProperty = Faker.Random.Hash();
+        var secondProperty = Faker.Random.Hash();
+        var firstMessage = Faker.Lorem.Sentence();
+        var secondMessage = Faker.Lorem.Sentence();
+        var error = new ResultErrorAggregate(code, description,
+            new Dictionary<string, string[]> {{firstProperty, [firstMessage]}, {secondProperty, [secondMessage]}});
+        var reordered = new ResultErrorAggregate(code, description,
+            new Dictionary<string, string[]> {{secondProperty, [secondMessage]}, {firstProperty, [firstMessage]}});
+
+        // Act
+        var areEqual = error.Equals(reordered);
+        var haveSameHashCode = error.GetHashCode() == reordered.GetHashCode();
+
+        // Assert
+        using var scope = new AssertionScope();
+        areEqual.Should().BeTrue();
+        haveSameHashCode.Should().BeTrue();
+    }
+
     [Theory]
     [ClassData(typeof(EqualsData))]
     public void GivenEquals_WhenComparingToOther_ThenReturnsExpected(
