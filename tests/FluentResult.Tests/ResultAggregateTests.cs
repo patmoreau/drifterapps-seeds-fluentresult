@@ -430,7 +430,7 @@ public class ResultAggregateTests
     {
         // Arrange
         var error1 = Faker.Random.Word();
-        var error2 = Faker.Random.Word();
+        var error2 = DifferentWordThan(error1);
         var description1 = Faker.Lorem.Sentence();
         var description2 = Faker.Lorem.Sentence();
         var resultAggregate = ResultAggregate.Create();
@@ -444,11 +444,11 @@ public class ResultAggregateTests
         result.Should().BeOfType<ResultErrorAggregate>()
             .Which
             .Errors.Should().ContainKey(error1)
-            .WhoseValue.Should().ContainSingle(description1);
+            .WhoseValue.Should().ContainSingle().Which.Should().Be(description1);
         result.Should().BeOfType<ResultErrorAggregate>()
             .Which
             .Errors.Should().ContainKey(error2)
-            .WhoseValue.Should().ContainSingle(description2);
+            .WhoseValue.Should().ContainSingle().Which.Should().Be(description2);
     }
 
     [Fact]
@@ -471,6 +471,17 @@ public class ResultAggregateTests
             .Errors.Should().ContainKey(error)
             .WhoseValue.Should().HaveCount(2)
             .And.Subject.Should().Contain(description1).And.Contain(description2);
+    }
+
+    private static string DifferentWordThan(string word)
+    {
+        string other;
+        do
+        {
+            other = Faker.Random.Word();
+        } while (string.Equals(word, other, StringComparison.Ordinal));
+
+        return other;
     }
 
     private static ResultAggregate CreateWithErrors()
