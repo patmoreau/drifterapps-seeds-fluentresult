@@ -97,6 +97,22 @@ public partial class ResultExtensionsTests
         result.Should().BeFailure().And.WithError(TestFirstError);
     }
 
+    [Fact]
+    public async Task GivenToResultAsync_WhenInvokedWithResultErrorNone_ThenThrowArgumentException()
+    {
+        // Arrange
+        var errorTask = Task.FromResult(ResultError.None);
+
+        // Act
+        var action = () => errorTask.ToResult<string>();
+
+        // Assert
+        await action.Should()
+            .ThrowAsync<ArgumentException>()
+            .WithParameterName("source")
+            .WithMessage("Invalid error (Parameter 'source')");
+    }
+
     [Theory]
     [MemberData(nameof(MatchData))]
     public async Task GivenAsyncMatchOfVoid_WhenInvoked_ThenAppropriateMethodIsCalled(Result<int> resultIn,

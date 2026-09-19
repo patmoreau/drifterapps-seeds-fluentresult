@@ -38,11 +38,14 @@ public static partial class ResultExtensions
     /// </summary>
     /// <typeparam name="T">The type of the source object.</typeparam>
     /// <param name="source">The source object to convert.</param>
-    /// <returns>A successful result containing the source object.</returns>
+    /// <returns>A failed result carrying the awaited error.</returns>
+    /// <exception cref="ArgumentException">Thrown when the awaited error is <see cref="ResultError.None" />.</exception>
     public static async Task<Result<T>> ToResult<T>(this Task<ResultError> source)
     {
         var result = await source;
-        return result;
+        return result == ResultError.None
+            ? throw new ArgumentException("Invalid error", nameof(source))
+            : result;
     }
 
     /// <summary>
