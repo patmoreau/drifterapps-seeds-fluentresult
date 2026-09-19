@@ -51,6 +51,37 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
+    public void GivenToResult_WhenTypeDerivesFromResultError_ThenThrowInvalidOperationException()
+    {
+        // Arrange
+        var aggregate = new ResultErrorAggregate("Test.Errors", "Errors occurred",
+            new Dictionary<string, string[]> {{TestFirstError.Code, [TestFirstError.Description]}});
+
+        // Act
+        var action = () => aggregate.ToResult();
+
+        // Assert
+        action.Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage("ResultError is not allowed.");
+    }
+
+    [Fact]
+    public void GivenToResult_WhenSourceIsResultErrorTypedAsObject_ThenThrowInvalidOperationException()
+    {
+        // Arrange
+        object error = TestFirstError;
+
+        // Act
+        var action = () => error.ToResult();
+
+        // Assert
+        action.Should()
+            .Throw<InvalidOperationException>()
+            .WithMessage("ResultError is not allowed.");
+    }
+
+    [Fact]
     public void GivenToResult_WhenInvokedWithResultError_ThenReturnFailure()
     {
         // Arrange

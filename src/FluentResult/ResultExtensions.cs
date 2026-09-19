@@ -22,10 +22,13 @@ public static partial class ResultExtensions
     ///     Thrown when the source object is null and <typeparamref name="T" /> is not
     ///     nullable.
     /// </exception>
-    /// <exception cref="InvalidOperationException">Thrown when <typeparamref name="T" /> is <see cref="ResultError" />.</exception>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when <typeparamref name="T" /> is, or derives from, <see cref="ResultError" />, or when
+    ///     <paramref name="source" /> is a <see cref="ResultError" /> held in a less derived variable.
+    /// </exception>
     public static Result<T> ToResult<T>(this T source)
     {
-        if (typeof(T) == typeof(ResultError))
+        if (typeof(ResultError).IsAssignableFrom(typeof(T)) || source is ResultError)
         {
             throw new InvalidOperationException("ResultError is not allowed.");
         }

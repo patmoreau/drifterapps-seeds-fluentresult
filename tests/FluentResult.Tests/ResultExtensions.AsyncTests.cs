@@ -55,6 +55,36 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
+    public async Task GivenToResultAsync_WhenTypeDerivesFromResultError_ThenThrowInvalidOperationException()
+    {
+        // Arrange
+        var aggregate = new ResultErrorAggregate("Test.Errors", "Errors occurred",
+            new Dictionary<string, string[]> {{TestFirstError.Code, [TestFirstError.Description]}});
+        var aggregateTask = Task.FromResult(aggregate);
+
+        // Act
+        var action = () => aggregateTask.ToResult();
+
+        // Assert
+        await action.Should()
+            .ThrowAsync<InvalidOperationException>().WithMessage("ResultError is not allowed.");
+    }
+
+    [Fact]
+    public async Task GivenToResultAsync_WhenValueIsResultErrorTypedAsObject_ThenThrowInvalidOperationException()
+    {
+        // Arrange
+        var errorTask = Task.FromResult<object>(TestFirstError);
+
+        // Act
+        var action = () => errorTask.ToResult();
+
+        // Assert
+        await action.Should()
+            .ThrowAsync<InvalidOperationException>().WithMessage("ResultError is not allowed.");
+    }
+
+    [Fact]
     public async Task GivenToResultAsync_WhenInvokedWithResultError_ThenReturnFailure()
     {
         // Arrange

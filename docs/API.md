@@ -333,7 +333,8 @@ Static class providing extension methods for `Result<T>` and `Task<Result<T>>`.
 ```csharp
 // Convert value to success Result<T>
 // Throws ArgumentNullException if value is null for a non-nullable type
-// Throws InvalidOperationException if T is ResultError
+// Throws InvalidOperationException if the value is a ResultError (including derived
+// types such as ResultErrorAggregate, and errors held in an object-typed variable)
 Result<T> ToResult<T>(this T source)
 
 // Async variant

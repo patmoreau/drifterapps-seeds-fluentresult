@@ -13,15 +13,23 @@ public static partial class ResultExtensions
     /// <typeparam name="T">The type of the source object.</typeparam>
     /// <param name="source">The source object to convert.</param>
     /// <returns>A successful result containing the source object.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when <typeparamref name="T" /> is <see cref="ResultError" />.</exception>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when <typeparamref name="T" /> is, or derives from, <see cref="ResultError" />, or when the awaited
+    ///     value is a <see cref="ResultError" /> held in a less derived variable.
+    /// </exception>
     public static async Task<Result<T>> ToResult<T>(this Task<T> source)
     {
-        if (typeof(T) == typeof(ResultError))
+        if (typeof(ResultError).IsAssignableFrom(typeof(T)))
         {
             throw new InvalidOperationException("ResultError is not allowed.");
         }
 
         var result = await source;
+        if (result is ResultError)
+        {
+            throw new InvalidOperationException("ResultError is not allowed.");
+        }
+
         return result;
     }
 
