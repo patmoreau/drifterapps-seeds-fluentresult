@@ -40,7 +40,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public void GivenToResultAsync_WhenInvokedForResultError_ThenThrowInvalidOperationException()
+    public async Task GivenToResultAsync_WhenInvokedForResultError_ThenThrowInvalidOperationException()
     {
         // Arrange
         var error = TestFirstError;
@@ -50,7 +50,7 @@ public partial class ResultExtensionsTests
         var action = () => numberTask.ToResult();
 
         // Assert
-        action.Should()
+        await action.Should()
             .ThrowAsync<InvalidOperationException>().WithMessage("ResultError is not allowed.");
     }
 
