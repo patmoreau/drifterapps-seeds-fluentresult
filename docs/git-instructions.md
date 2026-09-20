@@ -11,6 +11,7 @@ Only commit when:
 1. ALL tests are passing
 2. ALL compiler/linter warnings resolved
 3. Single logical unit of work
+4. I have performed a code review myself
 
 Never mix structural and behavioral changes in the same commit.
 Always make structural changes first when both are needed.
@@ -27,8 +28,13 @@ Always make structural changes first when both are needed.
 - Imperative mood ("Add unit tests" not "Added unit tests")
 - Add co-authored tag with agent name and model used similar to this `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
 
+## Push to origin
+- Watch the ci workflows for success:
+  - ci-cd
+  - codeql-analysis
+  - linter
+
 ## Never
 
-- Commit anything until I have performed a code review myself
 - Commit secrets or confidential information
 - Push to GitHub by yourself
