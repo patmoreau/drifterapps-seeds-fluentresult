@@ -129,7 +129,7 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
 
         _ = assertion.IsSuccessfulAssertion(Subject)
             .Then
-            .ForCondition(Subject.IsSuccess && Subject.Value!.Equals(expectedValue))
+            .ForCondition(Subject.IsSuccess && Equals(Subject.Value, expectedValue))
             .BecauseOf(because, becauseArgs)
             .FailWith("Expected {context:result} to have value {0}{reason}, but found {1}.", expectedValue,
                 Subject.Value);
