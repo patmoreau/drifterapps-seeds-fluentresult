@@ -27,7 +27,8 @@ SDK pinned in `global.json` (10.0.401, `rollForward: latestMinor`).
 ```bash
 dotnet build                      # whole solution
 dotnet test                       # whole suite — fast, always run it after each change
-dotnet format --severity error    # what the linter workflow enforces
+dotnet format --verify-no-changes --severity error   # what the linter workflow enforces
+dotnet format --severity error                       # same check, but fixes in place
 ```
 
 Test runner is **Microsoft.Testing.Platform** (`global.json` → `test.runner`), with
