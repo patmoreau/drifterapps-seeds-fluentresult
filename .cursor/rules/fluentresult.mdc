@@ -11,7 +11,7 @@ Railway-Oriented Programming (ROP) Result pattern for .NET.
 
 **Package:** `DrifterApps.Seeds.FluentResult`
 **Namespace:** `using DrifterApps.Seeds.FluentResult;`
-**Targets:** .NET 8, 9, 10
+**Targets:** .NET 10
 
 ## Core Types
 
@@ -102,8 +102,8 @@ agg
     .Ensure(() => age >= 18,            new ResultError("Age.Young", "Must be 18+"),
             EnsureOnFailure.IgnoreOnFailure);
 
-if (agg.IsFailure)
-    return agg.ToErrorAggregate<User>().ToResult<User>();
+// Terminal call: on failure the ResultErrorAggregate is built for you
+return agg.OnSuccess(() => CreateUser(email, password, age));
 ```
 
 ## Testing

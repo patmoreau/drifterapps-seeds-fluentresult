@@ -4,7 +4,7 @@ This repository implements the **Railway-Oriented Programming (ROP) Result patte
 
 **Package:** `DrifterApps.Seeds.FluentResult`
 **Namespace:** `using DrifterApps.Seeds.FluentResult;`
-**Targets:** .NET 8, 9, 10
+**Targets:** .NET 10
 
 ---
 
@@ -139,11 +139,14 @@ aggregate
     .Ensure(() => age >= 18,            new ResultError("Age.TooYoung",     "Must be 18+"),
             EnsureOnFailure.IgnoreOnFailure);
 
-if (aggregate.IsFailure)
-{
-    ResultErrorAggregate errors = aggregate.ToErrorAggregate<User>();
-    return errors.ToResult<User>();
-}
+// Terminal call: on failure the ResultErrorAggregate is built for you
+return aggregate.OnSuccess(() => CreateUser(email, password, age));
+
+// Or handle both branches explicitly
+return aggregate.Match(
+    onSuccess: ()     => CreateUser(email, password, age),
+    onFailure: errors => errors.ToResult<User>()
+);
 ```
 
 ---

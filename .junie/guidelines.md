@@ -4,7 +4,7 @@ Railway-Oriented Programming (ROP) Result pattern for .NET.
 
 **Package:** `DrifterApps.Seeds.FluentResult`
 **Namespace:** `using DrifterApps.Seeds.FluentResult;`
-**Targets:** .NET 8, 9, 10
+**Targets:** .NET 10
 
 ---
 
@@ -137,14 +137,14 @@ agg
     .Ensure(() => age >= 18,            new ResultError("Age.TooYoung",     "Must be 18+"),
             EnsureOnFailure.IgnoreOnFailure);   // skip check if already failed
 
-if (agg.IsFailure)
-{
-    ResultErrorAggregate errors = agg.ToErrorAggregate<User>();
+// Terminal call: on failure the ResultErrorAggregate is built for you
+return agg.Match(
+    onSuccess: ()     => CreateUser(email, password, age),
     // errors.Code        = "User.Errors"
     // errors.Description = "Errors occurred"
     // errors.Errors      = IReadOnlyDictionary<string, string[]>
-    return errors.ToResult<User>();
-}
+    onFailure: errors => errors.ToResult<User>()
+);
 ```
 
 ---
