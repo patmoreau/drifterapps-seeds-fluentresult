@@ -133,7 +133,7 @@ This repository ships instruction files for the most common AI coding assistants
 
 | IDE / Tool | Instruction file | Where to copy it in your project |
 | --- | --- | --- |
-| **Claude Code** | [CLAUDE.md](https://github.com/patmoreau/drifterapps-seeds-fluentresult/blob/main/CLAUDE.md) | `CLAUDE.md` at the project root |
+| **Claude Code** | [AI-GUIDELINES.md](https://github.com/patmoreau/drifterapps-seeds-fluentresult/blob/main/docs/AI-GUIDELINES.md) | `CLAUDE.md` at the project root |
 | **GitHub Copilot** | [copilot-instructions.md](https://github.com/patmoreau/drifterapps-seeds-fluentresult/blob/main/.github/copilot-instructions.md) | `.github/copilot-instructions.md` |
 | **Cursor** | [fluentresult.mdc](https://github.com/patmoreau/drifterapps-seeds-fluentresult/blob/main/.cursor/rules/fluentresult.mdc) | `.cursor/rules/fluentresult.mdc` |
 | **Windsurf** | [fluentresult.md](https://github.com/patmoreau/drifterapps-seeds-fluentresult/blob/main/.windsurf/rules/fluentresult.md) | `.windsurf/rules/fluentresult.md` |
@@ -145,7 +145,7 @@ This repository ships instruction files for the most common AI coding assistants
 
 ```sh
 # Claude Code
-curl -sLo CLAUDE.md https://raw.githubusercontent.com/patmoreau/drifterapps-seeds-fluentresult/main/CLAUDE.md
+curl -sLo CLAUDE.md https://raw.githubusercontent.com/patmoreau/drifterapps-seeds-fluentresult/main/docs/AI-GUIDELINES.md
 
 # GitHub Copilot
 mkdir -p .github && curl -sLo .github/copilot-instructions.md https://raw.githubusercontent.com/patmoreau/drifterapps-seeds-fluentresult/main/.github/copilot-instructions.md
