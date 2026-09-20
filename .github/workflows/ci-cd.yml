@@ -70,8 +70,10 @@ jobs:
           configFilePath: GitVersion.yml
 
       - name: Display GitVersion outputs
+        env:
+          GITVERSION_OUTPUTS: ${{ toJSON(steps.gitversion.outputs) }}
         run: |
-          echo "All outputs: ${{ toJSON(steps.gitversion.outputs) }}"
+          echo "All outputs: $GITVERSION_OUTPUTS"
 
       - name: Enable workflow commands
         run: |
