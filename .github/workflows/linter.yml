@@ -68,12 +68,19 @@ jobs:
         run: ./scripts/sync-agent-files.sh --check
 
   create_check:
-    needs: [check_changes, csharp]
+    needs: [check_changes, csharp, agent-files]
     permissions:
       checks: write
     uses: patmoreau/workflow-config/.github/workflows/create-check.yml@main
     if: always() && needs.check_changes.result == 'success'
     with:
-      code_was_changed: ${{ needs.check_changes.outputs.code_was_changed }}
+      # create-check.yml concludes success whenever code_was_changed is false,
+      # ignoring check_result. The agent-files job runs on every commit, including
+      # doc-only ones where csharp is skipped, so pass true and let check_result
+      # carry the whole verdict: a skipped csharp is not a failure, a failed
+      # agent-files is.
+      code_was_changed: 'true'
       check_name: 'linter-completed'
-      check_result: ${{ needs.csharp.result }}
+      check_result: >-
+        ${{ (needs.csharp.result == 'success' || needs.csharp.result == 'skipped')
+        && needs['agent-files'].result == 'success' && 'success' || 'failure' }}
