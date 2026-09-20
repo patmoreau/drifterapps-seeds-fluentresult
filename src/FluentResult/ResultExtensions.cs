@@ -64,7 +64,7 @@ public static partial class ResultExtensions
     /// <param name="selector">The mapping/selector method.</param>
     /// <returns>A result of the selector function or a failure result.</returns>
     public static Result<TResult> Select<TFrom, TResult>(this Result<TFrom> source, Func<TFrom, TResult> selector) =>
-        source.Match(r => selector(r), r => (Result<TResult>) r);
+        source.Match(r => selector(r), r => (Result<TResult>)r);
 
     /// <summary>
     ///     Performs a select-many operation, extracting intermediate results and combining them into a final result.
@@ -88,5 +88,5 @@ public static partial class ResultExtensions
                 // Select() just passes the error through as a failed Result<TResult>
                 return result.Select(v => resultSelector(r, v));
             },
-            r => (Result<TResult>) r); // error -> return a failed Result<TResult>
+            r => (Result<TResult>)r); // error -> return a failed Result<TResult>
 }

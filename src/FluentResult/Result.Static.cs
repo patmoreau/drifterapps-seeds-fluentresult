@@ -20,7 +20,7 @@ public partial struct Result<T>
     ///     Converts the current instance to a <see cref="Result{T}" /> with its existing success or failure.
     /// </summary>
     /// <returns>A successful or failed <see cref="Result{T}" /> based on the current instance.</returns>
-    public Result<T> ToResult() => IsSuccess ? Value : (Result<T>) Error;
+    public Result<T> ToResult() => IsSuccess ? Value : (Result<T>)Error;
 
     /// <summary>
     ///     Implicitly converts a value of type <typeparamref name="T" /> to a <see cref="Result{T}" />.

@@ -92,7 +92,7 @@ public partial struct Result<T>
     /// <param name="onSuccess">The function to execute if the result is successful.</param>
     /// <returns>The result of the onSuccess function or a failure result.</returns>
     public Task<Result<TOut>> OnSuccess<TOut>(Func<T, Task<Result<TOut>>> onSuccess) =>
-        Match(onSuccess, error => Task.FromResult((Result<TOut>) error));
+        Match(onSuccess, error => Task.FromResult((Result<TOut>)error));
 
     /// <summary>
     ///     Calls onFailure if the result is failure, returning the original result.

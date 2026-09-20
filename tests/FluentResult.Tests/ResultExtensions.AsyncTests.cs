@@ -59,7 +59,7 @@ public partial class ResultExtensionsTests
     {
         // Arrange
         var aggregate = new ResultErrorAggregate("Test.Errors", "Errors occurred",
-            new Dictionary<string, string[]> {{TestFirstError.Code, [TestFirstError.Description]}});
+            new Dictionary<string, string[]> { { TestFirstError.Code, [TestFirstError.Description] } });
         var aggregateTask = Task.FromResult(aggregate);
 
         // Act
@@ -359,11 +359,11 @@ public partial class ResultExtensionsTests
         var methodResult = await Task.FromResult(number.ToResult())
             .Select(n => Task.FromResult(n.ToString(CultureInfo.InvariantCulture)));
         var methodManyResult = await Task.FromResult(number.ToResult())
-            .SelectMany(i => Task.FromResult(((decimal) i).ToResult()),
+            .SelectMany(i => Task.FromResult(((decimal)i).ToResult()),
                 (_, d) => d.ToString(CultureInfo.InvariantCulture));
         var queryResult = await (from intResult in Task.FromResult(number.ToResult())
-            from stringResult in Task.FromResult(intResult.ToString(CultureInfo.InvariantCulture).ToResult())
-            select stringResult);
+                                 from stringResult in Task.FromResult(intResult.ToString(CultureInfo.InvariantCulture).ToResult())
+                                 select stringResult);
 
         // Assert
         methodResult.Should().BeOfType<Result<string>>()
@@ -383,11 +383,11 @@ public partial class ResultExtensionsTests
         var methodResult = await Task.FromResult(TestFirstError.ToResult<int>())
             .Select(n => Task.FromResult(n.ToString(CultureInfo.InvariantCulture)));
         var methodManyResult = await Task.FromResult(TestFirstError.ToResult<int>())
-            .SelectMany(i => Task.FromResult(((decimal) i).ToResult()),
+            .SelectMany(i => Task.FromResult(((decimal)i).ToResult()),
                 (_, d) => d.ToString(CultureInfo.InvariantCulture));
         var queryResult = await (from intResult in Task.FromResult(TestFirstError.ToResult<int>())
-            from stringResult in Task.FromResult(intResult.ToString(CultureInfo.InvariantCulture).ToResult())
-            select stringResult);
+                                 from stringResult in Task.FromResult(intResult.ToString(CultureInfo.InvariantCulture).ToResult())
+                                 select stringResult);
 
         // Assert
         methodResult.Should().BeOfType<Result<string>>()

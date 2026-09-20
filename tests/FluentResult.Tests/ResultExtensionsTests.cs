@@ -55,7 +55,7 @@ public partial class ResultExtensionsTests
     {
         // Arrange
         var aggregate = new ResultErrorAggregate("Test.Errors", "Errors occurred",
-            new Dictionary<string, string[]> {{TestFirstError.Code, [TestFirstError.Description]}});
+            new Dictionary<string, string[]> { { TestFirstError.Code, [TestFirstError.Description] } });
 
         // Act
         var action = () => aggregate.ToResult();
@@ -115,7 +115,7 @@ public partial class ResultExtensionsTests
         var result = Faker.Random.Int().ToResult();
 
         // Act
-        var projected = result.Select(_ => (string?) null);
+        var projected = result.Select(_ => (string?)null);
 
         // Assert
         projected.Should().BeSuccessful();
@@ -133,10 +133,10 @@ public partial class ResultExtensionsTests
         var methodResult = number.ToResult()
             .Select(n => n.ToString(CultureInfo.InvariantCulture));
         var methodManyResult = number.ToResult()
-            .SelectMany(i => ((decimal) i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
+            .SelectMany(i => ((decimal)i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
         var queryResult = from intResult in number.ToResult()
-            from stringResult in intResult.ToString(CultureInfo.InvariantCulture).ToResult()
-            select stringResult;
+                          from stringResult in intResult.ToString(CultureInfo.InvariantCulture).ToResult()
+                          select stringResult;
 
         // Assert
         methodResult.Should().BeOfType<Result<string>>()
@@ -156,10 +156,10 @@ public partial class ResultExtensionsTests
         var methodResult = TestFirstError.ToResult<int>()
             .Select(n => n.ToString(CultureInfo.InvariantCulture));
         var methodManyResult = TestFirstError.ToResult<int>()
-            .SelectMany(i => ((decimal) i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
+            .SelectMany(i => ((decimal)i).ToResult(), (_, d) => d.ToString(CultureInfo.InvariantCulture));
         var queryResult = from intResult in TestFirstError.ToResult<int>()
-            from stringResult in intResult.ToString(CultureInfo.InvariantCulture).ToResult()
-            select stringResult;
+                          from stringResult in intResult.ToString(CultureInfo.InvariantCulture).ToResult()
+                          select stringResult;
 
         // Assert
         methodResult.Should().BeOfType<Result<string>>()

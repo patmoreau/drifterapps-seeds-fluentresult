@@ -10,7 +10,7 @@ public class ResultAssertionsExtensionsTests
     {
         // Arrange
         var expectedValue = Faker.Random.Word();
-        var result = Faker.Random.Int().ToResult().Select(_ => (string?) null);
+        var result = Faker.Random.Int().ToResult().Select(_ => (string?)null);
 
         // Act
         var action = () => result.Should().BeSuccessful().And.WithValue(expectedValue);
@@ -26,7 +26,7 @@ public class ResultAssertionsExtensionsTests
     public void GivenWithValue_WhenExpectedValueIsNullAndSuccessCarriesNull_ThenSucceed()
     {
         // Arrange
-        var result = Faker.Random.Int().ToResult().Select(_ => (string?) null);
+        var result = Faker.Random.Int().ToResult().Select(_ => (string?)null);
 
         // Act
         var action = () => result.Should().BeSuccessful().And.WithValue(null);

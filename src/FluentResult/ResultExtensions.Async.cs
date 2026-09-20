@@ -209,7 +209,7 @@ public static partial class ResultExtensions
     {
         var result = await source;
         return await result.Match(async r => await selector(r),
-            e => Task.FromResult((Result<TResult>) e));
+            e => Task.FromResult((Result<TResult>)e));
     }
 
     /// <summary>
@@ -236,6 +236,6 @@ public static partial class ResultExtensions
                 // Select() just passes the error through as a failed Result<TResult>
                 return collectionResult.Select(v => resultSelector(r, v));
             },
-            e => Task.FromResult((Result<TResult>) e));
+            e => Task.FromResult((Result<TResult>)e));
     }
 }

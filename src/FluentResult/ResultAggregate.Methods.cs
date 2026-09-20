@@ -137,7 +137,7 @@ public partial record ResultAggregate
     /// <param name="onSuccess">The function to execute if the result is successful.</param>
     /// <returns>The result of the appropriate function.</returns>
     public Task<Result<TOut>> OnSuccess<TOut>(Func<Task<Result<TOut>>> onSuccess) =>
-        Match(onSuccess, error => Task.FromResult((Result<TOut>) error));
+        Match(onSuccess, error => Task.FromResult((Result<TOut>)error));
 
     /// <summary>
     ///     Runs an action if the result is a failure.

@@ -390,7 +390,7 @@ public class ResultTests
         var result = hash.ToResult();
 
         // Act
-        var isEqual = result.Equals((object) hash.ToResult());
+        var isEqual = result.Equals((object)hash.ToResult());
 
         // Assert
         isEqual.Should().BeTrue();
@@ -403,7 +403,7 @@ public class ResultTests
         var result = Faker.Random.Hash().ToResult();
 
         // Act
-        var isEqual = result.Equals((object) Faker.Random.Hash().ToResult());
+        var isEqual = result.Equals((object)Faker.Random.Hash().ToResult());
 
         // Assert
         isEqual.Should().BeFalse();

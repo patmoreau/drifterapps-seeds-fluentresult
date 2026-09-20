@@ -530,5 +530,5 @@ public class ResultAggregateTests
     private static Func<Result<Nothing>> SuccessfulValidation() => () => Nothing.Value;
 
     private static Func<Result<Nothing>> FailedValidation(ResultError resultError) =>
-        () => (Result<Nothing>) resultError;
+        () => (Result<Nothing>)resultError;
 }

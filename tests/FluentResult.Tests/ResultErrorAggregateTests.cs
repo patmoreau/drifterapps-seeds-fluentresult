@@ -25,7 +25,7 @@ public class ResultErrorAggregateTests
         var property = Faker.Random.Hash();
         var message = Faker.Lorem.Sentence();
         var error1 =
-            new ResultErrorAggregate(code, description, new Dictionary<string, string[]> {{property, [message]}});
+            new ResultErrorAggregate(code, description, new Dictionary<string, string[]> { { property, [message] } });
 
         // Act
         var result = error1.Equals(error1);
@@ -43,7 +43,7 @@ public class ResultErrorAggregateTests
         var property = Faker.Random.Hash();
         var message = Faker.Lorem.Sentence();
         var error1 =
-            new ResultErrorAggregate(code, description, new Dictionary<string, string[]> {{property, [message]}});
+            new ResultErrorAggregate(code, description, new Dictionary<string, string[]> { { property, [message] } });
 
         // Act
         var result = error1 == null;
@@ -63,9 +63,9 @@ public class ResultErrorAggregateTests
         var firstMessage = Faker.Lorem.Sentence();
         var secondMessage = Faker.Lorem.Sentence();
         var error = new ResultErrorAggregate(code, description,
-            new Dictionary<string, string[]> {{firstProperty, [firstMessage]}, {secondProperty, [secondMessage]}});
+            new Dictionary<string, string[]> { { firstProperty, [firstMessage] }, { secondProperty, [secondMessage] } });
         var reordered = new ResultErrorAggregate(code, description,
-            new Dictionary<string, string[]> {{secondProperty, [secondMessage]}, {firstProperty, [firstMessage]}});
+            new Dictionary<string, string[]> { { secondProperty, [secondMessage] }, { firstProperty, [firstMessage] } });
 
         // Act
         var areEqual = error.Equals(reordered);
@@ -119,17 +119,17 @@ public class ResultErrorAggregateTests
             var descriptionSelf = Faker.Lorem.Sentence();
             var propertySelf = Faker.Random.Hash();
             var messageSelf = Faker.Lorem.Sentence();
-            var errorSelf = new Dictionary<string, string[]> {{propertySelf, [messageSelf]}};
+            var errorSelf = new Dictionary<string, string[]> { { propertySelf, [messageSelf] } };
             Add("same all", codeSelf, descriptionSelf, errorSelf,
                 codeSelf, descriptionSelf, errorSelf, true);
             Add("same but new dictionary", codeSelf, descriptionSelf, errorSelf,
-                codeSelf, descriptionSelf, new Dictionary<string, string[]> {{propertySelf, [messageSelf]}}, true);
+                codeSelf, descriptionSelf, new Dictionary<string, string[]> { { propertySelf, [messageSelf] } }, true);
             Add("different code", codeSelf, descriptionSelf, errorSelf,
                 Faker.Random.Word(), descriptionSelf, errorSelf, false);
             Add("different description", codeSelf, descriptionSelf, errorSelf,
                 codeSelf, Faker.Lorem.Sentence(), errorSelf, false);
             Add("different key", codeSelf, descriptionSelf, errorSelf,
-                codeSelf, descriptionSelf, new Dictionary<string, string[]> {{Faker.Random.Hash(), [messageSelf]}},
+                codeSelf, descriptionSelf, new Dictionary<string, string[]> { { Faker.Random.Hash(), [messageSelf] } },
                 false);
             Add("different key count", codeSelf, descriptionSelf, errorSelf,
                 codeSelf, descriptionSelf, new Dictionary<string, string[]>
@@ -138,7 +138,7 @@ public class ResultErrorAggregateTests
                     {Faker.Random.Hash(), [Faker.Lorem.Sentence()]}
                 }, false);
             Add("different validation", codeSelf, descriptionSelf, errorSelf,
-                codeSelf, descriptionSelf, new Dictionary<string, string[]> {{propertySelf, [Faker.Lorem.Sentence()]}},
+                codeSelf, descriptionSelf, new Dictionary<string, string[]> { { propertySelf, [Faker.Lorem.Sentence()] } },
                 false);
             Add("different validation count", codeSelf, descriptionSelf, errorSelf, codeSelf, descriptionSelf,
                 new Dictionary<string, string[]>
