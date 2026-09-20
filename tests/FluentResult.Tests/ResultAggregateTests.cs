@@ -518,7 +518,8 @@ public class ResultAggregateTests
     private static ResultAggregate CreateWithErrors()
     {
         var aggregate = ResultAggregate.Create();
-        for (var i = 0; i < Faker.Random.Int(1, 5); i++)
+        var errorCount = Faker.Random.Int(1, 5);
+        for (var i = 0; i < errorCount; i++)
         {
             aggregate.AddResult(new ResultError(Faker.Lorem.Word(), Faker.Lorem.Sentence()));
         }

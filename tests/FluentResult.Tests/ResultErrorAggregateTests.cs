@@ -100,7 +100,11 @@ public class ResultErrorAggregateTests
         using var scope = new AssertionScope();
         resultEquals.Should().Be(expected, because);
         resultOperator.Should().Be(expected, because);
-        resultHashCode.Should().Be(expected, because);
+        if (expected)
+        {
+            // Equal aggregates must hash alike; unequal ones are free to collide.
+            resultHashCode.Should().BeTrue(because);
+        }
     }
 
     internal class EqualsData : TheoryData<
