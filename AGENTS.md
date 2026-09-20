@@ -6,6 +6,28 @@
 ## Git workflow
 @docs/contributing/git-instructions.md
 
+## Task playbooks
+
+Recurring procedures live in `docs/contributing/tasks/`, one file per task. Read
+the matching playbook before starting that work:
+
+| Task | When |
+|---|---|
+| `add-composition-method.md` | Adding a method to `Result<T>`, `ResultAggregate` or `ResultExtensions` |
+| `create-github-release.md` | Cutting a release, which publishes to nuget.org |
+
+`scripts/sync-agent-files.sh` copies each playbook into the per-assistant command
+formats — `.claude/commands/`, `.cursor/commands/`, `.windsurf/workflows/` and
+`.github/prompts/` — so the same procedure is invocable as `/<task-name>` in each
+tool. Those copies are **generated**: edit the file in `docs/contributing/tasks/`,
+rerun the script, and commit both. `scripts/sync-agent-files.sh --check` runs in
+the `linter` workflow and fails when a copy is stale or orphaned.
+
+Note the distinction from the rules files this repo *ships* for consumers
+(`.cursor/rules/`, `.windsurf/rules/`, `.junie/guidelines.md`,
+`.github/copilot-instructions.md`): those are hand-maintained and describe how to
+*use* the library. The generated command files describe how to *work on* it.
+
 ## What this repository is
 
 This repo **is** the source of `DrifterApps.Seeds.FluentResult` — a Railway-Oriented
