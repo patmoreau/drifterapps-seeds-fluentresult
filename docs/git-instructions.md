@@ -29,5 +29,6 @@ Always make structural changes first when both are needed.
 
 ## Never
 
+- Commit anything until I have performed a code review myself
 - Commit secrets or confidential information
 - Push to GitHub by yourself
