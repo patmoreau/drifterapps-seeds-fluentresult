@@ -426,6 +426,37 @@ public class ResultAggregateTests
     }
 
     [Fact]
+    public void GivenEnsure_WhenValidationIsNull_ThenThrowArgumentNullException()
+    {
+        // Arrange
+        var aggregate = ResultAggregate.Create();
+
+        // Act
+        var action = () => aggregate.Ensure(null!, TestFirstError);
+
+        // Assert
+        action.Should()
+            .Throw<ArgumentNullException>()
+            .WithParameterName("validation");
+    }
+
+    [Fact]
+    public void GivenEnsure_WhenValidationIsNullAndAggregateFailed_ThenThrowArgumentNullException()
+    {
+        // Arrange
+        var aggregate = ResultAggregate.Create();
+        aggregate.AddResult(TestFirstError);
+
+        // Act
+        var action = () => aggregate.Ensure(null!, TestSecondError, EnsureOnFailure.IgnoreOnFailure);
+
+        // Assert
+        action.Should()
+            .Throw<ArgumentNullException>()
+            .WithParameterName("validation");
+    }
+
+    [Fact]
     public void GivenToErrorAggregate_WhenMultipleFailureResults_ThenReturnsValidationError()
     {
         // Arrange

@@ -15,6 +15,8 @@ public partial record ResultAggregate
     public ResultAggregate Ensure(Func<bool> validation, ResultError error,
         EnsureOnFailure options = EnsureOnFailure.ValidateOnFailure)
     {
+        ArgumentNullException.ThrowIfNull(validation);
+
         return Ensure(Func, options);
 
         Result<Nothing> Func()
