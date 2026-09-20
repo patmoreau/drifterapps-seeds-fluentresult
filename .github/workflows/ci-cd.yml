@@ -179,12 +179,13 @@ jobs:
         if: >
           (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main') ||
           (github.event_name != 'workflow_run' && github.ref == 'refs/heads/main')
-        uses: exuanbo/actions-deploy-gist@v1
-        with:
-          token: ${{ secrets.GIST_TOKEN }}
-          gist_id: 51a2fc9fd8b7ed500ed3b6aabe0fc2d6
-          file_path: seeds-fluent-result-tests-badge-${{ matrix.framework }}.svg
-          file_type: text
+        env:
+          GH_TOKEN: ${{ secrets.GIST_TOKEN }}
+          BADGE_FILE: seeds-fluent-result-tests-badge-${{ matrix.framework }}.svg
+        run: |
+          jq -n --arg name "$BADGE_FILE" --rawfile content "$BADGE_FILE" \
+            '{files: {($name): {content: $content}}}' \
+            | gh api --method PATCH gists/51a2fc9fd8b7ed500ed3b6aabe0fc2d6 --input -
 
   tagging:
     needs: [set-version, build]
