@@ -58,6 +58,15 @@ jobs:
           echo "::error::dotnet format found issues in the code. Please fix them."
           exit 1
 
+  agent-files:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Verify generated assistant command files are up to date
+        run: ./scripts/sync-agent-files.sh --check
+
   create_check:
     needs: [check_changes, csharp]
     permissions:
