@@ -145,3 +145,5 @@ dotnet format --verify-no-changes --severity error    # what CI enforces
 
 Commit structural and behavioral changes separately, conventional-commit format,
 and do not push. See `docs/contributing/git-instructions.md`.
+
+<!-- probe: edited without regenerating -->
