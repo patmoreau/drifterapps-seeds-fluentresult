@@ -11,5 +11,5 @@ The instructions above apply in full. A few Claude-specific notes:
   the suite is small enough to run after every change, as the TDD cycle requires.
 - Before proposing a new package, check `Directory.Packages.props` — it may already be
   there. Adding one needs approval either way.
-- Commits: conventional-commit format from `docs/git-instructions.md`, structural and
+- Commits: conventional-commit format from `docs/contributing/git-instructions.md`, structural and
   behavioral changes never mixed, and never push.

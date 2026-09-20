@@ -1,10 +1,10 @@
 # FluentResult — Agent Instructions
 
 ## Engineering principles
-@docs/engineering-principles.md
+@docs/contributing/engineering-principles.md
 
 ## Git workflow
-@docs/git-instructions.md
+@docs/contributing/git-instructions.md
 
 ## What this repository is
 
@@ -17,7 +17,8 @@ not merely *with* it.
 | `src/FluentResult/` | The library: `Result<T>`, `ResultError`, `Nothing`, `ResultAggregate`, `ResultErrorAggregate`, `EnsureOnFailure`, `ResultExtensions` |
 | `src/FluentResult.FluentAssertions/` | Test assertions package: `Should().BeSuccessful()`, `.BeFailure()`, `.WithValue()`, `.WithError()` |
 | `tests/FluentResult.Tests/` | xUnit v3 test suite (the only test project) |
-| `docs/`, `README.md`, `ARCHITECTURE.md`, `llms.txt` | Published documentation — see "Documentation is part of the API" below |
+| `docs/`, `README.md`, `llms.txt` | Published documentation, for people **using** the library — packed into the NuGet package, see "Documentation is part of the API" below |
+| `docs/contributing/` | Process docs, for people **working on** this repo — never packed |
 
 Assembly/namespace: `DrifterApps.Seeds.FluentResult`. Target: `net10.0` only.
 SDK pinned in `global.json` (10.0.401, `rollForward: latestMinor`).
@@ -79,7 +80,7 @@ TDD cycle in the engineering principles (failing test first).
 
 ## Library design constraints
 
-These are load-bearing decisions — see `ARCHITECTURE.md` before changing any of them:
+These are load-bearing decisions — see `docs/ARCHITECTURE.md` before changing any of them:
 
 - `Result<T>` is a `readonly partial struct` implementing `IEquatable<Result<T>>`. It is
   never null and allocates nothing on the happy path. Keep it a struct.
@@ -102,14 +103,14 @@ These are load-bearing decisions — see `ARCHITECTURE.md` before changing any o
 
 ## Documentation is part of the API
 
-`Directory.Build.props` packs `README.md`, `ARCHITECTURE.md`, `docs/AI-GUIDELINES.md`,
+`Directory.Build.props` packs `README.md`, `docs/ARCHITECTURE.md`, `docs/AI-GUIDELINES.md`,
 `docs/API.md`, and `docs/EXAMPLES.md` into the NuGet package. When the public surface
 changes, update in the same change:
 
 - `docs/API.md` — signatures, overloads, conversions
 - `docs/EXAMPLES.md` — usage patterns
 - `docs/AI-GUIDELINES.md` — rules for assistants consuming the library
-- `ARCHITECTURE.md` — only when a design decision changes
+- `docs/ARCHITECTURE.md` — only when a design decision changes
 - `README.md` and `llms.txt` — only when the overview or doc map changes
 - XML doc comments on the members themselves
 
@@ -124,7 +125,7 @@ the published docs:
 - **`docs/EXAMPLES.md`** — domain models, repositories, service layers, ASP.NET Core,
   MediatR, async pipelines, testing
 - **`docs/AI-GUIDELINES.md`** — when to apply the pattern, anti-patterns, gotchas
-- **`ARCHITECTURE.md`** — why the design is what it is, and what the library will not do
+- **`docs/ARCHITECTURE.md`** — why the design is what it is, and what the library will not do
 
 The short version, which the code in this repo must also obey: every operation that can
 fail returns `Result<T>`; use `Nothing` for void-like results; define domain errors as
