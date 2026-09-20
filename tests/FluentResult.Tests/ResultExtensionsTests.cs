@@ -109,6 +109,20 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
+    public void GivenSelect_WhenSelectorReturnsNull_ThenSuccessCarriesNull()
+    {
+        // Arrange
+        var result = Faker.Random.Int().ToResult();
+
+        // Act
+        var projected = result.Select(_ => (string?) null);
+
+        // Assert
+        projected.Should().BeSuccessful();
+        projected.Value.Should().BeNull();
+    }
+
+    [Fact]
     public void GivenSelect_WhenResultIsSuccess_ThenExecuteSuccessNext()
     {
         // Arrange

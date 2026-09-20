@@ -21,6 +21,8 @@ Discriminated union: either a success carrying a value of type `T`, or a failure
 | `IsSuccess` | `bool` | `true` if the result is a success |
 | `IsFailure` | `bool` | `true` if the result is a failure |
 | `Value` | `T` | The success value. Throws `InvalidOperationException` when `IsFailure`. |
+
+A successful result carries whatever the operation produced, including `null` when `T` is a nullable type — `IsSuccess` does not promise a non-null `Value`. Use `ToResult()` instead of the implicit conversion when a null value should be rejected.
 | `Error` | `ResultError` | The failure error. Returns `ResultError.None` when `IsSuccess`. |
 
 ### Implicit conversions

@@ -29,14 +29,12 @@ public readonly partial struct Result<T> : IEquatable<Result<T>>
     ///     Indicates whether the operation was successful.
     /// </summary>
     [MemberNotNullWhen(true, nameof(_value))]
-    [MemberNotNullWhen(true, nameof(Value))]
     public bool IsSuccess { get; }
 
     /// <summary>
     ///     Indicates whether the operation failed.
     /// </summary>
     [MemberNotNullWhen(false, nameof(_value))]
-    [MemberNotNullWhen(false, nameof(Value))]
     public bool IsFailure => !IsSuccess;
 
     /// <summary>
