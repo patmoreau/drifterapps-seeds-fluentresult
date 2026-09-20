@@ -1,5 +1,7 @@
 # Examples — DrifterApps.Seeds.FluentResult
 
+> **Audience:** developers *using* `DrifterApps.Seeds.FluentResult` in their own project. Ships in the NuGet package.
+
 Real-world usage patterns. Full sample files live in [examples/](../examples/).
 
 ---

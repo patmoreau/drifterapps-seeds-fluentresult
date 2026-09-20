@@ -1,4 +1,6 @@
-## Engineering principles
+# Engineering Principles
+
+> **Audience:** contributors *working on* this repository. Not packaged — see [AGENTS.md](../../AGENTS.md).
 
 ## Role and Expertise
 

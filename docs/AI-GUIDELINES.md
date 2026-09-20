@@ -1,5 +1,7 @@
 # AI Guidelines — DrifterApps.Seeds.FluentResult
 
+> **Audience:** developers *using* `DrifterApps.Seeds.FluentResult` in their own project. Ships in the NuGet package.
+
 Guidelines for AI coding assistants (GitHub Copilot, Claude, Cursor, Windsurf, JetBrains AI) when working in a codebase that uses `DrifterApps.Seeds.FluentResult`.
 
 ---

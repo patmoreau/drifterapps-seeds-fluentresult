@@ -1,5 +1,7 @@
 # API Reference — DrifterApps.Seeds.FluentResult
 
+> **Audience:** developers *using* `DrifterApps.Seeds.FluentResult` in their own project. Ships in the NuGet package.
+
 **Namespace:** `DrifterApps.Seeds.FluentResult`
 **Package:** `DrifterApps.Seeds.FluentResult`
 **Target:** .NET 10

@@ -1,5 +1,7 @@
 # Git Instructions
 
+> **Audience:** contributors *working on* this repository. Not packaged — see [AGENTS.md](../../AGENTS.md).
+
 ## Commit Branching Strategy
 
 1. Commit directly to main unless branching is specified.

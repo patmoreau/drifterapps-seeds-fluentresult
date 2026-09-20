@@ -1,5 +1,9 @@
 # Architecture — DrifterApps.Seeds.FluentResult
 
+> **Audience:** both. Developers *using* the library — it ships in the NuGet package — and
+> contributors *working on* it, since these decisions are load-bearing and must be read before
+> any of them is changed.
+
 Design decisions and trade-offs for the Railway-Oriented Programming implementation.
 
 ---
