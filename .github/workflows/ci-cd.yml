@@ -157,8 +157,10 @@ jobs:
 
       - name: Set badge color
         shell: bash
+        env:
+          TEST_CONCLUSION: ${{ steps.test-results.outputs.conclusion }}
         run: |
-          case ${{ steps.test-results.outputs.conclusion }} in
+          case "$TEST_CONCLUSION" in
             success)
               echo "BADGE_COLOR=31c653" >> $GITHUB_ENV
               ;;
