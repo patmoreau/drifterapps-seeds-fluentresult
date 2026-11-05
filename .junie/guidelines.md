@@ -151,7 +151,7 @@ return agg.Match(
 
 ## Testing
 
-Add `DrifterApps.Seeds.FluentResult.FluentAssertions` for custom assertions:
+Add `DrifterApps.Seeds.FluentResult.AwesomeAssertions` for custom assertions:
 
 ```csharp
 result.Should().BeSuccessful();

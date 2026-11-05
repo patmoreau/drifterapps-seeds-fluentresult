@@ -329,7 +329,7 @@ Result<int> Compute() => 42.ToResult(); // also OK, but redundant
 
 ## Testing
 
-Use the `DrifterApps.Seeds.FluentResult.FluentAssertions` package for readable assertions.
+Use the `DrifterApps.Seeds.FluentResult.AwesomeAssertions` package for readable assertions.
 
 ```csharp
 // Assert success with specific value

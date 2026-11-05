@@ -127,7 +127,7 @@ return agg.Match(
 ## Testing
 
 ```csharp
-// Package: DrifterApps.Seeds.FluentResult.FluentAssertions
+// Package: DrifterApps.Seeds.FluentResult.AwesomeAssertions
 result.Should().BeSuccessful();
 result.Should().BeSuccessful().And.WithValue(expectedValue);
 result.Should().BeFailure();

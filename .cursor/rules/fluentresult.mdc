@@ -109,7 +109,7 @@ return agg.OnSuccess(() => CreateUser(email, password, age));
 ## Testing
 
 ```csharp
-// Package: DrifterApps.Seeds.FluentResult.FluentAssertions
+// Package: DrifterApps.Seeds.FluentResult.AwesomeAssertions
 result.Should().BeSuccessful().And.WithValue(expected);
 result.Should().BeFailure().And.WithError(expectedError);
 ```

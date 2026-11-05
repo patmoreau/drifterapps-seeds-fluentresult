@@ -37,7 +37,7 @@ not merely *with* it.
 | Path | Contents |
 |---|---|
 | `src/FluentResult/` | The library: `Result<T>`, `ResultError`, `Nothing`, `ResultAggregate`, `ResultErrorAggregate`, `EnsureOnFailure`, `ResultExtensions` |
-| `src/FluentResult.FluentAssertions/` | Test assertions package: `Should().BeSuccessful()`, `.BeFailure()`, `.WithValue()`, `.WithError()` |
+| `src/FluentResult.AwesomeAssertions/` | Test assertions package: `Should().BeSuccessful()`, `.BeFailure()`, `.WithValue()`, `.WithError()` |
 | `tests/FluentResult.Tests/` | xUnit v3 test suite (the only test project) |
 | `docs/`, `README.md`, `llms.txt` | Published documentation, for people **using** the library — packed into the NuGet package, see "Documentation is part of the API" below |
 | `docs/contributing/` | Process docs, for people **working on** this repo — never packed |
@@ -75,15 +75,15 @@ Versions are centralized — `ManagePackageVersionsCentrally=true`. Add a
 `<PackageVersion>` to `Directory.Packages.props`. Per the engineering principles, do not
 add a new dependency without approval.
 
-`FluentAssertions` is pinned to 7.x deliberately (8.x changed its license). Do not bump it
-to 8 or beyond.
+Assertions use `AwesomeAssertions` (the Apache-2.0 fork of FluentAssertions). Do not
+reintroduce `FluentAssertions` — 8.x changed its license.
 
 ## Test conventions
 
 Match the existing suite:
 
 - Class carries `[UnitTest]` (the local `ITraitAttribute` adding trait `Category=Unit`).
-- Global usings already cover `Bogus`, `DrifterApps.Seeds.FluentResult`, `FluentAssertions`
+- Global usings already cover `Bogus`, `DrifterApps.Seeds.FluentResult`, `AwesomeAssertions`
   — do not re-import them per file.
 - Random data comes from a `private static readonly Faker Faker = new();`, never hard-coded
   literals, unless the literal is the thing under test.
@@ -91,7 +91,7 @@ Match the existing suite:
   or `AddResult_WithFailureResult_UpdatesAggregate`.
 - Bodies use explicit `// Arrange` / `// Act` / `// Assert` sections.
 - Parameterized cases use `public static TheoryData<…>` properties with `[Theory]`.
-- Assert through the FluentAssertions package under test:
+- Assert through the AwesomeAssertions package under test:
   `result.Should().BeSuccessful().And.WithValue(expected);`
   `result.Should().BeFailure().And.WithError(expectedError);`
 - Test files mirror the source file they cover; partial-class splits are wired with

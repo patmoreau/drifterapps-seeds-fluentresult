@@ -132,7 +132,7 @@ Aggregate error codes follow `"TypeName.Errors"` — produced automatically when
 
 ## Testing Architecture
 
-`FluentResult.FluentAssertions` is a separate NuGet package so production code does not take a test-framework dependency. It implements `ReferenceTypeAssertions<Result<T>, ResultAssertions<T>>` following the FluentAssertions custom assertions pattern.
+`FluentResult.AwesomeAssertions` is a separate NuGet package so production code does not take a test-framework dependency. It builds on [AwesomeAssertions](https://awesomeassertions.org) (the Apache-2.0 fork of FluentAssertions) and implements `ReferenceTypeAssertions<Result<T>, ResultAssertions<T>>` following its custom assertions pattern, reporting failures through the ambient `AssertionChain` so `AssertionScope` collects them.
 
 The assertion chain:
 ```

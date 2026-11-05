@@ -424,9 +424,10 @@ Task<Result<T>> OnFailure<T>(this Task<Result<T>> resultTask,
 
 ---
 
-## FluentAssertions Integration
+## AwesomeAssertions Integration
 
-**Package:** `DrifterApps.Seeds.FluentResult.FluentAssertions`
+**Package:** `DrifterApps.Seeds.FluentResult.AwesomeAssertions` (replaces `DrifterApps.Seeds.FluentResult.FluentAssertions`)
+**Namespace:** `AwesomeAssertions` — the extensions live alongside the library's own `Should()` overloads
 
 ```csharp
 // Entry point — call .Should() on any Result<T>

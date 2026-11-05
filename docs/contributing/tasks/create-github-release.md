@@ -119,7 +119,7 @@ re-run is safe but will not replace anything).
 Indexing takes a few minutes. Both packages ship from this repo:
 
 ```bash
-for pkg in drifterapps.seeds.fluentresult drifterapps.seeds.fluentresult.fluentassertions; do
+for pkg in drifterapps.seeds.fluentresult drifterapps.seeds.fluentresult.awesomeassertions; do
   echo "$pkg: $(curl -s "https://api.nuget.org/v3-flatcontainer/$pkg/index.json" | jq -r '.versions[-1]')"
 done
 ```

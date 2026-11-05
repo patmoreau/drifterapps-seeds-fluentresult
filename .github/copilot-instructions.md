@@ -154,7 +154,7 @@ return aggregate.Match(
 ## Testing
 
 ```csharp
-// Uses DrifterApps.Seeds.FluentResult.FluentAssertions
+// Uses DrifterApps.Seeds.FluentResult.AwesomeAssertions
 result.Should().BeSuccessful();
 result.Should().BeSuccessful().And.WithValue(expectedValue);
 result.Should().BeFailure();
