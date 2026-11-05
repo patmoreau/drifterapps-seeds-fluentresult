@@ -207,6 +207,9 @@ jobs:
     needs: [set-version, build]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'created'
+    permissions:
+      contents: read
+      id-token: write
 
     env:
       VERSION: ${{ needs.set-version.outputs.version }}
@@ -233,8 +236,16 @@ jobs:
       - name: Pack NuGet packages
         run: dotnet pack /property:Version=${{ env.NUGET_VERSION }} --no-build --include-symbols --configuration Release -o ./nuget-packages
 
+      - name: NuGet login
+        id: nuget-login
+        uses: NuGet/login@v1.2.0
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
       - name: Publish Package
-        run: dotnet nuget push ./nuget-packages/*.nupkg --source "https://api.nuget.org/v3/index.json" --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+        env:
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push ./nuget-packages/*.nupkg --source "https://api.nuget.org/v3/index.json" --api-key "$NUGET_API_KEY" --skip-duplicate
 
   create_check:
     needs: [check_changes, build]
