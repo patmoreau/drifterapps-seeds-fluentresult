@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\FluentResult.FluentAssertions\FluentResult.FluentAssertions.csproj"/>
+        <ProjectReference Include="..\..\src\FluentResult.AwesomeAssertions\FluentResult.AwesomeAssertions.csproj"/>
         <ProjectReference Include="..\..\src\FluentResult\FluentResult.csproj"/>
     </ItemGroup>
 
