@@ -18,12 +18,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bogus"/>
-        <PackageReference Include="FluentAssertions"/>
-        <PackageReference Include="FluentAssertions.Analyzers">
+        <PackageReference Include="AwesomeAssertions"/>
+        <PackageReference Include="AwesomeAssertions.Analyzers">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Bogus"/>
         <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
         <PackageReference Include="xunit.runner.visualstudio">
           <PrivateAssets>all</PrivateAssets>

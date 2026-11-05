@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <AssemblyName>DrifterApps.Seeds.FluentResult.FluentAssertions</AssemblyName>
-        <RootNamespace>DrifterApps.Seeds.FluentResult.FluentAssertions</RootNamespace>
-        <PackageId>DrifterApps.Seeds.FluentResult.FluentAssertions</PackageId>
-        <Product>DrifterApps.Seeds.FluentResult.FluentAssertions</Product>
+        <AssemblyName>DrifterApps.Seeds.FluentResult.AwesomeAssertions</AssemblyName>
+        <RootNamespace>DrifterApps.Seeds.FluentResult.AwesomeAssertions</RootNamespace>
+        <PackageId>DrifterApps.Seeds.FluentResult.AwesomeAssertions</PackageId>
+        <Product>DrifterApps.Seeds.FluentResult.AwesomeAssertions</Product>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentAssertions"/>
+        <PackageReference Include="AwesomeAssertions"/>
     </ItemGroup>
 
     <ItemGroup>

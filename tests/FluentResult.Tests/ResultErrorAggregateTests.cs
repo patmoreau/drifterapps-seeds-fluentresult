@@ -1,7 +1,7 @@
 // ReSharper disable EqualExpressionComparison
 
 using System.Diagnostics.CodeAnalysis;
-using FluentAssertions.Execution;
+using AwesomeAssertions.Execution;
 
 // ReSharper disable ConditionIsAlwaysTrueOrFalse
 

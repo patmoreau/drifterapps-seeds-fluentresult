@@ -1,12 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
+using AwesomeAssertions.Execution;
+using AwesomeAssertions.Primitives;
 using DrifterApps.Seeds.FluentResult;
-using FluentAssertions.Execution;
-using FluentAssertions.Primitives;
 
 // ReSharper disable once CheckNamespace
 
 #pragma warning disable IDE0130
-namespace FluentAssertions;
+namespace AwesomeAssertions;
 #pragma warning restore IDE0130
 
 /// <summary>
@@ -20,16 +20,17 @@ public static class ResultAssertionsExtensions
     /// <typeparam name="TValue">The type of the value contained in the result.</typeparam>
     /// <param name="instance">The result instance to assert.</param>
     /// <returns>An assertion object for the specified result instance.</returns>
-    public static ResultAssertions<TValue> Should<TValue>(this Result<TValue> instance) => new(instance);
+    public static ResultAssertions<TValue> Should<TValue>(this Result<TValue> instance) =>
+        new(instance, AssertionChain.GetOrCreate());
 
     /// <summary>
     ///     Asserts that the specified result is successful.
     /// </summary>
     /// <typeparam name="TValue">The type of <see cref="Result{T}" /></typeparam>
-    /// <param name="assertion">The assertion scope.</param>
+    /// <param name="assertion">The assertion chain.</param>
     /// <param name="subject">The result to assert.</param>
     /// <returns>A <see cref="Continuation" /> for further assertions.</returns>
-    internal static Continuation IsSuccessfulAssertion<TValue>(this AssertionScope assertion, Result<TValue> subject) =>
+    internal static Continuation IsSuccessfulAssertion<TValue>(this AssertionChain assertion, Result<TValue> subject) =>
         assertion
             .ForCondition(subject.IsSuccess)
             .FailWith("Expected {context:result} to be a success{reason}, but it was a failure.");
@@ -38,10 +39,10 @@ public static class ResultAssertionsExtensions
     ///     Asserts that the specified result is a failure.
     /// </summary>
     /// <typeparam name="TValue">The type of <see cref="Result{T}" /></typeparam>
-    /// <param name="assertion">The assertion scope.</param>
+    /// <param name="assertion">The assertion chain.</param>
     /// <param name="subject">The result to assert.</param>
     /// <returns>A <see cref="Continuation" /> for further assertions.</returns>
-    internal static Continuation IsFailureAssertion<TValue>(this AssertionScope assertion, Result<TValue> subject) =>
+    internal static Continuation IsFailureAssertion<TValue>(this AssertionChain assertion, Result<TValue> subject) =>
         assertion
             .ForCondition(subject.IsFailure)
             .FailWith("Expected {context:result} to be a failure{reason}, but it was not.");
@@ -50,11 +51,11 @@ public static class ResultAssertionsExtensions
     ///     Asserts that the specified error is as expected.
     /// </summary>
     /// <typeparam name="TValue">The type of <see cref="Result{T}" /></typeparam>
-    /// <param name="assertion">The assertion scope.</param>
+    /// <param name="assertion">The assertion chain.</param>
     /// <param name="subject">The result to assert.</param>
     /// <param name="resultError">The <see cref="ResultError" /> to assert</param>
     /// <returns>A <see cref="Continuation" /> for further assertions.</returns>
-    internal static Continuation WithErrorAssertion<TValue>(this AssertionScope assertion,
+    internal static Continuation WithErrorAssertion<TValue>(this AssertionChain assertion,
         Result<TValue> subject,
         ResultError resultError) =>
         assertion
@@ -66,8 +67,10 @@ public static class ResultAssertionsExtensions
 /// <summary>
 ///     Provides assertion methods for <see cref="Result{TValue}" /> instances.
 /// </summary>
-public class ResultAssertions<TValue>(Result<TValue> instance)
-    : ReferenceTypeAssertions<Result<TValue>, ResultAssertions<TValue>>(instance)
+/// <param name="instance">The result instance to assert.</param>
+/// <param name="assertionChain">The assertion chain the assertions are reported to.</param>
+public class ResultAssertions<TValue>(Result<TValue> instance, AssertionChain assertionChain)
+    : ReferenceTypeAssertions<Result<TValue>, ResultAssertions<TValue>>(instance, assertionChain)
 {
     /// <summary>
     ///     Gets the identifier for the assertion.
@@ -87,7 +90,7 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
     public AndConstraint<ResultAssertions<TValue>> BeSuccessful(string because = "",
         params object[] becauseArgs)
     {
-        var assertion = Execute.Assertion.BecauseOf(because, becauseArgs).UsingLineBreaks;
+        var assertion = CurrentAssertionChain.BecauseOf(because, becauseArgs).UsingLineBreaks;
 
         _ = assertion.IsSuccessfulAssertion(Subject);
 
@@ -105,7 +108,7 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
     [CustomAssertion]
     public AndConstraint<ResultAssertions<TValue>> BeFailure(string because = "", params object[] becauseArgs)
     {
-        var assertion = Execute.Assertion.BecauseOf(because, becauseArgs).UsingLineBreaks;
+        var assertion = CurrentAssertionChain.BecauseOf(because, becauseArgs).UsingLineBreaks;
 
         _ = assertion.IsFailureAssertion(Subject);
 
@@ -125,7 +128,7 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
     public AndConstraint<ResultAssertions<TValue>> WithValue(TValue expectedValue,
         string because = "", params object[] becauseArgs)
     {
-        var assertion = Execute.Assertion.BecauseOf(because, becauseArgs).UsingLineBreaks;
+        var assertion = CurrentAssertionChain.BecauseOf(because, becauseArgs).UsingLineBreaks;
 
         _ = assertion.IsSuccessfulAssertion(Subject)
             .Then
@@ -150,7 +153,7 @@ public class ResultAssertions<TValue>(Result<TValue> instance)
     public AndConstraint<ResultAssertions<TValue>> WithError(ResultError resultError, string because = "",
         params object[] becauseArgs)
     {
-        var assertion = Execute.Assertion.BecauseOf(because, becauseArgs).UsingLineBreaks;
+        var assertion = CurrentAssertionChain.BecauseOf(because, becauseArgs).UsingLineBreaks;
 
         _ = assertion.WithErrorAssertion(Subject, resultError);
 
