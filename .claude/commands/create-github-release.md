@@ -42,6 +42,30 @@ JOB_ID=$(gh run view "$RUN_ID" --json jobs --jq '.jobs[] | select(.name == "set-
 gh run view "$RUN_ID" --log --job="$JOB_ID" | grep -E '"(majorMinorPatch|semVer)"'
 ```
 
+That only works when the latest run is for HEAD and its `set-version` job ran.
+Two cases where it does not:
+
+- **A commit that changes no files** — e.g. an empty `+semver:` bump made with
+  `git commit --allow-empty` — starts no workflow at all: `ci-cd`, `codeql-analysis`
+  and `linter` all use `paths-ignore`, which skips a push with no changed files.
+  Prefer putting the `+semver:` trailer on a commit that changes something.
+- **A docs-only push** runs `ci-cd`, but `check_changes` skips `set-version`.
+
+In either case, compute the version locally with the same GitVersion major CI
+uses (`versionSpec: '6.x'` in `ci-cd.yml`). Pin the version: unpinned, `dnx`
+can resolve 5.x, which fails on `GitVersion.yml` with
+`Property 'label' not found`.
+
+```bash
+dotnet dnx gitversion.tool --version 6.8.2 --yes -- /showvariable SemVer
+```
+
+On an untagged commit this prints a counter suffix, e.g. `2.1.0-2` (two commits
+since the last tag). The `X.Y.Z` part is the release version: creating the
+release tags HEAD, and GitVersion then computes the clean `2.1.0` for the
+publish. Running a package from NuGet may need the user's approval — if it is
+denied, ask the user to run the command themselves.
+
 Compare that to what is already released and tagged:
 
 ```bash
