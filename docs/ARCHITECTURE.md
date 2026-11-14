@@ -151,4 +151,4 @@ result.Should()  →  ResultAssertions<T>
 - **No async void.** All async paths return `Task<Result<T>>` or `Task<Nothing>`.
 - **No built-in HTTP mapping.** Mapping error codes to HTTP status codes is application-layer responsibility.
 - **No serialization support.** `Result<T>` is not designed to cross process boundaries. Serialize the unwrapped value or a DTO derived from the error.
-- **No multi-targeting.** The library targets .NET 10 only. Older runtimes are not supported.
+- **No legacy runtimes.** The library targets .NET 10 and .NET 11 (`net10.0;net11.0`). Runtimes older than .NET 10 are not supported.

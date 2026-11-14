@@ -4,7 +4,7 @@
 
 **Namespace:** `DrifterApps.Seeds.FluentResult`
 **Package:** `DrifterApps.Seeds.FluentResult`
-**Target:** .NET 10
+**Target:** .NET 10, .NET 11
 
 ---
 

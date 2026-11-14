@@ -1,6 +1,6 @@
 # DrifterApps.Seeds.FluentResult
 
-> Railway-Oriented Programming (ROP) Result pattern library for .NET 10. Every operation that can fail returns `Result<T>` — a discriminated union of success (carrying `T`) or failure (carrying `ResultError`) — instead of throwing exceptions or returning null.
+> Railway-Oriented Programming (ROP) Result pattern library for .NET 10 and .NET 11. Every operation that can fail returns `Result<T>` — a discriminated union of success (carrying `T`) or failure (carrying `ResultError`) — instead of throwing exceptions or returning null.
 
 Package: `DrifterApps.Seeds.FluentResult`
 Namespace: `DrifterApps.Seeds.FluentResult`

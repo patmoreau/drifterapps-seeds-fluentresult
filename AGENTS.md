@@ -42,8 +42,8 @@ not merely *with* it.
 | `docs/`, `README.md`, `llms.txt` | Published documentation, for people **using** the library — packed into the NuGet package, see "Documentation is part of the API" below |
 | `docs/contributing/` | Process docs, for people **working on** this repo — never packed |
 
-Assembly/namespace: `DrifterApps.Seeds.FluentResult`. Target: `net10.0` only.
-SDK pinned in `global.json` (10.0.401, `rollForward: latestMinor`).
+Assembly/namespace: `DrifterApps.Seeds.FluentResult`. Targets: `net10.0;net11.0` (set once in `Directory.Build.props`).
+SDK pinned in `global.json` (11.0.100, `rollForward: latestMinor`).
 
 ## Build and test
 
@@ -56,6 +56,8 @@ dotnet format --severity error                       # same check, but fixes in 
 
 Test runner is **Microsoft.Testing.Platform** (`global.json` → `test.runner`), with
 xUnit v3 (`xunit.v3.mtp-v2`). There are no long-running tests to exclude — run them all.
+`dotnet test` runs the suite once per target framework, so both the .NET 10 and
+.NET 11 runtimes must be installed; `--framework net11.0` limits it to one.
 
 ### The build is strict
 

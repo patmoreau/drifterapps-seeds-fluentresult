@@ -4,7 +4,7 @@ This repository implements the **Railway-Oriented Programming (ROP) Result patte
 
 **Package:** `DrifterApps.Seeds.FluentResult`
 **Namespace:** `using DrifterApps.Seeds.FluentResult;`
-**Targets:** .NET 10
+**Targets:** .NET 10, .NET 11
 
 ---
 
