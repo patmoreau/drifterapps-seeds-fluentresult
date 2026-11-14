@@ -176,3 +176,4 @@ result.Should().BeFailure().And.WithError(expectedError);
 - Access `result.Value` without first checking `result.IsSuccess` (throws `InvalidOperationException`)
 - Return `null` — use `Result<T>` or `Nothing`
 - Construct `ResultError` without both `Code` and `Description`
+- Declare a C# 15 `union` of a value and an error — return `Result<T>`

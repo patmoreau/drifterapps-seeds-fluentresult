@@ -186,6 +186,21 @@ return Nothing.Value; // ignores failure
 return result.OnSuccess(Process);
 ```
 
+### Declaring a C# 15 union for a fallible return
+
+```csharp
+// Wrong — a hand-rolled success-or-error union: no Match/OnSuccess/LINQ,
+// does not compose with other results, and does not compile on .NET 10
+public union UserOrError(User, ResultError);
+UserOrError FindUser(Guid id) => ...;
+
+// Correct
+Result<User> FindUser(Guid id) => ...;
+```
+
+Use a union only for a value that is genuinely one of several domain shapes
+(e.g. `union Payment(Card, BankTransfer)`), never to express success or failure.
+
 ---
 
 ## Batch Validation Pattern

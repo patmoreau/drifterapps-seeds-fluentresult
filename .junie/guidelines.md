@@ -178,3 +178,4 @@ result.Should().BeFailure().And.WithError(expectedError);
 - Return `null` from domain methods — use `Result<T>` or `Nothing`
 - Create `ResultError` without both `Code` and `Description`
 - Apply `EnsureOnFailure.IgnoreOnFailure` to mandatory validation guards
+- Declare a C# 15 `union` of a value and an error — return `Result<T>`

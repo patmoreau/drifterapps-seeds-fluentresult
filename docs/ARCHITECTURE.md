@@ -76,6 +76,17 @@ GetOrder(orderId).SelectMany(
 
 The result is a pipeline where any failure short-circuits the chain. Prefer LINQ syntax for 3+ steps and explicit `OnSuccess` for 1–2 steps.
 
+### Why not C# 15 union types
+
+C# 15 (.NET 11) adds union types — `union UserOrError(User, ResultError);` — with exhaustive `switch` checking. A union of a value and an error looks like `Result<T>`, but the library deliberately stays a `readonly struct`:
+
+- **It must work on every supported target.** Unions depend on `System.Runtime.CompilerServices.IUnion` and `UnionAttribute`, which only exist in .NET 11. On `net10.0` the declaration fails with `CS0518`, even with `LangVersion=latest`. Rebuilding `Result<T>` on unions would drop .NET 10, the current LTS.
+- **A union is a shape, not a pipeline.** A union says *what* a value can be; it brings no `Match` / `OnSuccess` / `Select` / `SelectMany`, no async overloads, and no LINQ syntax. Each union a consumer declares would need that composition surface rebuilt by hand.
+- **One error type for the whole codebase.** `Result<T>` fixes the failure side to `ResultError`, so every operation fails the same way and `ResultAggregate` can collect any of them. Ad-hoc unions each choose their own error type and do not compose with one another.
+- **The public contract would break.** `IsSuccess`, `Value`, `Error`, and the implicit conversions are relied on by every consumer; a union-based `Result<T>` could keep none of them unchanged.
+
+Unions remain a good fit *inside* a domain — modelling a value that is genuinely one of several shapes. For an operation that can fail, return `Result<T>`.
+
 ---
 
 ## ResultAggregate Design
