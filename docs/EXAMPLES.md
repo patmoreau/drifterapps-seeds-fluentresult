@@ -198,6 +198,10 @@ public sealed class RegisterUserHandler
 
 ## ASP.NET Core Controller — Mapping to HTTP Responses
 
+The HTTP boundary is where a result leaves the pipeline. `Match` always returns a
+`Result<TOut>`, so it cannot produce an `IActionResult` or `IResult` directly — branch on
+`IsSuccess` once, at the very end, and read `Value` or `Error` inside the checked branch.
+
 ```csharp
 [ApiController]
 [Route("api/users")]
@@ -212,10 +216,7 @@ public sealed class UsersController : ControllerBase
     {
         var result = await _service.GetUserAsync(id, ct);
 
-        return result.Match(
-            onSuccess: user => Ok(user),
-            onFailure: err  => MapError(err)
-        );
+        return result.IsSuccess ? Ok(result.Value) : MapError(result.Error);
     }
 
     [HttpPut("{id:guid}/email")]
@@ -224,10 +225,7 @@ public sealed class UsersController : ControllerBase
     {
         var result = await _service.ChangeEmailAsync(id, request.Email, ct);
 
-        return result.Match(
-            onSuccess: user => Ok(user),
-            onFailure: err  => MapError(err)
-        );
+        return result.IsSuccess ? Ok(result.Value) : MapError(result.Error);
     }
 
     private IActionResult MapError(ResultError err) => err.Code switch
@@ -248,14 +246,14 @@ public sealed class UsersController : ControllerBase
 app.MapGet("/users/{id:guid}", async (Guid id, UserService svc, CancellationToken ct) =>
 {
     var result = await svc.GetUserAsync(id, ct);
-    return result.Match(
-        onSuccess: Results.Ok,
-        onFailure: err => err.Code switch
-        {
-            "User.NotFound" => Results.NotFound(),
-            _               => Results.Problem(err.Description)
-        }
-    );
+    if (result.IsSuccess)
+        return Results.Ok(result.Value);
+
+    return result.Error.Code switch
+    {
+        "User.NotFound" => Results.NotFound(),
+        _               => Results.Problem(result.Error.Description)
+    };
 });
 ```
 

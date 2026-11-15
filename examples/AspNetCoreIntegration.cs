@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace FluentResult.Examples;
 
 // Shows the recommended pattern for mapping Result<T> to HTTP responses
-// in both controller and minimal API styles.
+// in both controller and minimal API styles. Match always returns a
+// Result<TOut>, so each endpoint branches on IsSuccess once, at the boundary
+// where the result leaves the pipeline.
 
 // --- Controller style ---
 
@@ -20,10 +22,7 @@ public sealed class UsersController : ControllerBase
     public async Task<IActionResult> GetUser(Guid id, CancellationToken ct)
     {
         var result = await _service.GetUserAsync(id, ct);
-        return result.Match(
-            onSuccess: user => Ok(user),
-            onFailure: err  => MapToActionResult(err)
-        );
+        return result.IsSuccess ? Ok(result.Value) : MapToActionResult(result.Error);
     }
 
     [HttpPost("{id:guid}/email")]
@@ -31,10 +30,7 @@ public sealed class UsersController : ControllerBase
         Guid id, [FromBody] ChangeEmailRequest request, CancellationToken ct)
     {
         var result = await _service.ChangeEmailAsync(id, request.NewEmail, ct);
-        return result.Match(
-            onSuccess: user => Ok(user),
-            onFailure: err  => MapToActionResult(err)
-        );
+        return result.IsSuccess ? Ok(result.Value) : MapToActionResult(result.Error);
     }
 
     [HttpPost("register")]
@@ -44,12 +40,12 @@ public sealed class UsersController : ControllerBase
         var result = await _service.RegisterAsync(
             request.Email, request.Name, request.Age, ct);
 
-        return result.Match(
-            onSuccess: user => CreatedAtAction(nameof(GetUser), new { id = user.Id }, user),
-            onFailure: err  => err is ResultErrorAggregate agg
-                ? UnprocessableEntity(new ValidationProblemResponse(agg))
-                : MapToActionResult(err)
-        );
+        if (result.IsSuccess)
+            return CreatedAtAction(nameof(GetUser), new { id = result.Value.Id }, result.Value);
+
+        return result.Error is ResultErrorAggregate agg
+            ? UnprocessableEntity(new ValidationProblemResponse(agg))
+            : MapToActionResult(result.Error);
     }
 
     private IActionResult MapToActionResult(ResultError err) => err.Code switch
@@ -76,29 +72,29 @@ public static class UserEndpoints
         Guid id, UserService svc, CancellationToken ct)
     {
         var result = await svc.GetUserAsync(id, ct);
-        return result.Match(
-            onSuccess: Results.Ok,
-            onFailure: err => err.Code switch
-            {
-                "User.NotFound" => Results.NotFound(),
-                _               => Results.Problem(err.Description)
-            }
-        );
+        if (result.IsSuccess)
+            return Results.Ok(result.Value);
+
+        return result.Error.Code switch
+        {
+            "User.NotFound" => Results.NotFound(),
+            _               => Results.Problem(result.Error.Description)
+        };
     }
 
     private static async Task<IResult> ChangeEmail(
         Guid id, ChangeEmailRequest request, UserService svc, CancellationToken ct)
     {
         var result = await svc.ChangeEmailAsync(id, request.NewEmail, ct);
-        return result.Match(
-            onSuccess: Results.Ok,
-            onFailure: err => err.Code switch
-            {
-                "User.NotFound"   => Results.NotFound(),
-                "User.EmailTaken" => Results.Conflict(),
-                _                 => Results.Problem(err.Description)
-            }
-        );
+        if (result.IsSuccess)
+            return Results.Ok(result.Value);
+
+        return result.Error.Code switch
+        {
+            "User.NotFound"   => Results.NotFound(),
+            "User.EmailTaken" => Results.Conflict(),
+            _                 => Results.Problem(result.Error.Description)
+        };
     }
 }
 

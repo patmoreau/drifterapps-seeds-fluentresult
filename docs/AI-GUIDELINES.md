@@ -113,11 +113,13 @@ return GetUser(id)
 
 ### Terminal branching
 
+`Match` returns `Result<TOut>`, so it cannot produce a non-`Result` value such as an
+`IActionResult`. When the result leaves the pipeline, branch on `IsSuccess` once:
+
 ```csharp
-return result.Match(
-    onSuccess: user => Ok(user),
-    onFailure: err  => Problem(err.Description)
-);
+return result.IsSuccess
+    ? Ok(result.Value)
+    : Problem(result.Error.Description);
 ```
 
 ---
@@ -134,6 +136,10 @@ if (result.IsSuccess)
 // Correct
 result.OnSuccess(Process);
 ```
+
+The one exception is the boundary where the result leaves the pipeline — an HTTP
+response, a UI update — because `Match` cannot return a non-`Result` value. Branch there
+once; see [Terminal branching](#terminal-branching).
 
 ### Accessing `.Value` without checking `.IsSuccess`
 
@@ -282,15 +288,15 @@ internal static ResultError NotFound(Guid id) =>
 Map in the controller or a result-mapping helper; do not map inside the domain.
 
 ```csharp
-return result.Match(
-    onSuccess: value => Ok(value),
-    onFailure: err   => err.Code switch
-    {
-        "User.NotFound"     => NotFound(err.Description),
-        "User.InvalidEmail" => BadRequest(err.Description),
-        _                   => Problem(err.Description)
-    }
-);
+if (result.IsSuccess)
+    return Ok(result.Value);
+
+return result.Error.Code switch
+{
+    "User.NotFound"     => NotFound(result.Error.Description),
+    "User.InvalidEmail" => BadRequest(result.Error.Description),
+    _                   => Problem(result.Error.Description)
+};
 ```
 
 ### MediatR / CQRS — handler return types
