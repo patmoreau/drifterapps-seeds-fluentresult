@@ -39,6 +39,7 @@ not merely *with* it.
 | `src/FluentResult/` | The library: `Result<T>`, `ResultError`, `Nothing`, `ResultAggregate`, `ResultErrorAggregate`, `EnsureOnFailure`, `ResultExtensions` |
 | `src/FluentResult.AwesomeAssertions/` | Test assertions package: `Should().BeSuccessful()`, `.BeFailure()`, `.WithValue()`, `.WithError()` |
 | `tests/FluentResult.Tests/` | xUnit v3 test suite (the only test project) |
+| `examples/` | Sample code linked from `docs/EXAMPLES.md`, built by `dotnet build` so it must compile against the current API; not packed, and held to the SDK default analyzers rather than `AnalysisMode=All` |
 | `docs/`, `README.md`, `llms.txt` | Published documentation, for people **using** the library — packed into the NuGet package, see "Documentation is part of the API" below |
 | `docs/contributing/` | Process docs, for people **working on** this repo — never packed |
 

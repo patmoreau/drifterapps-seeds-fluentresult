@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
+        <OutputType>Library</OutputType>
+        <AssemblyName>DrifterApps.Seeds.FluentResult.Examples</AssemblyName>
+        <RootNamespace>FluentResult.Examples</RootNamespace>
+        <!--
+            These files are documentation: they are built so that every sample is proven to
+            compile against the library, not to hold them to the library's own design rules.
+            Compiler warnings, nullable ones included, stay errors; the AnalysisMode=All
+            rules (CA1062 argument guards, CA1307 string comparisons, ...) would bury what
+            each sample is meant to show, so the samples use the SDK default rule set that a
+            consuming application gets.
+        -->
+        <AnalysisMode>Default</AnalysisMode>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\src\FluentResult\FluentResult.csproj"/>
+    </ItemGroup>
+
+</Project>
