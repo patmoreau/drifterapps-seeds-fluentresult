@@ -261,6 +261,72 @@ app.MapGet("/users/{id:guid}", async (Guid id, UserService svc, CancellationToke
 
 ---
 
+## Centralized ProblemDetails Mapping
+
+Rather than a `switch` on error codes in every endpoint, map errors to
+[RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details in one place.
+Choosing the HTTP status is the application's job, so the application defines its
+own error categories as records deriving from `ResultError`, and matches on the type:
+
+```csharp
+public sealed record NotFoundError : ResultError
+{
+    public NotFoundError(string code, string description) : base(code, description) { }
+}
+
+public sealed record ConflictError : ResultError
+{
+    public ConflictError(string code, string description) : base(code, description) { }
+}
+
+internal static class ProblemMapping
+{
+    public static IResult ToProblem(ResultError error) => error switch
+    {
+        ResultErrorAggregate aggregate => Results.ValidationProblem(
+            aggregate.Errors.ToDictionary(entry => entry.Key, entry => entry.Value),
+            detail: aggregate.Description,
+            extensions: Code(aggregate)),
+        NotFoundError => Problem(error, StatusCodes.Status404NotFound),
+        ConflictError => Problem(error, StatusCodes.Status409Conflict),
+        _             => Problem(error, StatusCodes.Status400BadRequest)
+    };
+
+    private static IResult Problem(ResultError error, int statusCode) =>
+        Results.Problem(statusCode: statusCode, detail: error.Description, extensions: Code(error));
+
+    private static Dictionary<string, object?> Code(ResultError error) =>
+        new() { ["code"] = error.Code };
+}
+```
+
+Domain errors then pick their category when they are declared:
+
+```csharp
+internal static ResultError NotFound(Guid id) =>
+    new NotFoundError("User.NotFound", $"User '{id}' was not found.");
+```
+
+And every endpoint converts at the boundary the same way:
+
+```csharp
+app.MapGet("/users/{id:guid}", async (Guid id, UserService svc, CancellationToken ct) =>
+{
+    var result = await svc.GetUserAsync(id, ct);
+    return result.IsSuccess
+        ? Results.Ok(result.Value)
+        : ProblemMapping.ToProblem(result.Error);
+});
+```
+
+`ResultErrorAggregate` — what `ResultAggregate` produces when validation fails — already
+has the shape of `ValidationProblemDetails`: its `Errors` dictionary maps each error code
+to its descriptions, so it becomes a 400 with an `errors` member. Every problem also
+carries the stable `code` as an extension member, so clients can branch on it instead
+of parsing `detail`.
+
+---
+
 ## MediatR Command Handler
 
 ```csharp
