@@ -504,6 +504,24 @@ public class ResultAggregateTests
             .And.Subject.Should().Contain(description1).And.Contain(description2);
     }
 
+    [Fact]
+    public void GivenToErrorAggregate_WhenCodeOnlyFailureResult_ThenCodeIsListedAsDescription()
+    {
+        // Arrange
+        var error = Faker.Random.Word();
+        var resultAggregate = ResultAggregate.Create();
+        resultAggregate.AddResult(new ResultError(error));
+
+        // Act
+        var result = resultAggregate.ToErrorAggregate<Nothing>();
+
+        // Assert
+        result.Should().BeOfType<ResultErrorAggregate>()
+            .Which
+            .Errors.Should().ContainKey(error)
+            .WhoseValue.Should().ContainSingle().Which.Should().Be(error);
+    }
+
     private static string DifferentWordThan(string word)
     {
         string other;

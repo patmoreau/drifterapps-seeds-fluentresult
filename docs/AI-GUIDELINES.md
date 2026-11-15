@@ -80,10 +80,17 @@ internal static class UserErrors
 
     internal static readonly ResultError InvalidEmail =
         new("User.InvalidEmail", "The email address is invalid.");
+
+    // Code only — the description is the code itself
+    internal static readonly ResultError Locked = new("User.Locked");
 }
 ```
 
 Error code format: `"Domain.Reason"` — PascalCase, dot-separated.
+
+Use the code-only constructor when the code already says everything a caller needs, and
+add a description when it carries more (an id, a limit, a hint). Never pass an empty
+string as the description to skip it — it throws.
 
 ---
 

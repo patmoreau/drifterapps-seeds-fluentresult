@@ -8,7 +8,9 @@ Real-world usage patterns. Full sample files live in [examples/](../examples/).
 
 ## Domain Model with Errors
 
-Define errors as static members next to the domain type.
+Define errors as static members next to the domain type. Give an error a description when
+it says more than its code; otherwise `new ResultError("User.Locked")` uses the code as the
+description.
 
 ```csharp
 public sealed class User

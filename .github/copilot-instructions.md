@@ -175,5 +175,5 @@ result.Should().BeFailure().And.WithError(expectedError);
 - Throw exceptions for expected domain failures
 - Access `result.Value` without first checking `result.IsSuccess` (throws `InvalidOperationException`)
 - Return `null` — use `Result<T>` or `Nothing`
-- Construct `ResultError` without both `Code` and `Description`
+- Construct `ResultError` without a `Code`, or with an empty `Description` — use `new ResultError(code)` when the code says it all
 - Declare a C# 15 `union` of a value and an error — return `Result<T>`

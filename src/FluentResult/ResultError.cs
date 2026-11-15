@@ -53,6 +53,25 @@ public record ResultError
         Description = description;
     }
 
+    /// <summary>
+    ///     Represents an error identified by its code alone; the description is the code itself.
+    /// </summary>
+    /// <param name="code">The error code, also used as the description.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="code" /> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="code" /> is empty or whitespace.</exception>
+    /// <example>
+    ///     When the code says everything a caller needs:
+    ///     <code>
+    ///     public static class DomainErrors
+    ///     {
+    ///         public static ResultError InvalidEmail = new("Domain.InvalidEmail");
+    ///     }
+    ///     </code>
+    /// </example>
+    public ResultError(string code) : this(RequireCode(code), code)
+    {
+    }
+
     /// <summary>The error code.</summary>
     public string Code { get; }
 
@@ -68,5 +87,11 @@ public record ResultError
     {
         code = Code;
         description = Description;
+    }
+
+    private static string RequireCode(string code)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(code);
+        return code;
     }
 }

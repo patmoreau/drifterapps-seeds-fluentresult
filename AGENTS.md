@@ -157,4 +157,5 @@ fail returns `Result<T>`; use `Nothing` for void-like results; define domain err
 static members near their type; compose with `Match` / `OnSuccess` / `OnFailure` /
 `Select` / `SelectMany` (LINQ `from … select` for multi-step pipelines) rather than
 `if (result.IsSuccess)` guards; never return `null`, never read `.Value` on an unchecked
-result, and never construct a `ResultError` without both `Code` and `Description`.
+result, and never construct a `ResultError` without a `Code` (the one-argument
+constructor uses the code as the description when no description is needed).

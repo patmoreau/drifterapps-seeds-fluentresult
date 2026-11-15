@@ -121,6 +121,6 @@ result.Should().BeFailure().And.WithError(expectedError);
 - Never throw for expected domain failures
 - Never access `result.Value` without checking `result.IsSuccess` first
 - Never return `null`
-- Always provide both `Code` and `Description` in `ResultError`
+- Always give a `ResultError` a `Code`; add a `Description` only when it says more — `new ResultError(code)` uses the code as the description
 - Never declare a C# 15 `union` of a value and an error — return `Result<T>`
 - Prefer LINQ query syntax over nested `OnSuccess` for multi-step pipelines

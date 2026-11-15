@@ -61,6 +61,66 @@ public class ResultErrorTests
     }
 
     [Fact]
+    public void GivenCreateWithCodeOnly_WhenValid_ThenDescriptionIsCode()
+    {
+        // Arrange
+        var code = _faker.Random.String();
+
+        // Act
+        var error = new ResultError(code);
+
+        // Assert
+        error.Code.Should().Be(code);
+        error.Description.Should().Be(code);
+    }
+
+    [Fact]
+    public void GivenCreateWithCodeOnly_WhenValid_ThenEqualsErrorWithCodeAsDescription()
+    {
+        // Arrange
+        var code = _faker.Random.String();
+
+        // Act
+        var error = new ResultError(code);
+
+        // Assert
+        error.Should().Be(new ResultError(code, code));
+    }
+
+    public static TheoryData<string> BlankCodes =>
+        new()
+        {
+            string.Empty,
+            " "
+        };
+
+    [Theory]
+    [MemberData(nameof(BlankCodes))]
+    public void GivenCreateWithCodeOnly_WhenCodeIsBlank_ThenThrowArgumentException(string code)
+    {
+        // Arrange
+
+        // Act
+        var action = () => new ResultError(code);
+
+        // Assert
+        action.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public void GivenCreateWithCodeOnly_WhenCodeIsNull_ThenThrowArgumentNullException()
+    {
+        // Arrange
+        string code = null!;
+
+        // Act
+        var action = () => new ResultError(code);
+
+        // Assert
+        action.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
     public void GivenDeconstruct_WhenValid_ThenValuesDeconstructed()
     {
         // Arrange

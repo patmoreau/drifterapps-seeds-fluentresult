@@ -129,10 +129,22 @@ public static bool operator !=(Result<T> left, Result<T> right)
 ## ResultError
 
 ```csharp
-public record ResultError(string Code, string Description)
+public record ResultError
+{
+    public ResultError(string code, string description);
+    public ResultError(string code);
+}
 ```
 
-Immutable structured error. Both `Code` and `Description` must be provided together; providing one without the other throws `ArgumentException`.
+Immutable structured error.
+
+- `ResultError(string code, string description)` — both values must be provided together; providing one without the other throws `ArgumentException`.
+- `ResultError(string code)` — for errors the code describes on its own; `Description` is set to the code, so it is never empty. A null code throws `ArgumentNullException`, and an empty or whitespace code throws `ArgumentException`.
+
+```csharp
+var withMessage = new ResultError("User.NotFound", "User was not found.");
+var codeOnly    = new ResultError("User.NotFound"); // Description == "User.NotFound"
+```
 
 ### Static members
 
