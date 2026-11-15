@@ -33,6 +33,11 @@ or `+semver: patch`, `+semver: feature` or `+semver: minor`, `+semver: breaking`
 or `+semver: major`. Without one the computed version stays where it is and the
 release would republish an existing version number.
 
+The conventional-commit type plays no part: a `feat:` commit without a trailer
+still yields a patch. Before releasing, check that the range holds a trailer
+matching its biggest change — `+semver: feature` for new public API,
+`+semver: breaking` for a breaking one — and add one if it does not.
+
 Read the version CI actually computed for HEAD rather than guessing:
 
 ```bash
