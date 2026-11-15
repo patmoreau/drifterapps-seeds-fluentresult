@@ -50,10 +50,10 @@ public sealed class UsersController : ControllerBase
 
     private IActionResult MapToActionResult(ResultError err) => err.Code switch
     {
-        "User.NotFound"     => NotFound(new ErrorResponse(err)),
-        "User.EmailTaken"   => Conflict(new ErrorResponse(err)),
+        "User.NotFound" => NotFound(new ErrorResponse(err)),
+        "User.EmailTaken" => Conflict(new ErrorResponse(err)),
         "User.InvalidEmail" => BadRequest(new ErrorResponse(err)),
-        _                   => Problem(err.Description)
+        _ => Problem(err.Description)
     };
 }
 
@@ -78,7 +78,7 @@ public static class UserEndpoints
         return result.Error.Code switch
         {
             "User.NotFound" => Results.NotFound(),
-            _               => Results.Problem(result.Error.Description)
+            _ => Results.Problem(result.Error.Description)
         };
     }
 
@@ -91,9 +91,9 @@ public static class UserEndpoints
 
         return result.Error.Code switch
         {
-            "User.NotFound"   => Results.NotFound(),
+            "User.NotFound" => Results.NotFound(),
             "User.EmailTaken" => Results.Conflict(),
-            _                 => Results.Problem(result.Error.Description)
+            _ => Results.Problem(result.Error.Description)
         };
     }
 }

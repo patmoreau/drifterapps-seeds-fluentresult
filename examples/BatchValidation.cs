@@ -11,11 +11,11 @@ public static class BatchValidationExamples
         string email, string password, int age)
     {
         return ResultAggregate.Create()
-            .Ensure(() => !string.IsNullOrWhiteSpace(email),  Errors.EmailRequired)
-            .Ensure(() => email.Contains('@'),                 Errors.EmailInvalid)
-            .Ensure(() => password.Length >= 8,               Errors.PasswordTooShort)
-            .Ensure(() => ContainsUppercase(password),        Errors.PasswordNoUppercase)
-            .Ensure(() => age >= 18,                          Errors.UnderAge,
+            .Ensure(() => !string.IsNullOrWhiteSpace(email), Errors.EmailRequired)
+            .Ensure(() => email.Contains('@'), Errors.EmailInvalid)
+            .Ensure(() => password.Length >= 8, Errors.PasswordTooShort)
+            .Ensure(() => ContainsUppercase(password), Errors.PasswordNoUppercase)
+            .Ensure(() => age >= 18, Errors.UnderAge,
                     EnsureOnFailure.IgnoreOnFailure) // only checked when prior guards pass
             .OnSuccess(() => Nothing.Value.ToResult());
     }
@@ -38,9 +38,9 @@ public static class BatchValidationExamples
     public static object ProduceValidationProblemDetails(string email, string password)
     {
         var result = ResultAggregate.Create()
-            .Ensure(() => !string.IsNullOrWhiteSpace(email),  Errors.EmailRequired)
-            .Ensure(() => email.Contains('@'),                 Errors.EmailInvalid)
-            .Ensure(() => password.Length >= 8,               Errors.PasswordTooShort)
+            .Ensure(() => !string.IsNullOrWhiteSpace(email), Errors.EmailRequired)
+            .Ensure(() => email.Contains('@'), Errors.EmailInvalid)
+            .Ensure(() => password.Length >= 8, Errors.PasswordTooShort)
             .OnSuccess(() => Nothing.Value.ToResult());
 
         // A failed aggregate surfaces its errors as a ResultErrorAggregate.

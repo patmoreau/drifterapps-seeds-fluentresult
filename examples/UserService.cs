@@ -22,9 +22,9 @@ public sealed class UserService
 
     // Multi-step: LINQ query syntax for clear sequential dependency.
     public Task<Result<User>> ChangeEmailAsync(Guid userId, string newEmail, CancellationToken ct) =>
-        from user  in _repo.FindByIdAsync(userId, ct)
-        from _     in EnsureEmailAvailableAsync(newEmail, ct)
-        from __    in user.ChangeEmail(newEmail).ToTask()
+        from user in _repo.FindByIdAsync(userId, ct)
+        from _ in EnsureEmailAvailableAsync(newEmail, ct)
+        from __ in user.ChangeEmail(newEmail).ToTask()
         from saved in _repo.SaveAsync(user, ct)
         select user;
 
@@ -34,14 +34,14 @@ public sealed class UserService
     {
         var aggregate = ResultAggregate.Create()
             .Ensure(() => !string.IsNullOrWhiteSpace(email), RegistrationErrors.EmailRequired)
-            .Ensure(() => email.Contains('@'),                RegistrationErrors.EmailInvalid)
-            .Ensure(() => !string.IsNullOrWhiteSpace(name),  RegistrationErrors.NameRequired)
-            .Ensure(() => age >= 18,                         RegistrationErrors.UnderAge,
+            .Ensure(() => email.Contains('@'), RegistrationErrors.EmailInvalid)
+            .Ensure(() => !string.IsNullOrWhiteSpace(name), RegistrationErrors.NameRequired)
+            .Ensure(() => age >= 18, RegistrationErrors.UnderAge,
                     EnsureOnFailure.IgnoreOnFailure); // optional check — skipped if prior errors
 
         return aggregate.OnSuccess(() =>
             from user in User.Create(email, name).ToTask()
-            from _    in _repo.SaveAsync(user, ct)
+            from _ in _repo.SaveAsync(user, ct)
             select user);
     }
 

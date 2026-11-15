@@ -41,10 +41,10 @@ public sealed class OrderProcessor
     // LINQ query syntax — preferred when steps have named intermediate values.
     // Every step must be a Task<Result<T>>: lift sync steps with ToTask().
     public Task<Result<Invoice>> GenerateInvoiceAsync(Guid orderId, CancellationToken ct) =>
-        from order    in _orders.FindByIdAsync(orderId, ct)
+        from order in _orders.FindByIdAsync(orderId, ct)
         from customer in _orders.FindCustomerAsync(order.CustomerId, ct)
-        from invoice  in CreateInvoice(order, customer).ToTask()
-        from _        in _orders.SaveInvoiceAsync(invoice, ct)
+        from invoice in CreateInvoice(order, customer).ToTask()
+        from _ in _orders.SaveInvoiceAsync(invoice, ct)
         select invoice;
 
     // Mixing sync and async: OnSuccess on a Task<Result<T>> accepts a sync step.

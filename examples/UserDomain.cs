@@ -20,8 +20,8 @@ public sealed class User
     {
         var aggregate = ResultAggregate.Create()
             .Ensure(() => !string.IsNullOrWhiteSpace(email), Errors.InvalidEmail)
-            .Ensure(() => email.Contains('@'),                Errors.InvalidEmail)
-            .Ensure(() => !string.IsNullOrWhiteSpace(name),  Errors.NameRequired);
+            .Ensure(() => email.Contains('@'), Errors.InvalidEmail)
+            .Ensure(() => !string.IsNullOrWhiteSpace(name), Errors.NameRequired);
 
         return aggregate.OnSuccess(() =>
             new User(Guid.NewGuid(), email.ToLowerInvariant(), name.Trim()).ToResult());
