@@ -126,6 +126,11 @@ await syncResult               // Result<T>
     .OnFailure(asyncLog);       // Task<Result<T>> extension method
 ```
 
+LINQ query syntax is the exception. Each `from` clause must infer `SelectMany`'s type
+arguments, and user-defined implicit conversions take no part in that inference, so a
+synchronous `Result<T>` step inside a query over `Task<Result<T>>` must be lifted with
+`.ToTask()`.
+
 ---
 
 ## Error Code Convention

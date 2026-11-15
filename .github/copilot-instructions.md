@@ -92,12 +92,12 @@ Result<decimal> d = intResult.Select(i => (decimal)i);
 
 ```csharp
 // LINQ query syntax (preferred)
-var result = from order    in GetOrder(orderId)
-             from customer in GetCustomer(order.CustomerId)
-             select new OrderDto(order, customer);
+var queryResult = from order    in GetOrder(orderId)
+                  from customer in GetCustomer(order.CustomerId)
+                  select new OrderDto(order, customer);
 
 // Method syntax
-var result = orderResult.SelectMany(
+var methodResult = orderResult.SelectMany(
     order    => GetCustomer(order.CustomerId),
     (order, customer) => new OrderDto(order, customer)
 );

@@ -40,7 +40,7 @@ public sealed class UserService
                     EnsureOnFailure.IgnoreOnFailure); // optional check — skipped if prior errors
 
         return aggregate.OnSuccess(() =>
-            from user in User.Create(email, name)
+            from user in User.Create(email, name).ToTask()
             from _    in _repo.SaveAsync(user, ct)
             select user);
     }

@@ -17,7 +17,7 @@ public static class BatchValidationExamples
             .Ensure(() => ContainsUppercase(password),        Errors.PasswordNoUppercase)
             .Ensure(() => age >= 18,                          Errors.UnderAge,
                     EnsureOnFailure.IgnoreOnFailure) // only checked when prior guards pass
-            .OnSuccess(() => Nothing.Value);
+            .OnSuccess(() => Nothing.Value.ToResult());
     }
 
     // Pattern 2: AddResult with results from separate validation methods.
@@ -37,19 +37,18 @@ public static class BatchValidationExamples
     // Pattern 3: Extracting the grouped error dictionary for API responses.
     public static object ProduceValidationProblemDetails(string email, string password)
     {
-        var aggregate = ResultAggregate.Create()
+        var result = ResultAggregate.Create()
             .Ensure(() => !string.IsNullOrWhiteSpace(email),  Errors.EmailRequired)
             .Ensure(() => email.Contains('@'),                 Errors.EmailInvalid)
-            .Ensure(() => password.Length >= 8,               Errors.PasswordTooShort);
+            .Ensure(() => password.Length >= 8,               Errors.PasswordTooShort)
+            .OnSuccess(() => Nothing.Value.ToResult());
 
-        return aggregate.Match(
-            onSuccess: () => new { Message = "Valid" },
-            onFailure: agg =>
-            {
-                // agg.Errors is IReadOnlyDictionary<string, string[]>
-                // e.g. { "Registration.EmailRequired": ["Email is required."] }
-                return new { agg.Code, agg.Description, Errors = agg.Errors };
-            });
+        // A failed aggregate surfaces its errors as a ResultErrorAggregate.
+        // agg.Errors is IReadOnlyDictionary<string, string[]>
+        // e.g. { "Registration.EmailRequired": ["Email is required."] }
+        return result.Error is ResultErrorAggregate agg
+            ? new { agg.Code, agg.Description, agg.Errors }
+            : new { Message = "Valid" };
     }
 
     private static Result<Nothing> ValidateProductCode(string code)

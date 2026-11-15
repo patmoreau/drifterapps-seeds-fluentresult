@@ -61,8 +61,8 @@ Result<Nothing> unit = Nothing.Value;
 // Failure — implicit conversion from ResultError
 Result<User> failure = UserErrors.NotFound(id);
 
-// From Task<T>
-Task<Result<User>> fromTask = dbQuery.ToResult();
+// From Task<T> — throws if the task yields null; map null to a ResultError instead
+Task<Result<User>> fromTask = LoadUserAsync(id).ToResult();
 ```
 
 ### Defining errors
@@ -252,8 +252,9 @@ if (userResult.IsSuccess)
 Converting existing async code:
 
 ```csharp
-// Task<T> → Task<Result<T>>
-Task<Result<User>> result = dbContext.Users.FindAsync(id).ToResult();
+// Task<T> → Task<Result<T>> (a Task, not a ValueTask; a null value throws —
+// see "EF Core — async repository pattern" for lookups that can miss)
+Task<Result<User>> result = LoadUserAsync(id).ToResult();
 
 // Task<ResultError> → Task<Result<T>>
 Task<Result<User>> result = GetErrorAsync().ToResult<User>();

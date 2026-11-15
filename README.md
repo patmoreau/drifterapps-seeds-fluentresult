@@ -45,7 +45,7 @@ using DrifterApps.Seeds.FluentResult;
 Result<int> successResult = 42;
 
 // Creating a success result by ToResult extension method
-var successResult = 45.ToResult<int>();
+var otherSuccessResult = 45.ToResult<int>();
 
 // Creating a failure result by implicit conversion
 Result<int> failureResult = new ResultError("Error.Code", "Error description");
@@ -54,8 +54,8 @@ Result<int> failureResult = new ResultError("Error.Code", "Error description");
 failureResult = new ResultError("Error.Code", "Error description").ToResult<int>();
 
 // Handling success and failure
-var finalResult = successResult.OnSuccess(value => (Result<string>)value.ToString())
-                               .OnFailure(error => (Result<string>)error);
+var finalResult = successResult.OnSuccess(value => value.ToString().ToResult())
+                               .OnFailure(error => Console.WriteLine(error.Code));
 ```
 
 ### Aggregating Results
@@ -85,8 +85,8 @@ using DrifterApps.Seeds.FluentResult;
 
 var resultTask = Task.FromResult((Result<int>)42);
 
-var finalResult = await resultTask.OnSuccess(async value => await Task.FromResult((Result<string>)value.ToString()))
-                                  .OnFailure(async error => await Task.FromResult((Result<string>)error));
+var finalResult = await resultTask.OnSuccess(value => Task.FromResult(value.ToString().ToResult()))
+                                  .OnFailure(error => Console.Out.WriteLineAsync(error.Code));
 ```
 
 ### Matching Results
@@ -100,32 +100,35 @@ Result<int> result = 42;
 
 result.Match(
     onSuccess: value => Console.WriteLine($"Success with value: {value}"),
-    onFailure: error => Console.WriteLine($"Error: {error.Code} - {error.Message}")
+    onFailure: error => Console.WriteLine($"Error: {error.Code} - {error.Description}")
 );
 ```
 
 ### Ensuring Validation
 
 You can ensure that a specific validation function returns true using the `Ensure` method. If the validation fails, it
-adds a failure result to the source.
+adds a failure result to the aggregate. `Ensure` returns the same aggregate, so calls chain.
 
 ```csharp
 using DrifterApps.Seeds.FluentResult;
 
-var aggregate = ResultAggregate.Create();
-aggregate.AddResult(new ResultError("Error.Code", "Initial error"));
+var error = new ResultError("Validation.Error", "Validation failed");
 
-// Ensure validation with IgnoreOnFailure option
-var result = aggregate.Ensure(() => true, new ResultError("Validation.Error", "Validation failed"), EnsureOnFailure.IgnoreOnFailure);
+// Default ValidateOnFailure: the guard always runs, so every failure is collected
+var validated = ResultAggregate.Create();
+validated.AddResult(new ResultError("Error.Code", "Initial error"));
+validated.Ensure(() => false, error);
 
-// Ensure validation with default ValidateOnFailure option
-var resultWithValidation = aggregate.Ensure(() => false, new ResultError("Validation.Error", "Validation failed"));
+int validatedCount = validated.Results.Count; // 2 — both errors are recorded
 
-bool isSuccess = result.IsSuccess; // true
-bool isFailure = result.IsFailure; // false
+// IgnoreOnFailure: the guard is skipped once the aggregate has already failed
+var ignored = ResultAggregate.Create();
+ignored.AddResult(new ResultError("Error.Code", "Initial error"));
+ignored.Ensure(() => false, error, EnsureOnFailure.IgnoreOnFailure);
 
-bool isValidationSuccess = resultWithValidation.IsSuccess; // false
-bool isValidationFailure = resultWithValidation.IsFailure; // true
+int ignoredCount = ignored.Results.Count; // 1 — the guard did not run
+
+bool isFailure = validated.IsFailure && ignored.IsFailure; // true
 ```
 
 ## AI Coding Assistants

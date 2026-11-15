@@ -91,12 +91,12 @@ Result<decimal> d = intResult.Select(i => (decimal)i);
 ### SelectMany — multi-step pipeline (LINQ query syntax)
 
 ```csharp
-var result = from order    in GetOrder(orderId)
-             from customer in GetCustomer(order.CustomerId)
-             select new OrderDto(order, customer);
+var queryResult = from order    in GetOrder(orderId)
+                  from customer in GetCustomer(order.CustomerId)
+                  select new OrderDto(order, customer);
 
 // Equivalent method syntax
-var result = orderResult.SelectMany(
+var methodResult = orderResult.SelectMany(
     order    => GetCustomer(order.CustomerId),
     (order, customer) => new OrderDto(order, customer)
 );

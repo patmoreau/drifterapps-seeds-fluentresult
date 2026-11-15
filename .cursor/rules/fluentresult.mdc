@@ -59,7 +59,7 @@ result.Match(
     onFailure: error  => HandleError(error)
 );
 
-Result<TOut> out = result.Match<TOut>(
+Result<TOut> output = result.Match<TOut>(
     onSuccess: value => Convert(value).ToResult(),
     onFailure: error  => error.ToResult<TOut>()
 );
@@ -75,9 +75,9 @@ result.OnFailure(error => logger.LogError(error.Code));
 Result<string> s = intResult.Select(i => i.ToString());
 
 // SelectMany — LINQ query syntax for pipelines
-var result = from order    in GetOrder(orderId)
-             from customer in GetCustomer(order.CustomerId)
-             select new OrderDto(order, customer);
+var dto = from order    in GetOrder(orderId)
+          from customer in GetCustomer(order.CustomerId)
+          select new OrderDto(order, customer);
 ```
 
 ## Async

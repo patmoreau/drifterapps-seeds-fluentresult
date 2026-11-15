@@ -111,6 +111,9 @@ public sealed class UserRepository : IUserRepository
 
 ### Using LINQ query syntax (preferred for 3+ steps)
 
+Every step of a query must have the same shape: once the first `from` is a
+`Task<Result<T>>`, lift each synchronous `Result<T>` step with `.ToTask()`.
+
 ```csharp
 public sealed class UserService
 {
@@ -122,10 +125,10 @@ public sealed class UserService
         Guid userId, string newEmail, CancellationToken ct)
     {
         return from user    in _repo.FindByIdAsync(userId, ct)
-               from _       in EnsureEmailNotTaken(newEmail, ct)
-               from updated in user.ChangeEmail(newEmail).ToTask()
-               from __      in _repo.SaveAsync(updated, ct)
-               select updated;
+               from free    in EnsureEmailNotTaken(newEmail, ct)
+               from changed in user.ChangeEmail(newEmail).ToTask()
+               from saved   in _repo.SaveAsync(user, ct)
+               select user;
     }
 
     private async Task<Result<Nothing>> EnsureEmailNotTaken(
@@ -173,7 +176,7 @@ public sealed class RegisterUserHandler
     }
 
     private Task<Result<User>> CreateAndSaveAsync(RegisterUserCommand cmd, CancellationToken ct) =>
-        from user in User.Create(cmd.Email, cmd.Name)
+        from user in User.Create(cmd.Email, cmd.Name).ToTask()
         from _    in _repo.SaveAsync(user, ct)
         select user;
 
@@ -346,7 +349,7 @@ public sealed class CreateOrderHandler
     public Task<Result<Order>> Handle(
         CreateOrderCommand request, CancellationToken ct) =>
         from customer in _customers.FindByIdAsync(request.CustomerId, ct)
-        from order    in Order.Create(customer, request.Lines)
+        from order    in Order.Create(customer, request.Lines).ToTask()
         from _        in _orders.SaveAsync(order, ct)
         select order;
 }
@@ -366,7 +369,7 @@ public async Task<Result<Invoice>> GenerateInvoiceAsync(
         .OnSuccess(order => ValidateOrderForInvoicing(order))
         .OnSuccess(order => _invoiceGenerator.GenerateAsync(order, ct))
         .OnSuccess(invoice => _invoices.SaveAsync(invoice, ct)
-            .OnSuccess(_ => invoice));
+            .OnSuccess(_ => invoice.ToResult()));
 }
 ```
 
@@ -375,14 +378,20 @@ public async Task<Result<Invoice>> GenerateInvoiceAsync(
 ## Pure Transformations with Select
 
 ```csharp
-// Map success value without possibility of failure
-Result<string> emailDisplay = _repo.FindByIdAsync(id, ct)
-    .Select(user => user.Email);
+Result<User> user = await _repo.FindByIdAsync(id, ct);
 
-// Chain Select in a pipeline
-Result<UserDto> dto = from user in _repo.FindByIdAsync(id, ct)
-                      select new UserDto(user.Id, user.Email, user.Name);
+// Map success value without possibility of failure
+Result<string> emailDisplay = user.Select(u => u.Email);
+
+// Same transformation in query syntax
+Result<UserDto> dto = from u in user
+                      select new UserDto(u.Id, u.Email, u.Name);
 ```
+
+On a `Task<Result<T>>`, `Select` takes an asynchronous selector
+(`Func<T, Task<TResult>>`), so a query with a single `from` over a task needs one.
+Queries with two or more `from` clauses are unaffected: their final `select` goes
+through `SelectMany`, which takes a synchronous projection.
 
 ---
 
@@ -404,13 +413,12 @@ public class UserServiceTests
         _repo.FindByIdAsync(userId, default).Returns(user.ToResult());
         _repo.FindByEmailAsync("new@example.com", default)
              .Returns(User.Errors.NotFound(Guid.Empty).ToResult<User>());
-        _repo.SaveAsync(Arg.Any<User>(), default).Returns(Nothing.Value);
+        _repo.SaveAsync(Arg.Any<User>(), default).Returns(Nothing.Value.ToResult());
 
         var result = await _sut.ChangeEmailAsync(userId, "new@example.com", default);
 
-        result.Should().BeSuccessful().And.WithValue(
-            result.Value with { });
-        result.Value.Email.Should().Be("new@example.com");
+        result.Should().BeSuccessful().And.WithValue(user);
+        user.Email.Should().Be("new@example.com");
     }
 
     [Fact]
@@ -465,7 +473,7 @@ public void Create_WithMultipleInvalidFields_ReturnsAllErrors()
 ## Pattern Matching with Deconstruct
 
 ```csharp
-Result<User> result = _repo.FindByIdAsync(id, ct);
+Result<User> result = await _repo.FindByIdAsync(id, ct);
 
 // Deconstruct the error for pattern matching
 if (result.IsFailure)

@@ -35,29 +35,30 @@ public sealed class OrderProcessor
                .OnSuccess(order => _inventory.ReserveAsync(order, ct))
                .OnSuccess(order => _payment.ChargeAsync(order, ct))
                .OnSuccess(confirmation => _notifications.SendConfirmationAsync(confirmation, ct)
-                   .OnSuccess(_ => confirmation))
+                   .OnSuccess(_ => confirmation.ToResult()))
                .OnFailure(err => _audit.LogAsync("Order processing failed", err, ct));
 
     // LINQ query syntax — preferred when steps have named intermediate values.
+    // Every step must be a Task<Result<T>>: lift sync steps with ToTask().
     public Task<Result<Invoice>> GenerateInvoiceAsync(Guid orderId, CancellationToken ct) =>
         from order    in _orders.FindByIdAsync(orderId, ct)
         from customer in _orders.FindCustomerAsync(order.CustomerId, ct)
-        from invoice  in CreateInvoice(order, customer)
+        from invoice  in CreateInvoice(order, customer).ToTask()
         from _        in _orders.SaveInvoiceAsync(invoice, ct)
         select invoice;
 
-    // Mixing sync and async: implicit Task<Result<T>> conversion handles the transition.
-    public Task<Result<OrderSummary>> SummarizeOrderAsync(Guid orderId, CancellationToken ct) =>
+    // Mixing sync and async: OnSuccess on a Task<Result<T>> accepts a sync step.
+    public Task<Result<OrderTotals>> SummarizeOrderAsync(Guid orderId, CancellationToken ct) =>
         _orders.FindByIdAsync(orderId, ct)
-               .OnSuccess(order => BuildSummary(order)); // sync step — implicit conversion applied
+               .OnSuccess(order => BuildSummary(order)); // sync step, no ToTask() needed
 
     private static Result<Invoice> CreateInvoice(Order order, Customer customer) =>
         order.Lines.Count == 0
             ? InvoiceErrors.EmptyOrder
             : new Invoice(Guid.NewGuid(), order, customer);
 
-    private static Result<OrderSummary> BuildSummary(Order order) =>
-        new OrderSummary(order.Id, order.Lines.Count, order.Total);
+    private static Result<OrderTotals> BuildSummary(Order order) =>
+        new OrderTotals(order.Id, order.Lines.Count, order.Total);
 
     private static class InvoiceErrors
     {
@@ -72,6 +73,7 @@ public sealed record OrderLine(string ProductCode, int Quantity, decimal UnitPri
 public sealed record Customer(Guid Id, string Name, string Email);
 public sealed record OrderConfirmation(Guid OrderId, string ConfirmationNumber);
 public sealed record Invoice(Guid Id, Order Order, Customer Customer);
+public sealed record OrderTotals(Guid OrderId, int LineCount, decimal Total);
 
 public interface IOrderRepository
 {
